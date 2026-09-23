@@ -49,7 +49,85 @@ $namesPayment .= '"--"';
 	<link href="../css/bootstrap-responsive.min.css" rel="stylesheet">
 	<link id="base-style" href="../css/style.css" rel="stylesheet">
 	<link id="base-style-responsive" href="../css/style-responsive.css" rel="stylesheet">
-	<script src="../js/inputInt.js"></script>
+	<style>
+		/* Strongly emphasized form controls to ensure they are instantly noticeable */
+		.form-control-notice {
+			background-color: #f8fafc !important;
+			border: 2px solid #718096 !important;
+			border-radius: 4px !important;
+			color: #1a202c !important;
+			font-weight: 500;
+			box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+			padding: 6px 10px !important;
+			height: auto !important;
+			min-height: 30px;
+		}
+		.form-control-notice:focus {
+			background-color: #ffffff !important;
+			border-color: #3182ce !important;
+			box-shadow: inset 0 1px 2px rgba(0,0,0,0.05), 0 0 6px rgba(49, 130, 206, 0.5) !important;
+		}
+		select.form-control-notice {
+			height: 34px !important;
+		}
+
+		/* Modern Confirmation Modal Styling */
+		.custom-modal-overlay {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.5);
+			z-index: 9999;
+			justify-content: center;
+			align-items: center;
+			animation: fadeIn 0.2s ease-in-out;
+		}
+		.custom-modal-card {
+			background: #ffffff;
+			width: 100%;
+			max-width: 400px;
+			border-radius: 8px;
+			box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+			overflow: hidden;
+			animation: scaleUp 0.2s ease-in-out;
+		}
+		.custom-modal-header {
+			padding: 16px 20px;
+			background: #f7fafc;
+			border-bottom: 1px solid #e2e8f0;
+			font-weight: bold;
+			font-size: 15px;
+			color: #2d3748;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		.custom-modal-body {
+			padding: 20px;
+			font-size: 14px;
+			color: #4a5568;
+			line-height: 1.5;
+		}
+		.custom-modal-footer {
+			padding: 12px 20px;
+			background: #f7fafc;
+			border-top: 1px solid #e2e8f0;
+			display: flex;
+			justify-content: flex-end;
+			gap: 10px;
+		}
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+		@keyframes scaleUp {
+			from { transform: scale(0.95); }
+			to { transform: scale(1); }
+		}
+	</style>
 	<!-- end: CSS -->
 	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
@@ -60,6 +138,7 @@ $namesPayment .= '"--"';
 	<![endif]-->
 	<!-- start: Favicon -->
 	<link rel="shortcut icon" href="../img/favicon.png">
+	<script src="../js/inputInt.js"></script>
 	<!-- end: Favicon -->
 <?php
 	$txtName = ( isset($_POST['txtName']) && !empty($_POST['txtName']) ) ? trim($_POST['txtName']) : '';
@@ -103,114 +182,153 @@ if( isset($_POST['btnSave']) ){
 <!-- body content: start here-->
 <div class="row-fluid">
 	<div class="box span12">
-		<div class="box-header" data-original-title>
+		<div class="box-header" data-original-title style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
 			<h2><i class="halflings-icon white edit"></i><span class="break"></span>Supplier / Payee Add Form</h2>
 		</div>
-		<div class="box-content">
-			<form class="form-horizontal" method="post">
-				<table width="80%" align="center" border="0" class="table table-bordered" style="background-color:#E4E1E1">
-					<tr>
-						<td width="17%" height="30"><div align="right">Supplier / Payee Name</div></td>
-						<td width="43%"><input type="text" name="txtName" id="txtName" class="span6" value="<?php echo $txtName?>" required></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Address</div></td>
-						<td><input type="text" name="txtAddress" id="txtAddress" class="span6" value="<?php echo $txtAddress?>" /></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Phone Number 1</div></td>
-						<td><input type="text" name="txtPhone1" id="txtPhone1" class="span6" value="<?php echo $txtPhone1?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Phone Number 2</div></td>
-						<td><input type="text" name="txtPhone2" id="txtPhone2" class="span6" value="<?php echo $txtPhone2?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Cell Number 1</div></td>
-						<td><input type="text" name="txtCell1" id="txtCell1" class="span6" value="<?php echo $txtCell1?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Cell Number 2</div></td>
-						<td><input type="text" name="txtCell2" id="txtCell2" class="span6" value="<?php echo $txtCell2?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Bank 1</div></td>
-						<td><input type="text" name="txBank1" id="txBank1" class="span6" value="<?php echo $txBank1?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Bank 2</div></td>
-						<td><input type="text" name="txBank2" id="txBank2" class="span6" value="<?php echo $txBank2?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Bank 3</div></td>
-						<td><input type="text" name="txBank3" id="txBank3" class="span6" value="<?php echo $txBank3?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Tax Identification Number (TIN)</div></td>
-						<td><input type="text" name="txTIN" id="txTIN" class="span6" value="<?php echo $tin?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">E-mail Address</div></td>
-						<td><input type="text" name="txEmail" id="txEmail" class="span6" value="<?php echo $email_add?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Person</div></td>
-						<td><input type="text" name="txtConPerson" id="txtConPerson" class="span6" value="<?php echo $txtConPerson?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Person's Designation</div></td>
-						<td><input type="text" class="span6 typeahead" name="txtConPersonDesig" id="txtConPersonDesig" value="<?php echo $contact_designation?>" autocomplete='off' data-provide="typeahead" data-items="10" data-source='[<?php echo $namesCD;?>]'></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Type of Business</div></td>
-						<td><input type="text" class="span6 typeahead" name="txBusType" id="txBusType" value="<?php echo $business_type?>" autocomplete='off' data-provide="typeahead" data-items="10" data-source='[<?php echo $namesBusiness;?>]'></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Year Established</div></td>
-						<td><input type="text" name="txYrEst" id="txYrEst" class="span6" value="<?php echo $year_established?>" onkeypress="return checkinput(this, event);"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Payment Term</div></td>
-						<td><input type="text" name="txPayTerm" id="txPayTerm" class="span6" value="<?php echo $payment_term?>" autocomplete='off' data-provide="typeahead" data-items="10" data-source='[<?php echo $namesPayment;?>]'></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Accreditation Status</div></td>
-						<td>
-							<select name="selAccredited" id="selAccredited">
-								<option value="">--select--</option>
-								<option value="Accredited" <?php if($selAccredited=='Accredited')echo 'selected="selected"';?>>Accredited</option>
-								<option value="Pre-Accredited" <?php if($selAccredited=="Pre-Accredited")echo 'selected="selected"';?>>Pre-Accredited</option>
-								<option value="Not Accredited" <?php if($selAccredited=="Not Accredited")echo 'selected="selected"';?>>Not Accredited</option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Evaluation Status</div></td>
-						<td>
-							<select name="selEvaluated" id="selEvaluated">
-								<option value="">--select--</option>
-								<option value="Evaluated" <?php if($selEvaluated=='Evaluated')echo 'selected="selected"';?>>Evaluated</option>
-								<option value="Passed" <?php if($selEvaluated=='Passed')echo 'selected="selected"';?>>Passed</option>
-								<option value="Failed" <?php if($selEvaluated=='Failed')echo 'selected="selected"';?>>Failed</option>
-								<option value="N/A" <?php if($selEvaluated=='N/A')echo 'selected="selected"';?>>N/A</option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">VAT Status</div></td>
-						<td>
-							<select name="selVATStat" id="selVATStat">
-								<option value="non-vatable" <?php if($selVATStat=='non-vatable')echo 'selected="selected"';?>>Non-Vatable</option>
-								<option value="vatable" <?php if($selVATStat=='vatable')echo 'selected="selected"';?>>Vatable</option>
-							</select>
-						</td>
-					</tr>
-				</table>
-				<div align="center"><input type="submit" name="btnSave" id="btnSave" onClick="if(confirm('Do you want to save this information?')){return true;}else{return false;}" value=" ADD " class="btn btn-primary btn-small"></div>
+		<div class="box-content" style="background: #fdfdfd; padding: 20px;">
+			<form id="supplierForm" method="post" style="margin: 0;">
+				
+				<div style="width: 100%; box-sizing: border-box;">
+					<!-- Main Profile Header Banner (Editable Name & Meta) -->
+					<div style="background: #fff; border: 1px solid #cbd5e0; border-radius: 6px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-sizing: border-box; width: 100%;">
+						<div style="flex: 1; min-width: 280px;">
+							<label style="font-size: 11px; font-weight: bold; color: #4a5568; text-transform: uppercase; margin-bottom: 3px;">Supplier / Payee Name</label>
+							<input type="text" name="txtName" id="txtName" class="span12 form-control-notice" value="<?php echo htmlspecialchars($txtName); ?>" style="margin-bottom: 10px; font-weight: bold; font-size: 16px;" required>
+							
+							<div style="font-size: 13px; color: #666; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+								<span style="flex: 2; min-width: 200px;">
+									<strong style="display: block; font-size: 11px; margin-bottom: 2px; color: #4a5568;">Business Type:</strong>
+									<input type="text" class="span12 typeahead form-control-notice" name="txBusType" id="txBusType" value="<?php echo htmlspecialchars($business_type); ?>" autocomplete='off' data-provide="typeahead" data-items="10" data-source='[<?php echo $namesBusiness;?>]'>
+								</span>
+								<span style="flex: 0.8; min-width: 90px;">
+									<strong style="display: block; font-size: 11px; margin-bottom: 2px; color: #4a5568;">Year Established:</strong>
+									<input type="text" name="txYrEst" id="txYrEst" class="span12 form-control-notice" value="<?php echo htmlspecialchars($year_established); ?>" onkeypress="return checkinput(this, event);">
+								</span>
+								<span style="flex: 0.8; min-width: 90px;">
+									<strong style="display: block; font-size: 11px; margin-bottom: 2px; color: #4a5568;">VAT Status:</strong>
+									<select name="selVATStat" id="selVATStat" class="span12 form-control-notice">
+										<option value="non-vatable" <?php if($selVATStat=='non-vatable')echo 'selected="selected"';?>>Non-Vatable</option>
+										<option value="vatable" <?php if($selVATStat=='vatable')echo 'selected="selected"';?>>Vatable</option>
+									</select>
+								</span>
+							</div>
+						</div>
+						<div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+							<div>
+								<label style="font-size: 11px; font-weight: bold; color: #4a5568; text-transform: uppercase; margin-bottom: 3px;">Accreditation</label>
+								<select name="selAccredited" id="selAccredited" class="span12 form-control-notice">
+									<option value="">--select--</option>
+									<option value="Accredited" <?php if($selAccredited=='Accredited')echo 'selected="selected"';?>>Accredited</option>
+									<option value="Pre-Accredited" <?php if($selAccredited=="Pre-Accredited")echo 'selected="selected"';?>>Pre-Accredited</option>
+									<option value="Not Accredited" <?php if($selAccredited=="Not Accredited")echo 'selected="selected"';?>>Not Accredited</option>
+								</select>
+							</div>
+							<div>
+								<label style="font-size: 11px; font-weight: bold; color: #4a5568; text-transform: uppercase; margin-bottom: 3px;">Evaluation</label>
+								<select name="selEvaluated" id="selEvaluated" class="span12 form-control-notice">
+									<option value="">--select--</option>
+									<option value="Evaluated" <?php if($selEvaluated=='Evaluated')echo 'selected="selected"';?>>Evaluated</option>
+									<option value="Passed" <?php if($selEvaluated=='Passed')echo 'selected="selected"';?>>Passed</option>
+									<option value="Failed" <?php if($selEvaluated=='Failed')echo 'selected="selected"';?>>Failed</option>
+									<option value="N/A" <?php if($selEvaluated=='N/A')echo 'selected="selected"';?>>N/A</option>
+								</select>
+							</div>
+						</div>
+					</div>
+
+					<!-- Two-Column Grid Layout for Details Editing -->
+					<div style="display: flex; gap: 20px; flex-wrap: wrap; box-sizing: border-box; width: 100%; margin: 0;">
+						
+						<!-- Left Column: Contact & Location Info -->
+						<div style="background: #fff; border: 1px solid #cbd5e0; border-radius: 6px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05); flex: 1; min-width: 300px;">
+							<h4 style="border-bottom: 2px solid #edf2f7; padding-bottom: 8px; margin-top: 0; color: #2d3748; font-size: 14px; text-transform: uppercase;"><i class="halflings-icon map-marker"></i> Contact & Location Information</h4>
+							
+							<div style="margin-bottom: 12px; font-size: 13px;">
+								<strong style="color: #4a5568; display: block; margin-bottom: 2px;">Address:</strong>
+								<input type="text" name="txtAddress" id="txtAddress" class="span12 form-control-notice" value="<?php echo htmlspecialchars($txtAddress); ?>">
+							</div>
+
+							<div style="margin-bottom: 12px; font-size: 13px;">
+								<strong style="color: #4a5568; display: block; margin-bottom: 2px;">Contact Person & Designation:</strong>
+								<div style="display: flex; gap: 10px;">
+									<input type="text" name="txtConPerson" id="txtConPerson" class="span6 form-control-notice" value="<?php echo htmlspecialchars($txtConPerson); ?>" placeholder="Contact Person">
+									<input type="text" class="span6 typeahead form-control-notice" name="txtConPersonDesig" id="txtConPersonDesig" value="<?php echo htmlspecialchars($contact_designation); ?>" autocomplete='off' data-provide="typeahead" data-items="10" data-source='[<?php echo $namesCD;?>]' placeholder="Designation">
+								</div>
+							</div>
+
+							<div style="margin-bottom: 12px; font-size: 13px;">
+								<strong style="color: #4a5568; display: block; margin-bottom: 2px;">Email Address:</strong>
+								<input type="text" name="txEmail" id="txEmail" class="span12 form-control-notice" value="<?php echo htmlspecialchars($email_add); ?>">
+							</div>
+
+							<div style="margin-bottom: 5px; font-size: 13px;">
+								<strong style="color: #4a5568; display: block; margin-bottom: 6px;">Phone & Mobile Numbers:</strong>
+								<div style="display: flex; flex-direction: column; gap: 8px;">
+									<input type="text" name="txtPhone1" id="txtPhone1" class="span12 form-control-notice" value="<?php echo htmlspecialchars($txtPhone1); ?>" placeholder="Phone Number 1">
+									<input type="text" name="txtPhone2" id="txtPhone2" class="span12 form-control-notice" value="<?php echo htmlspecialchars($txtPhone2); ?>" placeholder="Phone Number 2">
+									<input type="text" name="txtCell1" id="txtCell1" class="span12 form-control-notice" value="<?php echo htmlspecialchars($txtCell1); ?>" placeholder="Cell Number 1">
+									<input type="text" name="txtCell2" id="txtCell2" class="span12 form-control-notice" value="<?php echo htmlspecialchars($txtCell2); ?>" placeholder="Cell Number 2">
+								</div>
+							</div>
+						</div>
+
+						<!-- Right Column: Financial & Banking Info -->
+						<div style="background: #fff; border: 1px solid #cbd5e0; border-radius: 6px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05); flex: 1; min-width: 300px;">
+							<h4 style="border-bottom: 2px solid #edf2f7; padding-bottom: 8px; margin-top: 0; color: #2d3748; font-size: 14px; text-transform: uppercase;"><i class="halflings-icon credit-card"></i> Financial & Banking Details</h4>
+							
+							<div style="margin-bottom: 12px; font-size: 13px;">
+								<strong style="color: #4a5568; display: block; margin-bottom: 2px;">Tax Identification Number (TIN):</strong>
+								<input type="text" name="txTIN" id="txTIN" class="span12 form-control-notice" value="<?php echo htmlspecialchars($tin); ?>">
+							</div>
+
+							<div style="margin-bottom: 12px; font-size: 13px;">
+								<strong style="color: #4a5568; display: block; margin-bottom: 2px;">Payment Terms:</strong>
+								<input type="text" name="txPayTerm" id="txPayTerm" class="span12 form-control-notice" value="<?php echo htmlspecialchars($payment_term); ?>" autocomplete='off' data-provide="typeahead" data-items="10" data-source='[<?php echo $namesPayment;?>]'>
+							</div>
+
+							<div style="margin-bottom: 5px; font-size: 13px;">
+								<strong style="color: #4a5568; display: block; margin-bottom: 6px;">Registered Bank Accounts:</strong>
+								<div style="display: flex; flex-direction: column; gap: 8px;">
+									<input type="text" name="txBank1" id="txBank1" class="span12 form-control-notice" value="<?php echo htmlspecialchars($txBank1); ?>" placeholder="Bank Account 1">
+									<input type="text" name="txBank2" id="txBank2" class="span12 form-control-notice" value="<?php echo htmlspecialchars($txBank2); ?>" placeholder="Bank Account 2">
+									<input type="text" name="txBank3" id="txBank3" class="span12 form-control-notice" value="<?php echo htmlspecialchars($txBank3); ?>" placeholder="Bank Account 3">
+								</div>
+							</div>
+						</div>
+
+					</div>
+				</div>
+
+				<!-- Save Action Toolbar -->
+				<div style="margin-top: 25px; text-align: center; display: flex; gap: 10px; justify-content: center;">
+					<button type="button" id="openConfirmModal" class="btn btn-primary">
+						<i class="halflings-icon white ok"></i> ADD
+					</button>
+					<a href="supplier_add.php" class="btn btn-default">
+						<i class="halflings-icon remove"></i> Cancel
+					</a>
+				</div>
 			</form>
 		</div>
 	</div><!--/span-->
 </div><!--/row-->
+
+<!-- Modern Confirmation Modal Box -->
+<div id="confirmModal" class="custom-modal-overlay">
+	<div class="custom-modal-card">
+		<div class="custom-modal-header">
+			<i class="halflings-icon question-sign" style="color: #3182ce;"></i> Confirm Action
+		</div>
+		<div class="custom-modal-body">
+			Do you want to save this information?
+		</div>
+		<div class="custom-modal-footer">
+			<button type="button" id="cancelModalBtn" class="btn btn-default" style="padding: 4px 12px;">Cancel</button>
+			<button type="button" id="confirmSaveBtn" class="btn btn-primary" style="padding: 4px 12px;">Yes, Save</button>
+		</div>
+	</div>
+</div>
+
 <!-- body content: end here-->
 <!-- start: JavaScript-->
 <script src="../js/jquery-1.9.1.min.js"></script>
@@ -243,6 +361,43 @@ if( isset($_POST['btnSave']) ){
 <script src="../js/counter.js"></script>
 <script src="../js/retina.js"></script>
 <script src="../js/custom.js"></script>
+<script>
+	$(document).ready(function() {
+		// Show modal when ADD is clicked
+		$('#openConfirmModal').on('click', function(e) {
+			e.preventDefault();
+			var form = document.getElementById('supplierForm');
+			if (form.checkValidity()) {
+				$('#confirmModal').css('display', 'flex');
+			} else {
+				form.reportValidity();
+			}
+		});
+
+		// Close modal on Cancel
+		$('#cancelModalBtn').on('click', function() {
+			$('#confirmModal').hide();
+		});
+
+		// Submit form when confirmed
+		$('#confirmSaveBtn').on('click', function() {
+			$('<input>').attr({
+				type: 'hidden',
+				name: 'btnSave',
+				value: '1'
+			}).appendTo('#supplierForm');
+			
+			$('#supplierForm').submit();
+		});
+
+		// Close modal if clicking outside the card
+		$('#confirmModal').on('click', function(e) {
+			if (e.target === this) {
+				$(this).hide();
+			}
+		});
+	});
+</script>
 <?php if(isset($_SESSION['notif_success'])){?>
 <script src="../js/notify.min.js"></script>
 <script type="text/javascript">

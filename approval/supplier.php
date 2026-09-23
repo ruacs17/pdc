@@ -39,81 +39,137 @@ else
 	$qDisp = $db->select('supplier','*',$arrVal,'ORDER BY name');
 $arrDisp=array();
 while($rDisp = $db->fetch_array($qDisp)):
-	$contact = ($rDisp['contactPhoneNo']) ? $rDisp['contactPhoneNo'].' <br>' : '';
-	$contact .= ($rDisp['contactPhoneNo2']) ? $rDisp['contactPhoneNo2'].' <br>' : '';
-	$contact .= ($rDisp['contactCellNo']) ? $rDisp['contactCellNo'].' <br>' : '';
-	$contact .= ($rDisp['contactCellNo2']) ? $rDisp['contactCellNo2'].' <br>' : '';
+	$contact = ($rDisp['contactPhoneNo']) ? $rDisp['contactPhoneNo'].'<br>' : '';
+	$contact .= ($rDisp['contactPhoneNo2']) ? $rDisp['contactPhoneNo2'].'<br>' : '';
+	$contact .= ($rDisp['contactCellNo']) ? $rDisp['contactCellNo'].'<br>' : '';
+	$contact .= ($rDisp['contactCellNo2']) ? $rDisp['contactCellNo2'].'<br>' : '';
 	$arrDisp[] = array('supplierID'=>$rDisp['supplierID'],'name'=>$rDisp['name'],'address'=>$rDisp['address'],'contactPhoneNo'=>$contact,'business_type'=>$rDisp['business_type'],'accredited'=>$rDisp['accredited'],'evaluated'=>$rDisp['evaluated'],'vat'=>$rDisp['vat']);
 endwhile;
 if(count($arrDisp))
 	functions::sortMultiArray($arrDisp,$orderBy,$sort_AscDesc);
 ?>
 <!-- body content: start here-->
-<div align="right"><a id="adc" href="#" class="btn btn-info btn-small btn-setting thickbox" onclick="showThis(this.id,'supplier_add.php?','Supplier Detail')">Add New Supplier / Payee</a></div><br>
 <div class="row-fluid">
 	<div class="box span12">
-		<div class="box-header" data-original-title>
-			<h2><i class="halflings-icon white list-alt"></i><span class="break"></span>Supplier / Payee List</h2>
+		<div class="box-header" data-original-title style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
+			<h2><i class="halflings-icon white list-alt"></i><span class="break"></span>Supplier / Payee Directory</h2>
+			<div>
+				<a id="adc" href="#" class="btn btn-success btn-small btn-setting thickbox" onclick="showThis(this.id,'supplier_add.php?','Supplier Detail')">
+					<i class="halflings-icon white plus"></i> Add New Supplier
+				</a>
+			</div>
 		</div>
 		<div class="box-content">
-			<form method="post">
-				<div align="center">
-					<table border="0">
-						<tr>
-							<td style="padding-top: 7px;"><input type="text" name="txSupName" id="txSupName" value="<?php echo $searchVal?>"></td>
-							<td style="padding-top: 7px;">&nbsp;
-								<select name="selAccredited" id="selAccredited" style="width: 150px;">
-									<option value="">--Accreditation--</option>
-									<option value="Accredited" <?php if($selAccredited=='Accredited')echo 'selected="selected"';?>>Accredited</option>
-									<option value="Pre-Accredited" <?php if($selAccredited=="Pre-Accredited")echo 'selected="selected"';?>>Pre-Accredited</option>
-									<option value="Not Accredited" <?php if($selAccredited=="Not Accredited")echo 'selected="selected"';?>>Not Accredited</option>
-								</select>&nbsp;
-							</td>
-							<td style="padding-top: 7px;">&nbsp;
-								<select name="selEvaluated" id="selEvaluated" style="width: 150px;">
-									<option value="">--Evaluation--</option>
-									<option value="Evaluated" <?php if($selEvaluated=='Evaluated')echo 'selected="selected"';?>>Evaluated</option>
-									<option value="Passed" <?php if($selEvaluated=='Passed')echo 'selected="selected"';?>>Passed</option>
-									<option value="Failed" <?php if($selEvaluated=='Failed')echo 'selected="selected"';?>>Failed</option>
-								</select>&nbsp;
-							</td>
-							<td>&nbsp;&nbsp;<input type="submit" class="btn btn-info btn-small" name="btnSearch" id="btnSearch" value="Search"></td>
-							<td>&nbsp;&nbsp;<input type="submit" class="btn btn-info btn-small" name="btnAll" id="btnAll" value="View All"></td>
-						</tr>
-					</table>
+			<!-- Search / Filter Form Toolbar -->
+			<form method="post" class="form-inline" style="margin-bottom: 20px; background: #f9f9f9; padding: 15px; border: 1px solid #ddd; border-radius: 4px;">
+				<div class="row-fluid" style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+					<input type="text" name="txSupName" id="txSupName" value="<?php echo htmlspecialchars($searchVal); ?>" placeholder="Search name or type..." class="span3" style="margin-bottom: 0;">
+					
+					<select name="selAccredited" id="selAccredited" class="span3" style="margin-bottom: 0;">
+						<option value="">-- All Accreditations --</option>
+						<option value="Accredited" <?php if($selAccredited=='Accredited')echo 'selected="selected"';?>>Accredited</option>
+						<option value="Pre-Accredited" <?php if($selAccredited=="Pre-Accredited")echo 'selected="selected"';?>>Pre-Accredited</option>
+						<option value="Not Accredited" <?php if($selAccredited=="Not Accredited")echo 'selected="selected"';?>>Not Accredited</option>
+					</select>
+					
+					<select name="selEvaluated" id="selEvaluated" class="span3" style="margin-bottom: 0;">
+						<option value="">-- All Evaluations --</option>
+						<option value="Evaluated" <?php if($selEvaluated=='Evaluated')echo 'selected="selected"';?>>Evaluated</option>
+						<option value="Pass" <?php if($selEvaluated=='Pass')echo 'selected="selected"';?>>Pass</option>
+						<option value="Failed" <?php if($selEvaluated=='Failed')echo 'selected="selected"';?>>Failed</option>
+						<option value="N/A" <?php if($selEvaluated=='N/A')echo 'selected="selected"';?>>N/A</option>
+					</select>
+					
+					<div style="display: flex; gap: 5px;">
+						<button type="submit" class="btn btn-info btn-small" name="btnSearch" id="btnSearch"><i class="halflings-icon white search"></i> Search</button>
+						<button type="submit" class="btn btn-default btn-small" name="btnAll" id="btnAll">View All</button>
+					</div>
 				</div>
 			</form>
-			<table id="tblist" class="table <?php if(!isset($_SESSION['notif_id_list'])){echo 'table-bordered';} ?> table-hover" style="font-size: 12px;">
-				<thead>
-					<tr style="background-color:#CCC;">
-						<th width="20%" scope="col"><a href="?srch=<?php echo $searchVal?>&orderBy=<?php echo functions::encode('name').'&ascDes='.$ascDes?>">NAME</a></th>
-						<th width="20%" scope="col"><a href="?srch=<?php echo $searchVal?>&orderBy=<?php echo functions::encode('address').'&ascDes='.$ascDes?>">ADDRESS</a></th>
-						<th width="15%" scope="col"><a href="?srch=<?php echo $searchVal?>&orderBy=<?php echo functions::encode('contactPhoneNo').'&ascDes='.$ascDes?>">CONTACT #</a></th>
-						<th width="11%" scope="col"><a href="?srch=<?php echo $searchVal?>&orderBy=<?php echo functions::encode('business_type').'&ascDes='.$ascDes?>">BUSINESS TYPE</a></th>
-						<th width="11%" scope="col"><a href="?srch=<?php echo $searchVal?>&orderBy=<?php echo functions::encode('accredited').'&ascDes='.$ascDes?>">ACCREDITATION</a></th>
-						<th width="11%" scope="col"><a href="?srch=<?php echo $searchVal?>&orderBy=<?php echo functions::encode('evaluated').'&ascDes='.$ascDes?>">EVALUATION</a></th>
-						<th width="9%" scope="col"><div align="center">OPTIONS</div></th>
-					</tr>
-				</thead>
-				<tbody>
+
+			<!-- Sorting & Count Control Bar -->
+			<div style="margin-bottom: 15px; font-size: 12px; color: #555; display: flex; justify-content: space-between; align-items: center; background: #f1f1f1; padding: 8px 12px; border-radius: 4px; flex-wrap: wrap; gap: 10px;">
+				<span>Showing <strong><?php echo count($arrDisp); ?></strong> suppliers</span>
+				<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+					<span style="color: #333; font-weight: bold;">Sort by:</span>
+					<a href="?srch=<?php echo urlencode($searchVal)?>&orderBy=<?php echo functions::encode('name').'&ascDes='.$ascDes?>" class="btn btn-mini <?php echo ($orderBy=='name') ? 'btn-info' : 'btn-default'; ?>">Name</a>
+					<a href="?srch=<?php echo urlencode($searchVal)?>&orderBy=<?php echo functions::encode('address').'&ascDes='.$ascDes?>" class="btn btn-mini <?php echo ($orderBy=='address') ? 'btn-info' : 'btn-default'; ?>">Address</a>
+					<a href="?srch=<?php echo urlencode($searchVal)?>&orderBy=<?php echo functions::encode('business_type').'&ascDes='.$ascDes?>" class="btn btn-mini <?php echo ($orderBy=='business_type') ? 'btn-info' : 'btn-default'; ?>">Business Type</a>
+					<a href="?srch=<?php echo urlencode($searchVal)?>&orderBy=<?php echo functions::encode('accredited').'&ascDes='.$ascDes?>" class="btn btn-mini <?php echo ($orderBy=='accredited') ? 'btn-info' : 'btn-default'; ?>">Accreditation</a>
+					<a href="?srch=<?php echo urlencode($searchVal)?>&orderBy=<?php echo functions::encode('evaluated').'&ascDes='.$ascDes?>" class="btn btn-mini <?php echo ($orderBy=='evaluated') ? 'btn-info' : 'btn-default'; ?>">Evaluation</a>
+				</div>
+			</div>
+
+			<!-- Full-Width List Container -->
+			<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box;" id="tblist">
+			<?php if(count($arrDisp) > 0): ?>
 				<?php foreach($arrDisp as $itm):?>
-					<tr id="rw<?php echo $itm['supplierID']?>">
-						<td style="font-size: 14px;"><?php echo $itm['name']; echo ($itm['vat']) ? ' <i>('.$itm['vat'].')</i>' : '';?></td>
-						<td><?php echo $itm['address']?></td>
-						<td><?php echo $itm['contactPhoneNo'];?></td>
-						<td><?php echo $itm['business_type']?></td>
-						<td><?php echo ($itm['accredited']) ? $itm['accredited'] : '----';?></td>
-						<td><?php echo ($itm['evaluated']) ? $itm['evaluated'] : '----';?></td>
-						<td>
-							<div align="center">
-								<a id="vw<?php echo $itm['supplierID']?>" class="btn btn-mini btn-info thickbox" title="Supplier Detail" data-rel="tooltip" onclick="showThis(this.id,'supplier_view.php?sid=<?php echo functions::encode($itm['supplierID']);?>','Supplier Detail','1')"><i class="halflings-icon white zoom-in"></i></a>
-								<a id="edit<?php echo $itm['supplierID']?>" class="btn btn-mini btn-warning thickbox" title="Modify this Supplier" data-rel="tooltip" onclick="showThis(this.id,'supplier_edit.php?sid=<?php echo functions::encode($itm['supplierID']);?>','Supplier Detail')"><i class="halflings-icon white pencil"></i></a>
+					<div id="rw<?php echo $itm['supplierID']?>" style="background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+						
+						<!-- Left Section: Name, Type & Badges -->
+						<div style="flex: 2; padding-right: 15px;">
+							<div style="font-size: 15px; font-weight: bold; color: #333; margin-bottom: 6px;">
+								<?php echo htmlspecialchars($itm['name']); ?>
+								<?php echo ($itm['vat']) ? '<small style="font-weight: normal; color: #777;">('.htmlspecialchars($itm['vat']).')</small>' : '';?>
 							</div>
-						</td>
-					</tr>
+							<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12px;">
+								<span style="color: #666;"><strong>Business Type:</strong> <span style="background: #f1f1f1; padding: 2px 8px; border-radius: 4px; color: #333;"><?php echo htmlspecialchars($itm['business_type'] ? $itm['business_type'] : 'General'); ?></span></span>
+								<?php 
+									// Accreditation Badge Styling
+									$acc = $itm['accredited'];
+									$badgeClass = 'label';
+									if($acc == 'Accredited') $badgeClass .= ' label-success';
+									elseif($acc == 'Pre-Accredited') $badgeClass .= ' label-warning';
+									elseif($acc == 'Not Accredited') $badgeClass .= ' label-important';
+									
+									echo ($acc) ? '<span class="'.$badgeClass.'">'.htmlspecialchars($acc).'</span>' : '';
+
+									// Evaluation Badge Styling & Icons (Clean visual indicator without "Eval:" text)
+									$eval = $itm['evaluated'];
+									$evalClass = 'label';
+									$evalIcon = '';
+									if($eval == 'Pass' || $eval == 'Passed') {
+										$evalClass .= ' label-success';
+										$evalIcon = '<i class="halflings-icon white ok"></i>';
+									} elseif($eval == 'Evaluated') {
+										$evalClass .= ' label-info';
+										$evalIcon = '<i class="halflings-icon white eye-open"></i>';
+									} elseif($eval == 'Failed') {
+										$evalClass .= ' label-important';
+										$evalIcon = '<i class="halflings-icon white remove"></i>';
+									} else { // N/A or default
+										$evalClass .= ' label-default';
+										$evalIcon = '<i class="halflings-icon white minus"></i>';
+									}
+									
+									echo ($eval) ? '<span class="'.$evalClass.'" title="Evaluation Status: '.htmlspecialchars($eval).'" data-rel="tooltip">'.$evalIcon.' '.htmlspecialchars($eval).'</span>' : '';
+								?>
+							</div>
+						</div>
+
+						<!-- Middle Section: Address & Contact Details -->
+						<div style="flex: 2; padding-right: 15px; font-size: 12px; color: #555; border-left: 1px solid #f0f0f0; border-right: 1px solid #f0f0f0; padding-left: 15px;">
+							<p style="margin: 0 0 4px 0;"><strong>Address:</strong> <?php echo htmlspecialchars($itm['address'] ? $itm['address'] : 'No address provided'); ?></p>
+							<?php if($itm['contactPhoneNo']): ?>
+								<p style="margin: 0;"><strong>Contact Numbers:</strong><br><?php echo $itm['contactPhoneNo']; ?></p>
+							<?php endif; ?>
+						</div>
+
+						<!-- Right Section: Actions with Spacing -->
+						<div style="flex: 0 0 90px; text-align: right; display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+							<a id="vw<?php echo $itm['supplierID']?>" class="btn btn-mini btn-success thickbox" title="View Supplier Details" data-rel="tooltip" onclick="showThis(this.id,'supplier_view.php?sid=<?php echo functions::encode($itm['supplierID']);?>','Supplier Detail','1')"><i class="halflings-icon white zoom-in"></i></a>
+							<a id="edit<?php echo $itm['supplierID']?>" class="btn btn-mini btn-info thickbox" title="Modify Supplier" data-rel="tooltip" onclick="showThis(this.id,'supplier_edit.php?sid=<?php echo functions::encode($itm['supplierID']);?>','Supplier Detail')"><i class="halflings-icon white pencil"></i></a>
+						</div>
+
+					</div>
 				<?php endforeach;?>
-				</tbody>
-			</table>
+			<?php else: ?>
+				<div style="text-align: center; padding: 40px; background: #fff; border: 1px solid #ddd; border-radius: 6px; width: 100%; box-sizing: border-box;" class="muted">
+					<i class="halflings-icon warning-sign"></i> No suppliers found matching your query.
+				</div>
+			<?php endif; ?>
+			</div>
+
 		</div>
 	</div><!--/span-->
 </div><!--/row-->
@@ -128,7 +184,6 @@ $(document).ready(function(){
 	$('#rw<?php echo $_SESSION['notif_id_list'] ?>').css('border','3px solid green');
 	$("#rw<?php echo $_SESSION['notif_id_list'] ?>").animate({borderColor:"#87EAC1"}, 4000);
 	$("#rw<?php echo $_SESSION['notif_id_list'] ?>").animate({borderColor:""}, 4000);
-	window.setTimeout(function(){$('#tblist').addClass('table-bordered');}, 5000);
 });
 </script>
 <?php unset($_SESSION['notif_id_list']);} ?>

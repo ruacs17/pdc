@@ -64,116 +64,125 @@ $selVATStat = $rShow['vat'];
 <!-- body content: start here-->
 <div class="row-fluid">
 	<div class="box span12">
-		<div class="box-header" data-original-title>
-			<h2><i class="halflings-icon white edit"></i><span class="break"></span>Supplier / Payyee Details</h2>
-			<div class="box-icon">
-				<a id="edit" style="cursor:pointer;" title="Modify this Supplier" data-rel="tooltip" href="supplier_edit.php?sid=<?php echo functions::encode($sid);?>"><h2>Edit</h2><i class="halflings-icon white pencil"></i></a>
-			</div>
+		<div class="box-header" data-original-title style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
+			<h2><i class="halflings-icon white user"></i><span class="break"></span>Supplier / Payee Details</h2>
 		</div>
-		<div class="box-content">
-			<form class="form-horizontal" method="post"> 
-				<input type="hidden" name="sid" id="sid" class="span6" value="<?php echo functions::encode($sid);?>">         
-				<table width="80%" align="center" border="0" class="table table-bordered" style="background-color:#E4E1E1">
-					<tr>
-						<td width="17%" height="30"><div align="right">Supplier / Payee Name</div></td>
-						<td width="43%"><input type="text" name="txtName" id="txtName" class="span6" value="<?php echo $txtName;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Address</td>
-						<td><input type="text" name="txtAddress" id="txtAddress" class="span6" value="<?php echo $txtAddress;?>" readonly/></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Phone Number 1</div></td>
-						<td><input type="text" name="txtPhone1" id="txtPhone1" class="span6" value="<?php echo $txtPhone1;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Phone Number 2</div></td>
-						<td><input type="text" name="txtPhone2" id="txtPhone2" class="span6" value="<?php echo $txtPhone2;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Cell Number 1</div></td>
-						<td><input type="text" name="txtCell1" id="txtCell1" class="span6" value="<?php echo $txtCell1;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Cell Number 2</div></td>
-						<td><input type="text" name="txtCell2" id="txtCell2" class="span6" value="<?php echo $txtCell2;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Bank 1</div></td>
-						<td><input type="text" name="txBank1" id="txBank1" class="span6" value="<?php echo $txBank1?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Bank 2</div></td>
-						<td><input type="text" name="txBank2" id="txBank2" class="span6" value="<?php echo $txBank2?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Bank 3</div></td>
-						<td><input type="text" name="txBank3" id="txBank3" class="span6" value="<?php echo $txBank3?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Tax Identification Number (TIN)</div></td>
-						<td><input type="text" name="txTIN" id="txTIN" class="span6" value="<?php echo $txTIN;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">E-mail Address</div></td>
-						<td><input type="text" name="txEmail" id="txEmail" class="span6" value="<?php echo $txEmail;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Person</div></td>
-						<td><input type="text" name="txtConPerson" id="txtConPerson" class="span6" value="<?php echo $txtConPerson;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Contact Person's Designation</div></td>
-						<td><input type="text" class="span6 typeahead" name="txtConPersonDesig" id="txtConPersonDesig" value="<?php echo $txtConPersonDesig;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Type of Business</div></td>
-						<td><input type="text" class="span6 typeahead" name="txBusType" id="txBusType" value="<?php echo $txBusType;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Year Established</div></td>
-						<td><input type="text" name="txYrEst" id="txYrEst" class="span6" value="<?php echo $txYrEst;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Payment Term</div></td>
-						<td><input type="text" name="txPayTerm" id="txPayTerm" class="span6" value="<?php echo $txPayTerm;?>" readonly></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Accreditation Status</div></td>
-						<td>
-							<select name="selAccredited" id="selAccredited" disabled="disabled">
-								<option value="">--select--</option>
-								<option value="Accredited" <?php if($selAccredited=='Accredited')echo 'selected="selected"';?>>Accredited</option>
-								<option value="Pre-Accredited" <?php if($selAccredited=="Pre-Accredited")echo 'selected="selected"';?>>Pre-Accredited</option>
-								<option value="Not Accredited" <?php if($selAccredited=="Not Accredited")echo 'selected="selected"';?>>Not Accredited</option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Evaluation Status</div></td>
-						<td>
-							<select name="selEvaluated" id="selEvaluated" disabled="disabled">
-								<option value="">--select--</option>
-								<option value="Evaluated" <?php if($selEvaluated=='Evaluated')echo 'selected="selected"';?>>Evaluated</option>
-								<option value="Passed" <?php if($selEvaluated=='Passed')echo 'selected="selected"';?>>Passed</option>
-								<option value="Failed" <?php if($selEvaluated=='Failed')echo 'selected="selected"';?>>Failed</option>
-								<option value="N/A" <?php if($selEvaluated=='N/A')echo 'selected="selected"';?>>N/A</option>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">VAT Status</div></td>
-						<td>
-							<select name="selVATStat" id="selVATStat" disabled="disabled">
-								<option value="">--select--</option>
-								<option value="vatable" <?php if($selVATStat=='vatable')echo 'selected="selected"';?>>Vatable</option>
-								<option value="non-vatable" <?php if($selVATStat=='non-vatable')echo 'selected="selected"';?>>Non-Vatable</option>
-							</select>
-						</td>
-					</tr>
-				</table>
-				<div align="center"><a href="supplier_edit.php?sid=<?php echo functions::encode($sid);?>" class="btn btn-primary btn-small">Edit</a></div>
-			</form>
+		<div class="box-content" style="background: #fdfdfd; padding: 20px;">
+			
+			<div style="width: 100%; box-sizing: border-box;">
+				<!-- Main Profile Header Banner -->
+				<div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 20px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; box-sizing: border-box; width: 100%;">
+					<div>
+						<h3 style="margin: 0 0 5px 0; color: #333; font-size: 20px;"><?php echo htmlspecialchars($txtName); ?></h3>
+						<div style="font-size: 13px; color: #666; display: flex; gap: 15px; align-items: center; flex-wrap: wrap;">
+							<span><strong>Business Type:</strong> <?php echo htmlspecialchars($txBusType ? $txBusType : 'N/A'); ?></span>
+							<span><strong>Established:</strong> <?php echo htmlspecialchars($txYrEst ? $txYrEst : 'N/A'); ?></span>
+							<span><strong>VAT Status:</strong> <span style="text-transform: capitalize;"><?php echo htmlspecialchars($selVATStat ? $selVATStat : 'N/A'); ?></span></span>
+						</div>
+					</div>
+					<div style="display: flex; gap: 8px; align-items: center;">
+						<?php 
+							// Accreditation Badge Styling
+							$badgeClass = 'label';
+							if($selAccredited == 'Accredited') $badgeClass .= ' label-success';
+							elseif($selAccredited == 'Pre-Accredited') $badgeClass .= ' label-warning';
+							elseif($selAccredited == 'Not Accredited') $badgeClass .= ' label-important';
+							echo ($selAccredited) ? '<span class="'.$badgeClass.'" style="padding: 5px 10px; font-size: 12px;">'.htmlspecialchars($selAccredited).'</span>' : '';
+
+							// Evaluation Badge Styling & Icons
+							$evalClass = 'label';
+							$evalIcon = '';
+							if($selEvaluated == 'Passed' || $selEvaluated == 'Pass') {
+								$evalClass .= ' label-success';
+								$evalIcon = '<i class="halflings-icon white ok"></i>';
+							} elseif($selEvaluated == 'Evaluated') {
+								$evalClass .= ' label-info';
+								$evalIcon = '<i class="halflings-icon white eye-open"></i>';
+							} elseif($selEvaluated == 'Failed') {
+								$evalClass .= ' label-important';
+								$evalIcon = '<i class="halflings-icon white remove"></i>';
+							} else {
+								$evalClass .= ' label-default';
+								$evalIcon = '<i class="halflings-icon white minus"></i>';
+							}
+							echo ($selEvaluated) ? '<span class="'.$evalClass.'" style="padding: 5px 10px; font-size: 12px;" title="Evaluation Status" data-rel="tooltip">'.$evalIcon.' '.htmlspecialchars($selEvaluated).'</span>' : '';
+						?>
+					</div>
+				</div>
+
+				<!-- Two-Column Grid Layout for Details -->
+				<div style="display: flex; gap: 20px; flex-wrap: wrap; box-sizing: border-box; width: 100%; margin: 0;">
+					
+					<!-- Left Column: Contact & Location Info -->
+					<div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.03); flex: 1; min-width: 300px;">
+						<h4 style="border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; margin-top: 0; color: #444; font-size: 14px; text-transform: uppercase;"><i class="halflings-icon map-marker"></i> Contact & Location Information</h4>
+						
+						<div style="margin-bottom: 12px; font-size: 13px;">
+							<strong style="color: #555; display: block; margin-bottom: 2px;">Address:</strong>
+							<span style="color: #333;"><?php echo htmlspecialchars($txtAddress ? $txtAddress : 'No address provided'); ?></span>
+						</div>
+
+						<div style="margin-bottom: 12px; font-size: 13px;">
+							<strong style="color: #555; display: block; margin-bottom: 2px;">Contact Person:</strong>
+							<span style="color: #333;"><?php echo htmlspecialchars($txtConPerson ? $txtConPerson : 'N/A'); ?> <?php echo ($txtConPersonDesig) ? '<span style="color: #777;">('.htmlspecialchars($txtConPersonDesig).')</span>' : ''; ?></span>
+						</div>
+
+						<div style="margin-bottom: 12px; font-size: 13px;">
+							<strong style="color: #555; display: block; margin-bottom: 2px;">Email Address:</strong>
+							<span style="color: #333;"><?php echo htmlspecialchars($txEmail ? $txEmail : 'N/A'); ?></span>
+						</div>
+
+						<div style="margin-bottom: 5px; font-size: 13px;">
+							<strong style="color: #555; display: block; margin-bottom: 4px;">Phone & Mobile Numbers:</strong>
+							<div style="color: #333; line-height: 1.6;">
+								<?php 
+								$hasPhones = false;
+								if($txtPhone1) { echo 'Phone 1: '.htmlspecialchars($txtPhone1).'<br>'; $hasPhones=true; }
+								if($txtPhone2) { echo 'Phone 2: '.htmlspecialchars($txtPhone2).'<br>'; $hasPhones=true; }
+								if($txtCell1) { echo 'Cell 1: '.htmlspecialchars($txtCell1).'<br>'; $hasPhones=true; }
+								if($txtCell2) { echo 'Cell 2: '.htmlspecialchars($txtCell2).'<br>'; $hasPhones=true; }
+								if(!$hasPhones) echo '<span style="color: #888;">No contact numbers listed.</span>';
+								?>
+							</div>
+						</div>
+					</div>
+
+					<!-- Right Column: Financial & Banking Info -->
+					<div style="background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 20px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.03); flex: 1; min-width: 300px;">
+						<h4 style="border-bottom: 2px solid #f0f0f0; padding-bottom: 8px; margin-top: 0; color: #444; font-size: 14px; text-transform: uppercase;"><i class="halflings-icon credit-card"></i> Financial & Banking Details</h4>
+						
+						<div style="margin-bottom: 12px; font-size: 13px;">
+							<strong style="color: #555; display: block; margin-bottom: 2px;">Tax Identification Number (TIN):</strong>
+							<span style="color: #333; font-family: monospace; font-size: 14px;"><?php echo htmlspecialchars($txTIN ? $txTIN : 'N/A'); ?></span>
+						</div>
+
+						<div style="margin-bottom: 12px; font-size: 13px;">
+							<strong style="color: #555; display: block; margin-bottom: 2px;">Payment Terms:</strong>
+							<span style="color: #333;"><?php echo htmlspecialchars($txPayTerm ? $txPayTerm : 'N/A'); ?></span>
+						</div>
+
+						<div style="margin-bottom: 5px; font-size: 13px;">
+							<strong style="color: #555; display: block; margin-bottom: 4px;">Registered Bank Accounts:</strong>
+							<div style="color: #333; line-height: 1.6;">
+								<?php 
+								$hasBanks = false;
+								if($txBank1) { echo 'Bank 1: '.htmlspecialchars($txBank1).'<br>'; $hasBanks=true; }
+								if($txBank2) { echo 'Bank 2: '.htmlspecialchars($txBank2).'<br>'; $hasBanks=true; }
+								if($txBank3) { echo 'Bank 3: '.htmlspecialchars($txBank3).'<br>'; $hasBanks=true; }
+								if(!$hasBanks) echo '<span style="color: #888;">No bank accounts listed.</span>';
+								?>
+							</div>
+						</div>
+					</div>
+
+				</div>
+			</div>
+
+			<!-- Bottom Action Toolbar -->
+			<div style="margin-top: 25px; text-align: center; display: flex; gap: 10px; justify-content: center;">
+				<a href="supplier_edit.php?sid=<?php echo functions::encode($sid);?>" class="btn btn-warning"><i class="halflings-icon white pencil"></i> Modify Details</a>
+			</div>
+
 		</div>
 	</div><!--/span-->
 </div><!--/row-->
