@@ -1,0 +1,13 @@
+# Ignore user-uploaded documents and images
+img_emp/*
+img_equip/*
+img_material/*
+po_doc/*
+
+# Keep your default system image and folder structure
+!uploads/.gitkeep
+
+# Ignore database backup files
+*.sql
+*.sql.gz
+*.bak

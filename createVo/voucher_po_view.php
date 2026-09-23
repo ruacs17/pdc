@@ -1,0 +1,310 @@
+<?php require_once('authorize.php');
+$username = (isset($_SESSION['username'])) ? $_SESSION['username'] : '';
+$user_id = (isset($_SESSION['user_id'])) ? $_SESSION['user_id'] : '';
+require_once('../class/database.php');
+#require_once('../class/logs.php');
+require_once('../class/functions.php');
+$db = new Database();
+$name = $db->getValue('users','concat(lname,", ",fname,"",mname)',array('username'=>$username));
+#$logs = new Logs();
+#$logs->save('visit');
+
+$vid = (isset($_REQUEST['vid']) && !empty($_REQUEST['vid']) ) ? functions::decode($_REQUEST['vid']) : 0;
+$vp_id = (isset($_REQUEST['vpid']) && !empty($_REQUEST['vpid']) ) ? functions::decode($_REQUEST['vpid']) : 0;
+$po_id = (isset($_REQUEST['po_id']) && !empty($_REQUEST['po_id']) ) ? functions::decode($_REQUEST['po_id']) : 0;
+$edt = (isset($_REQUEST['edt']) && !empty($_REQUEST['edt']) ) ? 1 : 0;
+$po_type = $db->getValue('po','po_type',array('po_id'=>$po_id));
+$proj_id = $db->getValue('po','proj_id',array('po_id'=>$po_id));
+$approved = $db->getValue('voucher','count(approved)',array('voucher_id'=>$vid));
+if($approved==0){$_SESSION['notif_id2_list']=$vp_id;}
+if( isset($_POST['btnSave']) && $po_id && $vp_id ){
+	$payment = ( isset($_POST['txPayment']) && !empty($_POST['txPayment']) ) ? functions::moneyToDouble($_POST['txPayment']) : '0';
+	
+	$total_amount=0;$amount=0;
+	$qPOI = $db->select('po_item','*',array('po_id'=>$po_id),'ORDER BY item');
+	while($rPOI = $db->fetch_array($qPOI)):
+		$amount = $rPOI['cost'] * $rPOI['qty_delivered'];
+		$disc_amount = ($rPOI['discount']) ? $amount * ($rPOI['discount'] / 100) : 0;
+		$amount = $amount - $disc_amount;
+		$total_amount += $amount;
+	endwhile;
+
+	$paid=0;
+	$qPayHist = $db->select('voucher_po_payment','*',array('po_id'=>$po_id));
+	while($rPH = $db->fetch_array($qPayHist)):
+		if($vp_id!=$rPH['vp_id'])
+			$paid += $rPH['amount'];
+	endwhile;
+
+	$payable = $total_amount - $paid;
+	if($payable >= $payment){
+		$db->update('voucher_po_payment',array('amount'=>$payment),array('vp_id'=>$vp_id,'po_id'=>$po_id));
+		$_SESSION['notif_success']='Changes Saved!';
+	}
+	else{
+		functions::say('Payment must not be greater than Amount Payable!');
+	}
+	functions::sendTo($_SERVER['REQUEST_URI']);
+	die();
+}
+$payment = $db->getValue('voucher_po_payment','amount',array('vp_id'=>$vp_id,'po_id'=>$po_id));
+$total_payment = $db->getValue('voucher_po_payment','round(sum(amount),2)',array('po_id'=>$po_id));
+$service_invoice='';
+if($po_type=='service'){
+	$vp_title = $db->getValue('voucher_particular','vp_title',array('vp_id'=>$vp_id));
+	$vpt = explode(':', $vp_title);
+	$service_invoice = isset($vpt[1]) ? trim($vpt[1]) : '';
+}
+
+if( isset($_POST['txInvoice']) ){
+	$new_service_invoice = trim($_POST['txInvoice']);
+	$new_vp_title = 'P.O. PAYMENT - Invoice: '.$new_service_invoice;
+	$db->update('voucher_particular',array('vp_title'=>$new_vp_title),array('vp_id'=>$vp_id));
+
+	$po_invoice = $db->getValue('po','invoice',array('po_id'=>$po_id));
+	$str_inv = '';
+	if($po_invoice){
+		//look for (invoice from particular) if it exist from (invoice from po)
+		$pos = strpos($po_invoice,$service_invoice);
+		if($pos){
+			$str_inv = str_replace($service_invoice, $new_service_invoice, $po_invoice);
+		}
+		else
+		$str_inv = $po_invoice.'/'.$new_service_invoice;
+	}
+	else
+		$str_inv = $new_service_invoice;
+
+	$db->update('po',array('invoice'=>$str_inv),array('po_id'=>$po_id));
+
+	$_SESSION['notif_success']='Invoice saved!';
+	functions::sendTo(functions::pageName().'?vid='.functions::encode($vid).'&vpid='.functions::encode($vp_id).'&po_id='.functions::encode($po_id));
+	die();
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<!-- start: Meta -->
+	<meta charset="utf-8">
+	<title>P.O. Items</title>
+	<!-- end: Meta -->
+	<!-- start: Mobile Specific -->
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<!-- end: Mobile Specific -->
+	<!-- start: CSS -->
+	<link id="bootstrap-style" href="../css/bootstrap.min.css" rel="stylesheet">
+	<link href="../css/bootstrap-responsive.min.css" rel="stylesheet">
+	<link id="base-style" href="../css/style.css" rel="stylesheet">
+	<link id="base-style-responsive" href="../css/style-responsive.css" rel="stylesheet">
+	<script src="../js/formatCurrency.js"></script>
+	<!-- end: CSS -->
+	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+	<!--[if lt IE 9]>
+	<link id="ie-style" href="../css/ie.css" rel="stylesheet">
+	<![endif]-->
+	<!--[if IE 9]>
+	<link id="ie9style" href="../css/ie9.css" rel="stylesheet">
+	<![endif]-->
+	<!-- start: Favicon -->
+	<link rel="shortcut icon" href="../img/favicon.png">
+	<!-- end: Favicon -->
+	<style type="text/css">body{font-size:12px;}</style>
+</head>
+<body>
+<!-- body content: start here-->
+<div class="row-fluid">
+	<div class="box span12">
+		<div class="box-header" data-original-title>
+			<h2><i class="halflings-icon white edit"></i><span class="break"></span>Purchase Order Item Details</h2>
+		</div>
+		<div class="box-content">
+			<div>Project: <strong><?php echo $db->getValue('project','proj_name',array('proj_id'=>$proj_id));?></strong></div>
+			<div>
+				Payee/Supplier:
+				<strong>
+					<?php 
+					$supplierID = $db->getValue('po','supplierID',array('po_id'=>$po_id));
+					echo $db->getValue('supplier','name',array('supplierID'=>$supplierID));
+					?>
+				</strong>
+			</div>
+			<div>P.O. Number: <strong><?php echo $db->getValue('po','po_no',array('po_id'=>$po_id));?></strong></div>
+			<div>Date: <strong><?php echo functions::datearr($db->getValue('po','po_date',array('po_id'=>$po_id)));?></strong></div>
+			<div>
+				Invoice:
+				<?php if($po_type=='service'){ ?>
+				<?php echo $service_invoice; ?>&nbsp;<a id="editInv" title="Modify this Invoice" data-rel="tooltip" href="?vid=<?php echo functions::encode($vid)?>&vpid=<?php echo functions::encode($vp_id)?>&po_id=<?php echo functions::encode($po_id)?>&edt=1" ><i class="halflings-icon pencil"></i></a>
+				<?php if($edt){ ?>
+				<form method="post">
+					<table border="0">
+						<tr>
+							<td valign="middle"><input type="text" name="txInvoice" value="<?php echo $service_invoice ?>"></td>
+							<td valign="top"><input type="submit" name="btnInvoice" class="btn btn-primary btn-small">&nbsp;<a class="btn btn btn-small" href="?vid=<?php echo functions::encode($vid)?>&vpid=<?php echo functions::encode($vp_id)?>&po_id=<?php echo functions::encode($po_id)?>">Cancel</a></td>
+						</tr>
+					</table>
+				</form>
+				<?php } ?>
+				<?php }else{ ?> 
+				<strong><?php echo $db->getValue('po','invoice',array('po_id'=>$po_id));?></strong>
+				<?php } ?>
+			</div><br><br>
+			<form class="form-horizontal" method="post">
+				<table width="100%" border="0" align="center" class="table table-bordered" style="font-size:12px;">
+					<thead>
+						<tr style="background-color:#CCC;">
+							<th width="25%" scope="col"><div align="left">Item</div></th>
+							<?php if($po_type!="service"){ ?><th width="7%" scope="col"><div align="center">Qty Request</div></th><?php } ?>
+							<?php if($po_type!="service"){ ?><th width="7%" scope="col"><div align="center">Qty Delivered</div></th><?php } ?>
+							<th width="5%" scope="col"><div align="center">Unit</div></th>
+							<th width="15%" scope="col"><div align="left">Brand</div></th>
+							<th width="10%" scope="col"><div align="right">Price</div></th>
+							<th width="5%" scope="col"><div align="center">Discount</div></th>
+							<th width="10%" scope="col"><div align="right">Amount</div></th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<td height="25"></td>
+							<?php if($po_type!="service"){ ?><td></td><?php } ?>
+							<?php if($po_type!="service"){ ?><td></td><?php } ?>
+							<td></td>
+							<td height="25"></td>
+							<td></td>
+							<td height="25"></td>
+							<td></td>
+						</tr>
+						<?php
+						$total_amount=0;$amount=0;
+						$qPOI = $db->select('po_item','*',array('po_id'=>$po_id),'ORDER BY item');
+						while($rPOI = $db->fetch_array($qPOI)):
+							$amount = $rPOI['cost'] * $rPOI['qty_delivered'];
+							$disc_amount = ($rPOI['discount']) ? $amount * ($rPOI['discount'] / 100) : 0;
+							$amount = $amount - $disc_amount;
+							$total_amount += $amount;
+							$bgColor='';
+							if($rPOI['quantity'] != $rPOI['qty_delivered'])
+								$bgColor = 'bgcolor="#f5ae00"';
+						?>
+						<tr <?php echo $bgColor;?>>
+							<td><?php echo $rPOI['item'];?></td>
+							<?php if($po_type!="service"){ ?><td><div align="center"><?php echo number_format($rPOI['quantity'],2);?></div></td><?php } ?>
+							<?php if($po_type!="service"){ ?><td><div align="center"><?php echo number_format($rPOI['qty_delivered'],2);?></div></td><?php } ?>
+							<td><div align="center"><?php echo $rPOI['unit'];?></div></td>
+							<td><?php echo $rPOI['brand'];?></td>
+							<td><div align="right"><?php echo functions::formatMoney($rPOI['cost']);?></div></td>
+							<td><div align="center"><?php echo $rPOI['discount'];?>%</div></td>
+							<td><div align="right"><?php echo functions::formatMoney($amount);?></div></td>
+						</tr>
+						<?php endwhile;?>
+						<tr>
+							<td colspan="<?php echo ($po_type=="service") ? 5 : 7 ?>"><div align="right"><strong>Total Amount</strong></div></td>
+							<td><div align="right"><strong><?php echo functions::formatMoney($total_amount)?></strong></div></td>
+						</tr>
+					</tbody>
+				</table><p>&nbsp;</p>
+				<div align="left">
+				<?php
+				$qPayHist = $db->select('voucher_po_payment','*',array('po_id'=>$po_id),'ORDER BY vpp_id');
+				if( $db->num_rows($qPayHist)>0 ){
+				?>
+					<div style="width:40%">
+					<table width="40%" border="0" class="table table-striped table-hover" align="left">
+						<thead>
+							<tr>
+								<td colspan="3" align="left" height="35px">Payment History</td>
+							</tr>
+							<tr style="background-color:#CCC;">
+								<th width="25%" scope="col"><div align="left">Voucher No</div></th>
+								<th width="25%" scope="col"><div align="left">Date</div></th>
+								<th width="40%" scope="col"><div align="right">Payment</div></th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+							$total_payment=0; $individual_payment=0;
+							while($rPH = $db->fetch_array($qPayHist)):
+								$phVid = $db->getValue('voucher_particular','voucher_id',array('vp_id'=>$rPH['vp_id']));
+								$voucherChkDate = $db->getValue('voucher','cheque_date',array('voucher_id'=>$phVid));
+								$voucherDeduction = $db->getValue('voucher_deduction','sum(deduction_value)',array('voucher_id'=>$phVid));
+								#$individual_payment=$rPH['amount'] - $voucherDeduction;
+								$individual_payment=$rPH['amount'];
+								$total_payment+=$individual_payment;
+							?>
+							<tr>
+								<td><?php echo $db->getValue('voucher','voucher_no',array('voucher_id'=>$phVid));?></td>
+								<td><?php echo functions::datearr($voucherChkDate);?></td>
+								<td><div align="right"><?php echo ($vp_id==$rPH['vp_id'])?' <i><strong>(this payment)</strong></i>&nbsp;&nbsp;&nbsp;':''; echo functions::formatMoney($individual_payment);?></div></td>
+							</tr>
+							<?php endwhile; ?>
+							<tr>
+								<td></td>
+								<td align="right" height="35px"><strong>Total Payment</strong>&nbsp;&nbsp;</td>
+								<td><div align="right"><strong><?php echo functions::formatMoney($total_payment);?></strong></div></td>
+							</tr>
+							<tr>
+								<td></td>
+								<td align="right" height="35px"><strong>Payable</strong>&nbsp;&nbsp;</td>
+								<td><div align="right"><strong><?php echo functions::formatMoney($total_amount - $total_payment);?></strong></div></td>
+							</tr>
+						</tbody>
+					</table>
+					</div>
+				<?php } #if( $db->num_rows($qPayHist)>0 )?>
+				</div>
+				<div align="right">
+					Payment Made:
+					<input type="text" name="txPayment" id="txPayment" value="<?php echo functions::formatMoney($payment)?>" onkeyup="FormatCurrency(this);" <?php if($approved==1)echo 'readonly';?>>
+					<?php if($approved==0){?><input type="submit" name="btnSave" id="btnSave" value="Save" class="btn btn-primary btn-small"><?php }?>
+				</div>
+			</form>
+		</div>
+	</div><!--/span-->
+</div><!--/row-->
+<!-- body content: end here-->
+<!-- start: JavaScript-->
+<script src="../js/jquery-1.9.1.min.js"></script>
+<script src="../js/jquery-migrate-1.0.0.min.js"></script>
+<script src="../js/jquery-ui-1.10.0.custom.min.js"></script>
+<script src="../js/jquery.ui.touch-punch.js"></script>
+<script src="../js/modernizr.js"></script>
+<script src="../js/bootstrap.min.js"></script>
+<script src="../js/jquery.cookie.js"></script>
+<script src='../js/fullcalendar.min.js'></script>
+<script src='../js/jquery.dataTables.min.js'></script>
+<script src="../js/excanvas.js"></script>
+<script src="../js/jquery.flot.js"></script>
+<script src="../js/jquery.flot.pie.js"></script>
+<script src="../js/jquery.flot.stack.js"></script>
+<script src="../js/jquery.flot.resize.min.js"></script>
+<script src="../js/jquery.chosen.min.js"></script>
+<script src="../js/jquery.uniform.min.js"></script>
+<script src="../js/jquery.cleditor.min.js"></script>
+<script src="../js/jquery.noty.js"></script>
+<script src="../js/jquery.elfinder.min.js"></script>
+<script src="../js/jquery.raty.min.js"></script>
+<script src="../js/jquery.iphone.toggle.js"></script>
+<script src="../js/jquery.uploadify-3.1.min.js"></script>
+<script src="../js/jquery.gritter.min.js"></script>
+<script src="../js/jquery.imagesloaded.js"></script>
+<script src="../js/jquery.masonry.min.js"></script>
+<script src="../js/jquery.knob.modified.js"></script>
+<script src="../js/jquery.sparkline.min.js"></script>
+<script src="../js/counter.js"></script>
+<script src="../js/retina.js"></script>
+<script src="../js/custom.js"></script>
+<?php if(isset($_SESSION['notif_success'])){?>
+<script src="../js/notify.min.js"></script>
+<script type="text/javascript">
+$.notify("<?php echo $_SESSION['notif_success'] ?>", {className: "success",autoHideDelay: 3500,globalPosition: 'bottom right'});
+</script>
+<?php unset($_SESSION['notif_success']);} ?>
+<?php if(isset($_SESSION['notif_warning'])){?>
+<script src="../js/notify.min.js"></script>
+<script type="text/javascript">
+$.notify("<?php echo $_SESSION['notif_warning'] ?>", {className: "error",autoHideDelay: 3500,globalPosition: 'bottom right'});
+</script>
+<?php unset($_SESSION['notif_warning']);} ?>
+<!-- end: JavaScript-->
+</body>
+</html>
