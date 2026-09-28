@@ -107,7 +107,7 @@ function absentDay($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut=''
 }
 
 #computing the difference
-function diffComp($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn,$actualOtOut,&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
+function diffComp($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn='',$actualOtOut='',&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
 	$cDate = date('Y-m-d');
 	if( $assignAmIn && $assignAmOut )
 		$dutyHours += functions::min_diff($assignAmIn,$cDate,$assignAmOut,$cDate);
@@ -479,7 +479,7 @@ if( isset($_POST['upload']) ){
 					foreach($calDate as $cDate => $logins):
 						$am_in='';$am_out='';$pm_in='';$pm_out='';$att_record=$logins['att_record'];
 						$dayName = dayName($cDate);
-						$late=0; $undertime=0;$dutyHours=0;$otHours=0;
+						$late=0; $undertime=0;$dutyHours=$otHours=0;
 						$am_in_assign=NULL;$am_out_assign=NULL;$pm_in_assign=NULL;$pm_out_assign=NULL;
 						$actualAmIn = $logins['amin']; $actualAmOut = $logins['amout']; $actualPmIn = $logins['pmin']; $actualPmOut = $logins['pmout'];
 						$eatd_id = $db->getValue('emp_attendance_detail','eatd_id',array('emp_id'=>$emp_id,'eat_id'=>$eatid,'eat_date'=>$cDate));

@@ -64,9 +64,9 @@ if($trig && $eatid && $emp_id){
 	functions::sendTo(functions::pageName().'?eatid='.functions::encode($eatid).'&empid='.functions::encode($emp_id).'&rw='.$rowStart);
 	die();
 }
-$regularDutyHours=0; $otDutyHours=0;$totalAbsent=0; $hoursPerDay=0;
+$regularDutyHours=$otDutyHours=$totalAbsent=$hoursPerDay=$dayAbsent=$totalDayPresent=$totalDayAbsent=$totalDayRequired=0;
 
-$arrDailyAttendance = array();
+$arrDayAbsent=$arrDailyAttendance = array();
 
 if( $has_attendance==0 ){
 	$hoursPerDay = 480;
@@ -122,12 +122,26 @@ else{
 		$regularDutyHours += $rA['duty_min'];
 		$otDutyHours += $rA['ot_min'];
 		$totalAbsent += $rA['late_min'] + $rA['under_min'];
-
+		$totalDayAbsent += $dayAbsent = ($rA['am_absent'] + $rA['pm_absent']); 
+		$dayPresent=0;
+		if( !empty($rA['am_in_assign']) && !empty($rA['am_out_assign']) ){
+			$totalDayRequired+=.5;
+			if( empty($rA['am_absent']) )
+				$dayPresent+=.5;
+		}
+		if( !empty($rA['pm_in_assign']) && !empty($rA['pm_out_assign']) ){
+			$totalDayRequired+=.5;
+			if( empty($rA['pm_absent']) )
+				$dayPresent+=.5;
+		}
+		$totalDayPresent+=$dayPresent;
 		$otin = ($rA['ot_in']) ? functions::MilToTwelve($rA['ot_in']) : functions::MilToTwelve($db->getValue('attendance_overtime_detail','actual_start_time',array('emp_id'=>$rA['emp_id'],'actual_start_date'=>$rA['eat_date'])));
 		$otout = ($rA['ot_out']) ? functions::MilToTwelve($rA['ot_out']) : functions::MilToTwelve($db->getValue('attendance_overtime_detail','actual_end_time',array('emp_id'=>$rA['emp_id'],'actual_start_date'=>$rA['eat_date'])));
-		$arrDailyAttendance[] = array('eatd_id'=>$rA['eatd_id'],'dailyName'=>$dailyName,'amin'=>$amin,'amout'=>$amout,'pmin'=>$pmin,'pmout'=>$pmout,'otin'=>$otin,'otout'=>$otout,'dutyHours'=>$rA['duty_min'],'otHours'=>$rA['ot_min'],'late'=>$rA['late_min'],'undertime'=>$rA['under_min'],'bgColor'=>$bgColor);
+		$arrDailyAttendance[] = array('eatd_id'=>$rA['eatd_id'],'dailyName'=>$dailyName,'amin'=>$amin,'amout'=>$amout,'pmin'=>$pmin,'pmout'=>$pmout,'otin'=>$otin,'otout'=>$otout,'dutyHours'=>$rA['duty_min'],'otHours'=>$rA['ot_min'],'late'=>$rA['late_min'],'undertime'=>$rA['under_min'],'dayAbsent'=>$dayAbsent,'dayPresent'=>$dayPresent,'bgColor'=>$bgColor);
 	endwhile;
 }
+// print_r($arrDayAbsent);
+// echo '<br>Total: '.$totalDayAbsent;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -248,9 +262,9 @@ else{
 							<table width="100%" border="0" class="table table-bordered table-condensed" style="font-size: 11px; background: #fff; margin-top: 10px;">
 								<thead>
 									<tr style="background-color:#f5f5f5">
-										<th class="text-center">Rendered Days (Hours)</th>
-										<th class="text-center">Absent Days (Hours)</th>
-										<th class="text-center">Required Days (Hours)</th>
+										<th class="text-center">Rendered Days</th>
+										<th class="text-center">Absent Days</th>
+										<th class="text-center">Required Days</th>
 										<th class="text-center">Overtime Hours</th>
 										<th class="text-center">Total Duty</th>
 									</tr>
@@ -264,33 +278,22 @@ else{
 									<tr>
 										<td class="text-center">
 											<?php
-											echo $regDays = ($regularDutyHours) ? number_format(($regularDutyHours/$hoursPerDay),2) : '0';
-											echo ($regDays > 1) ? ' days' : ' day';
-											echo ($regularDutyHours) ? '<br><small class="muted">('.functions::min_to_hour($regularDutyHours).')</small>' : '';
+											#echo $regDays = ($regularDutyHours) ? number_format(($regularDutyHours/$hoursPerDay),2) : '0';
+											echo ($totalDayPresent > 1) ? $totalDayPresent.' days' : $totalDayPresent.' day';
+											#echo ($regularDutyHours) ? '<br><small class="muted">('.functions::min_to_hour($regularDutyHours).')</small>' : '';
 											?>
 										</td>
 										<td class="text-center">
 											<?php
-											echo $absentDays = ($hoursPerDay) ? number_format(($totalAbsent/$hoursPerDay),2) : '0';
-											echo ($absentDays > 1) ? ' days' : ' day';
-											echo ($totalAbsent) ? '<br><small class="muted">('.functions::min_to_hour($totalAbsent).')</small>' : '';
+											echo ($totalDayAbsent > 1) ? $totalDayAbsent.' days' : $totalDayAbsent.' day';
 											?>
 										</td>
 										<td class="text-center">
-											<?php
-											echo $requiredDays = ( ($regularDutyHours || $totalAbsent) && $hoursPerDay) ? number_format(($regularDutyHours + $totalAbsent) / $hoursPerDay,2) : '0';
-											echo ($requiredDays > 1) ? ' days' : ' day';
-											echo ($regularDutyHours || $totalAbsent) ? '<br><small class="muted">('.functions::min_to_hour($regularDutyHours + $totalAbsent).')</small>' : '';
-											?>
+											<?php echo ($totalDayRequired > 1) ? $totalDayRequired.' days' : $totalDayRequired.' day';?>
 										</td>
 										<td class="text-center"><?php echo ($otDutyHours) ? functions::min_to_hour($otDutyHours) : '0 hr';?></td>
 										<td class="text-center">
-											<strong>
-												<?php
-												echo $tDuty = ($totalDuty && $hoursPerDay) ? number_format(($totalDuty/$hoursPerDay),2) : '0';
-												echo ($tDuty > 1) ? ' days' : ' day';
-												echo ($totalDuty) ? '<br><small class="muted">('.functions::min_to_hour($totalDuty).')</small>' : '';
-												?>
+											<strong><?php echo ($totalDayRequired > 1) ? $totalDayRequired.' days' : $totalDayRequired.' day';?>
 											</strong>
 										</td>
 									</tr>
