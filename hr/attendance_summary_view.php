@@ -113,8 +113,10 @@ $content = array();
 $arrAttendanceRecord = array();
 $arrPayrollList = array();
 $arrMember = array();
+
 $qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','eas_id.emp_id,eas_id.att_ready',array('eat_id'=>$eatid),'AND eas_id.emp_id=emp.emp_id GROUP BY eas_id.emp_id,eas_id.att_ready ORDER BY lname,fname');
 while( $rEmps = $db->fetch_array($qEmps)):
+	$dayAbsent=$totalDayPresent=$totalDayAbsent=$totalAbsent=$totalDayRequired=0;
 	$arrMember[$rEmps['emp_id']]=$rEmps['att_ready'];
 	$empRegDutyHours=0;$empOTDutyHours=0;$empUnderDutyHours=0;$empLateDutyHours=0;$empAbsentHours=0;
 	$emp_id = $rEmps['emp_id'];
@@ -154,11 +156,26 @@ while( $rEmps = $db->fetch_array($qEmps)):
 			$empOTDutyHours += $rA['ot_min'];
 			$empUnderDutyHours += $rA['under_min'];
 			$empLateDutyHours += $rA['late_min'];
+
+			$totalAbsent += $rA['late_min'] + $rA['under_min'];
+			$totalDayAbsent += $dayAbsent = ($rA['am_absent'] + $rA['pm_absent']); 
+			$dayPresent=0;
+			if( !empty($rA['am_in_assign']) && !empty($rA['am_out_assign']) ){
+				$totalDayRequired+=.5;
+				if( empty($rA['am_absent']) )
+					$dayPresent+=.5;
+			}
+			if( !empty($rA['pm_in_assign']) && !empty($rA['pm_out_assign']) ){
+				$totalDayRequired+=.5;
+				if( empty($rA['pm_absent']) )
+					$dayPresent+=.5;
+			}
+			$totalDayPresent+=$dayPresent;
 		endwhile;
 	}
 	$bgColor = ($rEmps['att_ready']==1) ? '' : 'bgcolor="#FBD490"';
 	$empAbsentHours = $empUnderDutyHours + $empLateDutyHours;
-	$arrPayrollList[$emp_id] = array('emp_id'=>$emp_id,'emp_no'=>$emp_no,'name'=>$name,'position'=>$position,'regular_hours'=>$empRegDutyHours,'overtime_hours'=>$empOTDutyHours,'undertime_hours'=>$empUnderDutyHours,'late_hours'=>$empLateDutyHours,'absentHours'=>$empAbsentHours,'bgColor'=>$bgColor);
+	$arrPayrollList[$emp_id] = array('emp_id'=>$emp_id,'emp_no'=>$emp_no,'name'=>$name,'position'=>$position,'regular_hours'=>$empRegDutyHours,'overtime_hours'=>$empOTDutyHours,'undertime_hours'=>$empUnderDutyHours,'late_hours'=>$empLateDutyHours,'absentHours'=>$empAbsentHours,'totalDayPresent'=>$totalDayPresent,'totalDayAbsent'=>$totalDayAbsent,'totalDayRequired'=>$totalDayRequired,'bgColor'=>$bgColor);
 endwhile;
 ?>
 <!DOCTYPE html>
@@ -366,11 +383,11 @@ endwhile;
 						<thead>
 							<tr>
 								<th width="28%">NAME / POSITION</th>
-								<th width="10%"><div align="right">Rendered Days (Hours)</div></th>
-								<th width="10%"><div align="right">Absent Days (Hours)</div></th>
-								<th width="10%"><div align="right">Required Days (Hours)</div></th>
+								<th width="10%"><div align="right">Rendered Days</div></th>
+								<th width="10%"><div align="right">Absent Days</div></th>
+								<th width="10%"><div align="right">Required Days</div></th>
 								<th width="10%"><div align="right">Overtime Hours</div></th>
-								<th width="11%"><div align="right">Total Duty Hours</div></th>
+								<th width="11%"><div align="right">Total Duty (HOURS)</div></th>
 								<th width="11%"><div align="center"><?php if($attendance_ready==0){?><a href="#" onClick="statAll('1')">Verify All</a>&nbsp;|&nbsp;<a href="#" onClick="statAll('2')">Unverify All</a><?php }else{echo 'Verified';} ?></div></th>
 							</tr>
 						</thead>
@@ -411,43 +428,11 @@ endwhile;
 										</div>
 									</div>
 								</td>
-								<td>
-									<div align="right">
-									<?php
-									echo $regDays = ($pd['regular_hours']) ? number_format(($pd['regular_hours'] / $hrsPrDay),2) : '0';
-									echo ($regDays > 1) ? ' day/s' : ' day';
-									echo ($pd['regular_hours']) ? ' ('.functions::min_to_hour($pd['regular_hours']).')' : '';
-									?>
-									</div>
-								</td>
-								<td>
-									<div align="right">
-									<?php
-									echo $absentDays = ($pd['absentHours']) ? number_format(($pd['absentHours'] / $hrsPrDay),2) : '0';
-									echo ($absentDays > 1) ? ' day/s' : ' day';
-									echo ($pd['absentHours']) ? ' ('.functions::min_to_hour($pd['absentHours']).')' : '';
-									?>
-									</div>
-								</td>
-								<td>
-									<div align="right">
-									<?php
-									echo $requiredDays = ($pd['regular_hours'] || $pd['absentHours']) ? number_format(($pd['regular_hours'] + $pd['absentHours']) / $hrsPrDay,2) : '0';
-									echo ($requiredDays > 1) ? ' day/s' : ' day';
-									echo ($pd['regular_hours'] || $pd['absentHours']) ? ' ('.functions::min_to_hour($pd['regular_hours'] + $pd['absentHours']).')' : '';
-									?>
-									</div>
-								</td>
+								<td><div align="right"><?php echo ($pd['totalDayPresent'] > 1) ? $pd['totalDayPresent'].' days' : $pd['totalDayPresent'].' day';?></div></td>
+								<td><div align="right"><?php echo ($pd['totalDayAbsent'] > 1) ? $pd['totalDayAbsent'].' days' : $pd['totalDayAbsent'].' day';?></div></td>
+								<td><div align="right"><?php echo ($pd['totalDayRequired'] > 1) ? $pd['totalDayRequired'].' days' : $pd['totalDayRequired'].' day';?></div></td>
 								<td><div align="right"><?php echo ($pd['overtime_hours']) ? ' ('.functions::min_to_hour($pd['overtime_hours']).')' : '';?></div></td>
-								<td>
-									<div align="right">
-									<?php
-									echo ($totalDutyHours) ? number_format(($totalDutyHours / $hrsPrDay),2) : '0';
-									echo ($totalDutyHours > 1) ? ' day/s' : ' day';
-									echo ($totalDutyHours) ? ' ('.functions::min_to_hour($totalDutyHours).')' : '';
-									?>
-									</div>
-								</td>
+								<td><div align="right"><?php echo ($totalDutyHours) ? ' ('.functions::min_to_hour($totalDutyHours).')' : '';?></div></td>
 								<td><div align="center"><input type="checkbox" class="chkDel" name="chkDel[<?php echo $memberID; ?>]" id="chkDel[<?php echo $memberID; ?>]" value="<?php echo functions::encode($memberID); ?>" <?php if($attendance_ready){echo 'disabled';}?> onClick="statIndi(this.value)" <?php echo ($statReady) ? 'checked':''; ?>></div></td>
 							</tr>
 						<?php }else{?>

@@ -64,7 +64,7 @@ if($trig && $eatid && $emp_id){
 	functions::sendTo(functions::pageName().'?eatid='.functions::encode($eatid).'&empid='.functions::encode($emp_id).'&rw='.$rowStart);
 	die();
 }
-$regularDutyHours=$otDutyHours=$totalAbsent=$hoursPerDay=$dayAbsent=$totalDayPresent=$totalDayAbsent=$totalDayRequired=0;
+$regularDutyHours=$otDutyHours=$totalDutyHours=$totalAbsent=$hoursPerDay=$dayAbsent=$totalDayPresent=$totalDayAbsent=$totalDayRequired=0;
 
 $arrDayAbsent=$arrDailyAttendance = array();
 
@@ -121,6 +121,7 @@ else{
 		$hoursPerDay = 480;
 		$regularDutyHours += $rA['duty_min'];
 		$otDutyHours += $rA['ot_min'];
+		$totalDutyHours += $rA['duty_min']+$rA['ot_min'];
 		$totalAbsent += $rA['late_min'] + $rA['under_min'];
 		$totalDayAbsent += $dayAbsent = ($rA['am_absent'] + $rA['pm_absent']); 
 		$dayPresent=0;
@@ -137,7 +138,7 @@ else{
 		$totalDayPresent+=$dayPresent;
 		$otin = ($rA['ot_in']) ? functions::MilToTwelve($rA['ot_in']) : functions::MilToTwelve($db->getValue('attendance_overtime_detail','actual_start_time',array('emp_id'=>$rA['emp_id'],'actual_start_date'=>$rA['eat_date'])));
 		$otout = ($rA['ot_out']) ? functions::MilToTwelve($rA['ot_out']) : functions::MilToTwelve($db->getValue('attendance_overtime_detail','actual_end_time',array('emp_id'=>$rA['emp_id'],'actual_start_date'=>$rA['eat_date'])));
-		$arrDailyAttendance[] = array('eatd_id'=>$rA['eatd_id'],'dailyName'=>$dailyName,'amin'=>$amin,'amout'=>$amout,'pmin'=>$pmin,'pmout'=>$pmout,'otin'=>$otin,'otout'=>$otout,'dutyHours'=>$rA['duty_min'],'otHours'=>$rA['ot_min'],'late'=>$rA['late_min'],'undertime'=>$rA['under_min'],'dayAbsent'=>$dayAbsent,'dayPresent'=>$dayPresent,'bgColor'=>$bgColor);
+		$arrDailyAttendance[] = array('eatd_id'=>$rA['eatd_id'],'dailyName'=>$dailyName,'amin'=>$amin,'amout'=>$amout,'pmin'=>$pmin,'pmout'=>$pmout,'otin'=>$otin,'otout'=>$otout,'dutyHours'=>$rA['duty_min'],'otHours'=>$rA['ot_min'],'late'=>$rA['late_min'],'undertime'=>$rA['under_min'],'dayAbsent'=>$dayAbsent,'dayPresent'=>$dayPresent,'totalDutyHours'=>$totalDutyHours,'bgColor'=>$bgColor);
 	endwhile;
 }
 // print_r($arrDayAbsent);
@@ -182,9 +183,6 @@ else{
 	<div class="box span12">
 		<div class="box-header" data-original-title>
 			<h2><i class="halflings-icon white file"></i><span class="break"></span>ATTENDANCE PREVIEW</h2>
-			<div class="box-icon">
-				<a href="#" class="btn-minimize"><i class="halflings-icon white chevron-up"></i></a>
-			</div>
 		</div>
 		<div class="box-content">
 			<form class="form-horizontal" method="post">
@@ -284,17 +282,13 @@ else{
 											?>
 										</td>
 										<td class="text-center">
-											<?php
-											echo ($totalDayAbsent > 1) ? $totalDayAbsent.' days' : $totalDayAbsent.' day';
-											?>
+											<?php echo ($totalDayAbsent > 1) ? $totalDayAbsent.' days' : $totalDayAbsent.' day';?>
 										</td>
 										<td class="text-center">
 											<?php echo ($totalDayRequired > 1) ? $totalDayRequired.' days' : $totalDayRequired.' day';?>
 										</td>
 										<td class="text-center"><?php echo ($otDutyHours) ? functions::min_to_hour($otDutyHours) : '0 hr';?></td>
-										<td class="text-center">
-											<strong><?php echo ($totalDayRequired > 1) ? $totalDayRequired.' days' : $totalDayRequired.' day';?>
-											</strong>
+										<td class="text-center"><strong><?php echo ($totalDuty) ? functions::min_to_hour($totalDuty) : '0 hr';?></strong>
 										</td>
 									</tr>
 								</tbody>
