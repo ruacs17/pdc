@@ -14,20 +14,20 @@ $filename='';$payroll_type='';$selMonFrom='';$selDayFrom='';$selYrFrom=date('Y')
 $eatid = (isset($_REQUEST['eatid']) && !empty($_REQUEST['eatid']) ) ? functions::decode($_REQUEST['eatid']) : 0;
 $qEatID = $db->select('emp_attendance','*',array('eat_id'=>$eatid));
 $rEatID = $db->fetch_array($qEatID);
-$proj_id = $rEatID['proj_id'];
-$eas_name = $rEatID['note'];
-$worker_type = $rEatID['payroll_type'];
+$proj_id = $rEatID['proj_id'] ?? NULL;
+$eas_name = $rEatID['note'] ?? NULL;
+$worker_type = $rEatID['payroll_type'] ?? NULL;
 
-$att_year = $rEatID['att_year'];
-$att_month = $rEatID['att_month'];
-$date_start = $rEatID['date_start'];
-$date_end = $rEatID['date_end'];
-$date_start_arr = ($rEatID['date_start']) ? explode('-',$rEatID['date_start']) : "";
+$att_year = $rEatID['att_year'] ?? NULL;
+$att_month = $rEatID['att_month'] ?? NULL;
+$date_start = $rEatID['date_start'] ?? NULL;
+$date_end = $rEatID['date_end'] ?? NULL;
+$date_start_arr = isset($rEatID['date_start']) ? explode('-',$rEatID['date_start']) : "";
 $selMonFrom = ( isset($date_start_arr[1]) ) ? $date_start_arr[1] : '';
 $selDayFrom = ( isset($date_start_arr[2]) ) ? $date_start_arr[2] : '';
 $selYrFrom = ( isset($date_start_arr[0]) ) ? $date_start_arr[0] : '';
 
-$date_end_arr = ($rEatID['date_end']) ? explode('-',$rEatID['date_end']) : "";
+$date_end_arr = isset($rEatID['date_end']) ? explode('-',$rEatID['date_end']) : "";
 $selMonTo = ( isset($date_end_arr[1]) ) ? $date_end_arr[1] : '';
 $selDayTo = ( isset($date_end_arr[2]) ) ? $date_end_arr[2] : '';
 $selYrTo = ( isset($date_end_arr[0]) ) ? $date_end_arr[0] : '';

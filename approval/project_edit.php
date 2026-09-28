@@ -149,7 +149,7 @@ $date_completed = $projInfo['date_completed'];
 $date_contract = $projInfo['date_contract'];
 $date_noa = $projInfo['date_noa'];
 $date_ntp = $projInfo['date_ntp'];
-$dateCompleted = explode('-',$projInfo['date_completed']);
+$dateCompleted = @explode('-',$projInfo['date_completed']);
 
 if(count($dateCompleted)==3){
 	$monCompleted=$dateCompleted[1];

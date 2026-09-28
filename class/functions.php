@@ -73,12 +73,12 @@ class functions{
 
 	static function pageName(){
 		$pg = basename($_SERVER['REQUEST_URI']);
-		$pgx = explode('?', $pg);
+		$pgx = @explode('?', $pg);
 		return $current_page = isset($pgx[0]) ? $pgx[0] : '';
 	}
 	
 	public static function datearr($date){
-		$exp = explode("-",$date);
+		$exp = @explode("-",$date);
 		$d='-- -- ----';
 		if( count($exp)==3){
 		$mb = $exp[1];
@@ -152,7 +152,7 @@ class functions{
 	
 
 	static function encode($data){
-		return base64_encode($data);
+		return @base64_encode($data);
 	}
 	
 	static function search_array($find,$array){
@@ -405,7 +405,7 @@ class functions{
 
 	#converting 24 hours to 12 hours hh:mm format
 	static function MilToTwelve($military_hour){	
-		$mil = explode(":",$military_hour);
+		$mil = @explode(":",$military_hour);
 		if( count($mil)>= 2){
 			$hr=$mil[0];
 			$mn=$mil[1];

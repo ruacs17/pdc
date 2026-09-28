@@ -303,7 +303,7 @@ else{
 				<br>
 				<?php if($has_attendance){?>
 				<div style="overflow-x: auto;">
-					<table width="100%" align="center" border="1" class="table table-bordered table-striped table-hover" style="font-size: 12px;">
+					<table width="100%" align="center" border="0" class="table table-bordered table-stripedx table-hover" style="font-size: 12px;">
 						<thead>
 							<tr style="background-color:#f5f5f5">
 								<td rowspan="2" style="padding-left:10px; font-weight: bold;">DATE</td>
@@ -338,7 +338,7 @@ else{
 								<td height="5" style="padding-left:10px;">
 									<div style="display: flex; justify-content: space-between; align-items: center;">
 										<span><?php echo $dly['dailyName'];?></span>
-										<a id="vw<?php echo $rID?>" class="thickbox btn btn-mini btn-info" style="cursor: pointer;" title="Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>','Attendance Detail'<?php echo ($attendance_ready==1) ? ",'1'" : '' ?>)"><i class="icon-edit icon-white"></i> Edit</a>
+										<a id="vw<?php echo $rID?>" class="thickbox btn btn-mini btn-warning" style="cursor: pointer;" title="Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>','Attendance Detail'<?php echo ($attendance_ready==1) ? ",'1'" : '' ?>)"><i class="icon-edit icon-white"></i> Edit</a>
 									</div>
 								</td>
 								<td style="text-align: center !important;"><?php echo $dly['amin'];?></td>

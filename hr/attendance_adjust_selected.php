@@ -142,8 +142,7 @@ function absentDay($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut=''
 	}
 }
 
-function diffComp($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',
-	$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn,$actualOtOut,&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
+function diffComp($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn='',$actualOtOut='',&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
 	$cDate = date('Y-m-d');
 	if( $assignAmIn && $assignAmOut )
 		$dutyHours += functions::min_diff($assignAmIn,$cDate,$assignAmOut,$cDate);
@@ -823,7 +822,7 @@ $arrPayrollList = array();
 							<td style="padding-left:10px;">
 								<?php
 								echo functions::datearr($dly['eat_date']);
-								echo '<br>('.$dly['eat_day'].')';
+								echo ' -  ('.$dly['eat_day'].')';
 								?>
 							</td>
 							<td style="padding: 12px 8px;">

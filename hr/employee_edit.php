@@ -29,75 +29,52 @@ function address($street='',$brgy='',$city='',$province=''){
 	$adrs .= ( $adrs && $province  ) ? ', '.$province : $province;
 	return $adrs;
 }
-// function updateAddress($emp_id){
-// 	global $db;
-// 	$q = $db->prepareQ('SELECT 
-// 		curr_street,
-// 		(SELECT brgyDesc FROM refbrgy WHERE emp.curr_add=brgyCode) as curr_brgy, 
-// 		(SELECT citymunDesc FROM refcitymun WHERE emp.curr_cityMun=cityMunCode) as curr_city, 
-// 		(SELECT provDesc FROM refprovince WHERE emp.curr_province=provCode) as curr_province,
-// 		perm_street,
-// 		(SELECT brgyDesc FROM refbrgy WHERE emp.perm_add=brgyCode) as perm_brgy, 
-// 		(SELECT citymunDesc FROM refcitymun WHERE emp.perm_cityMun=cityMunCode) as perm_city, 
-// 		(SELECT provDesc FROM refprovince WHERE emp.perm_province=provCode) as perm_province,
-// 		emp_id
-// 		FROM employee emp WHERE emp_id=?',array($emp_id));
-// 	while($r = $db->fetch_array($q)):
-// 		$curr_address = address($r['curr_street'],$r['curr_brgy'],$r['curr_city'],$r['curr_province']);
-// 		$perm_address = address($r['perm_street'],$r['perm_brgy'],$r['perm_city'],$r['perm_province']);
-// 		$db->update('employee',array('curr_address'=>$curr_address,'perm_address'=>$perm_address),array('emp_id'=>$r['emp_id']));
-// 	endwhile;
-// }
-
-
 
 $q = $db->select('employee','*',array('emp_id'=>$eid));
 $r = $db->fetch_array($q);
-$cert_id = $r['cert_id'];
-$txtEmpNo = $r['emp_no'];
-$txtfName = $r['fname'];
-$txtmName = $r['mname'];
-$txtlName = $r['lname'];
-$txtExtName = $r['extname'];
-$txtNickName = $r['nickname'];
-$bdate = $r['bdate'];
-
-$txtBirthPlace = $r['bplace'];
-$selGender = $r['gender'];
-$selCivilStat = $r['civil_status'];
-$txCitizenship = $r['citizenship'];
-$txReligion = $r['religion'];
-$txHeight = $r['height'];
-$txWeight = $r['weight'];
-$txBloodType = $r['bloodtype'];
-$txTIN = $r['tin'];
-$txpagibig = $r['pagibig'];
-$pagibig_autodeduct = $r['pagibig_autodeduct'];
-$txtPagIbigContrib = functions::formatMoney($r['pagibig_contribution']);
-$txphilhealth = $r['philhealth'];
-$philhealth_autodeduct = $r['philhealth_autodeduct'];
-$txtPHContrib = functions::formatMoney($r['philhealth_contribution']);
-$txtSSS = $r['sss'];
-$sss_autodeduct = $r['sss_autodeduct'];
-$txtSSSContrib = functions::formatMoney($r['sss_contribution']);
-$txtGSIS = $r['gsis'];
-$gsis_autodeduct = $r['gsis_autodeduct'];
-$selCurProvince = $r['curr_province'];
-$selCurCityMun = $r['curr_cityMun'];
-$selCurBrngy = $r['curr_add'];
-$curStreet = $r['curr_street'];
-$curZipCode = $r['curr_zipcode'];
-$curTelNo = $r['curr_tel'];
-$selProvincePerm = $r['perm_province'];
-$selCityMunPerm = $r['perm_cityMun'];
-$selBrngyPerm = $r['perm_add'];
-$permStreet = $r['perm_street'];
-$permZipCode = $r['perm_zipcode'];
-$permTelNo = $r['perm_tel'];
-$txEmail = $r['email'];
-$txCellphone = $r['cell_no'];
-
-$date_accomplished = $r['date_accomplished'];
+$cert_id = $r['cert_id'] ?? NULL;
+$txtEmpNo = $r['emp_no'] ?? NULL;
+$txtfName = $r['fname'] ?? NULL;
+$txtmName = $r['mname'] ?? NULL;
+$txtlName = $r['lname'] ?? NULL;
+$txtExtName = $r['extname'] ?? NULL;
+$txtNickName = $r['nickname'] ?? NULL;
+$bdate = $r['bdate'] ?? NULL;
+$txtBirthPlace = $r['bplace'] ?? NULL;
+$selGender = $r['gender'] ?? NULL;
+$selCivilStat = $r['civil_status'] ?? NULL;
+$txCitizenship = $r['citizenship'] ?? NULL;
+$txReligion = $r['religion'] ?? NULL;
+$txHeight = $r['height'] ?? NULL;
+$txWeight = $r['weight'] ?? NULL;
+$txBloodType = $r['bloodtype'] ?? NULL;
+$txTIN = $r['tin'] ?? NULL;
+$txpagibig = $r['pagibig'] ?? NULL;
+$pagibig_autodeduct = $r['pagibig_autodeduct'] ?? NULL;
+$txtPagIbigContrib = isset($r['pagibig_contribution'])  ? functions::formatMoney($r['pagibig_contribution']) : '';
+$txphilhealth = $r['philhealth'] ?? NULL;
+$philhealth_autodeduct = $r['philhealth_autodeduct'] ?? NULL;
+$txtPHContrib = isset($r['philhealth_contribution'])  ? functions::formatMoney($r['philhealth_contribution']) : '';
+$txtSSS = $r['sss'] ?? NULL;
+$sss_autodeduct = $r['sss_autodeduct'] ?? NULL;
+$txtSSSContrib = isset($r['sss_contribution']) ? functions::formatMoney($r['sss_contribution']) : '';
+$txtGSIS = $r['gsis'] ?? NULL;
+$gsis_autodeduct = $r['gsis_autodeduct'] ?? NULL;
+$selCurProvince = $r['curr_province'] ?? NULL;
+$selCurCityMun = $r['curr_cityMun'] ?? NULL;
+$selCurBrngy = $r['curr_add'] ?? NULL;
+$curStreet = $r['curr_street'] ?? NULL;
+$curZipCode = $r['curr_zipcode'] ?? NULL;
+$curTelNo = $r['curr_tel'] ?? NULL;
+$selProvincePerm = $r['perm_province'] ?? NULL;
+$selCityMunPerm = $r['perm_cityMun'] ?? NULL;
+$selBrngyPerm = $r['perm_add'] ?? NULL;
+$permStreet = $r['perm_street'] ?? NULL;
+$permZipCode = $r['perm_zipcode'] ?? NULL;
+$permTelNo = $r['perm_tel'] ?? NULL;
+$txEmail = $r['email'] ?? NULL;
+$txCellphone = $r['cell_no'] ?? NULL;
+$date_accomplished = $r['date_accomplished'] ?? NULL;
 
 $qSelPos = $db->select('emp_position','*',array('emp_id'=>$eid));
 while($rSelPos = $db->fetch_array($qSelPos)):
@@ -109,7 +86,8 @@ while($rSelSite = $db->fetch_array($qSelSite)):
 	$arrSiteAssign[$rSelSite['proj_id']]=1;
 endwhile;
 
-if( isset($_POST['btnSave']) && !empty($eid) ){
+// UPDATED: Triggers if REQUEST_METHOD is POST OR btnSave is set
+if( ($_SERVER['REQUEST_METHOD'] === 'POST' || isset($_POST['btnSave'])) && !empty($eid) ){
 	$emp_no = ( isset($_POST['txtEmpNo']) ) ? strtoupper(trim($_POST['txtEmpNo'])) : '';
 	$fname = ( isset($_POST['txtfName']) ) ? strtoupper(trim($_POST['txtfName'])) : '';
 	$mname = ( isset($_POST['txtmName']) ) ? strtoupper(trim($_POST['txtmName'])) : '';
@@ -158,10 +136,8 @@ if( isset($_POST['btnSave']) && !empty($eid) ){
 	$date_accomplished = ( isset($_POST['txAccmplshdDate']) && functions::valid_date($_POST['txAccmplshdDate']) ) ? trim($_POST['txAccmplshdDate']) : NULL;
 
 	if( !empty($_FILES['image']) && $_FILES['image']['error'] == 0 ) {
-        
 		$uploaddir = '../img_emp/';
-		$max_size = 2000 * 1024; // 500 KB
-		// Generates random filename and extension 
+		$max_size = 2000 * 1024;
 		function tempnam_sfx($path, $suffix){
 			do{
 				$file = $path."/".mt_rand().$suffix;
@@ -172,10 +148,7 @@ if( isset($_POST['btnSave']) && !empty($eid) ){
 			fclose($fp);
 			return $file;
 		}
-		// Process image with GD library
 		$verifyimg = getimagesize($_FILES['image']['tmp_name']);
-
-		// Make sure the MIME type is an image
 		$pattern = "#^(image/)[^\s\n<]+$#i";
 
 		if( !preg_match($pattern, $verifyimg['mime']) ){
@@ -185,9 +158,7 @@ if( isset($_POST['btnSave']) && !empty($eid) ){
 			functions::say("Image reached the limit size!");
 		}
 		else{
-			// Rename both the image and the extension
 			$uploadfile = tempnam_sfx($uploaddir, ".jpg");
-			// Upload the file to a secure directory with the new name and extension
 			if (move_uploaded_file($_FILES['image']['tmp_name'], $uploadfile)) {
 				$oldFileName = $db->getValue('cert_img','cert_name',array('cert_id'=>$cert_id));
 				if($oldFileName)
@@ -226,7 +197,6 @@ if( isset($_POST['btnSave']) && !empty($eid) ){
 			$arrUpdate = array_merge($arrUpdate,array('emp_no'=>$emp_no));
 
 		if($eid){
-			#updateAddress($eid);
 			$curr_brgy=$db->getValue('refbrgy','brgyDesc',array('brgyCode'=>$curr_add));
 			$curr_city=$db->getValue('refcitymun','citymunDesc',array('cityMunCode'=>$curr_cityMun));
 			$curr_province=$db->getValue('refprovince','provDesc',array('provCode'=>$curr_province));
@@ -239,27 +209,17 @@ if( isset($_POST['btnSave']) && !empty($eid) ){
 			$perm_address = address($perm_street,$perm_brgy,$perm_city,$perm_province);
 			$db->update('employee',array('curr_address'=>$curr_address,'perm_address'=>$perm_address),array('emp_id'=>$eid));
 
-			#die();
-			//Removing the excluded position
 			$qSelPos = $db->select('emp_position','*',array('emp_id'=>$eid));
 			while($rSelPos = $db->fetch_array($qSelPos)):
 				if( !isset($selPosition[$rSelPos['dp_id']]) )
 					$db->delete('emp_position',array('emp_id'=>$eid,'dp_id'=>$rSelPos['dp_id']));
 			endwhile;
-			//Inserting new position
 			foreach($selPosition as $dpID):
 				$arrField = array('emp_id'=>$eid,'dp_id'=>$dpID);
 				if( $db->getValue('emp_position','count(*)',$arrField)==0 )
 					$db->insert('emp_position',$arrField);
 			endforeach;
 
-			// //Removing the excluded assignment
-			// $qSelSite = $db->select('emp_site_assign','*',array('emp_id'=>$eid));
-			// while($rSelSite = $db->fetch_array($qSelSite)):
-			// 	if( !isset($selProjAssign[$rSelSite['proj_id']]) )
-			// 		$db->delete('emp_site_assign',array('emp_id'=>$eid,'proj_id'=>$rSelSite['proj_id']));
-			// endwhile;
-			//Inserting new assignment
 			foreach($selProjAssign as $prjID):
 				$arrField = array('emp_id'=>$eid,'proj_id'=>$prjID);
 				if( $db->getValue('emp_site_assign','count(*)',$arrField)==0 )
@@ -296,14 +256,9 @@ $namesReligion .= '"--"';
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<!-- start: Meta -->
 	<meta charset="utf-8">
-	<title>Employee Update</title>
-	<!-- end: Meta -->
-	<!-- start: Mobile Specific -->
+	<title>Employee Update - Portal</title>
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!-- end: Mobile Specific -->
-	<!-- start: CSS -->
 	<link id="bootstrap-style" href="../css/bootstrap.min.css" rel="stylesheet">
 	<link href="../css/bootstrap-responsive.min.css" rel="stylesheet">
 	<link id="base-style" href="../css/style.css" rel="stylesheet">
@@ -311,317 +266,620 @@ $namesReligion .= '"--"';
 	<script src="../js/inputInt.js"></script>
 	<link rel="stylesheet" href="../css/bootstrap-multiselect.css" type="text/css">
 	<script type="text/javascript" src="../js/datetimepicker_css.js"></script>
-	<!-- end: CSS -->
-	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
-	<!--[if lt IE 9]>
-	<link id="ie-style" href="../css/ie.css" rel="stylesheet">
-	<![endif]-->
-	<!--[if IE 9]>
-	<link id="ie9style" href="../css/ie9.css" rel="stylesheet">
-	<![endif]-->
-	<!-- start: Favicon -->
 	<link rel="shortcut icon" href="../img/favicon.png">
-	<!-- end: Favicon -->
+	<link rel="stylesheet" type="text/css" href="../css/thickbox.css"/>
+
+	<style>
+		:root {
+			--accent-color: #0f172a;
+			--brand-blue: #3b82f6;
+			--bg-canvas: #f8fafc;
+			--panel-bg: #ffffff;
+			--border-subtle: #e2e8f0;
+			--text-primary: #0f172a;
+			--text-muted: #64748b;
+		}
+
+		body {
+			background-color: var(--bg-canvas);
+			font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+			color: var(--text-primary);
+			padding: 20px 10px;
+		}
+
+		.profile-container {
+			max-width: 1100px;
+			margin: 0 auto;
+		}
+
+		.banner-header {
+			background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+			border-radius: 16px 16px 0 0;
+			padding: 30px;
+			color: white;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+		}
+
+		.banner-title h2 {
+			margin: 0;
+			font-size: 22px;
+			font-weight: 700;
+			color: #ffffff;
+			letter-spacing: 0.5px;
+		}
+
+		.banner-title p {
+			margin: 5px 0 0 0;
+			font-size: 13px;
+			color: #94a3b8;
+		}
+
+		.main-card {
+			background: var(--panel-bg);
+			border-radius: 0 0 16px 16px;
+			padding: 30px;
+			box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+			border: 1px solid var(--border-subtle);
+			border-top: none;
+		}
+
+		.avatar-wrapper {
+			display: flex;
+			align-items: center;
+			gap: 25px;
+			background: #f1f5f9;
+			padding: 20px;
+			border-radius: 12px;
+			margin-bottom: 30px;
+		}
+
+		.avatar-wrapper img {
+			border-radius: 12px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+			background: #ffffff;
+			padding: 4px;
+		}
+
+		.section-badge {
+			display: inline-block;
+			background: #e0f2fe;
+			color: #0369a1;
+			font-weight: 700;
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			padding: 4px 10px;
+			border-radius: 20px;
+			margin-bottom: 15px;
+		}
+
+		.grid-2col {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 20px;
+		}
+
+		@media (max-width: 768px) {
+			.grid-2col {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		.form-group-custom {
+			margin-bottom: 15px;
+		}
+
+		.form-group-custom label {
+			display: block;
+			font-size: 12px;
+			font-weight: 600;
+			color: var(--text-muted);
+			text-transform: uppercase;
+			margin-bottom: 6px;
+		}
+
+		input[type="text"], select {
+			width: 100% !important;
+			height: 42px !important;
+			padding: 8px 14px !important;
+			font-size: 14px !important;
+			border-radius: 8px !important;
+			border: 1px solid var(--border-subtle) !important;
+			background-color: #ffffff !important;
+			box-sizing: border-box !important;
+			transition: all 0.2s ease !important;
+		}
+
+		input[type="text"]:focus, select:focus {
+			border-color: var(--brand-blue) !important;
+			box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15) !important;
+			outline: none !important;
+		}
+
+		.address-card-group {
+			background: #fafafa;
+			border: 1px dashed var(--border-subtle);
+			padding: 20px;
+			border-radius: 12px;
+			margin-bottom: 20px;
+		}
+
+		.btn-save-floating {
+			position: sticky;
+			bottom: 20px;
+			background: #ffffff;
+			padding: 15px 25px;
+			border-radius: 12px;
+			box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+			border: 1px solid var(--border-subtle);
+			display: flex;
+			justify-content: flex-end;
+			align-items: center;
+			margin-top: 30px;
+			z-index: 10;
+		}
+
+		.btn-modern-primary {
+			background: var(--brand-blue);
+			color: #ffffff;
+			font-weight: 600;
+			border: none;
+			padding: 12px 30px;
+			border-radius: 8px;
+			cursor: pointer;
+			font-size: 14px;
+			transition: background 0.2s;
+		}
+
+		.btn-modern-primary:hover {
+			background: #2563eb;
+		}
+
+		.chzn-container-multi .chzn-choices {
+			border-radius: 8px !important;
+			border: 1px solid var(--border-subtle) !important;
+			padding: 4px !important;
+		}
+
+		.checkbox-custom {
+			display: inline-flex;
+			align-items: center;
+			gap: 8px;
+			font-size: 12px;
+			color: var(--text-muted);
+			margin-left: 10px;
+			cursor: pointer;
+		}
+
+		/* Modal Overlay with Blur */
+		.modal-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100vw;
+			height: 100vh;
+			background: rgba(15, 23, 42, 0.4);
+			backdrop-filter: blur(8px);
+			-webkit-backdrop-filter: blur(8px);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			z-index: 9999;
+			opacity: 0;
+			visibility: hidden;
+			transition: opacity 0.25s ease, visibility 0.25s ease;
+		}
+
+		.modal-overlay.active {
+			opacity: 1;
+			visibility: visible;
+		}
+
+		/* Modal Card */
+		.modal-card {
+			background: #ffffff;
+			width: 100%;
+			max-width: 420px;
+			border-radius: 16px;
+			padding: 24px;
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+			transform: scale(0.95);
+			transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+			text-align: center;
+		}
+
+		.modal-overlay.active .modal-card {
+			transform: scale(1);
+		}
+
+		/* Icon Styling */
+		.modal-icon-wrapper {
+			width: 48px;
+			height: 48px;
+			background: #eff6ff;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 0 auto 16px auto;
+		}
+
+		.modal-icon {
+			width: 24px;
+			height: 24px;
+			color: #3b82f6;
+		}
+
+		/* Text Content */
+		.modal-title {
+			margin: 0 0 8px 0;
+			font-size: 18px;
+			font-weight: 700;
+			color: #0f172a;
+		}
+
+		.modal-description {
+			margin: 0 0 24px 0;
+			font-size: 14px;
+			color: #64748b;
+			line-height: 1.5;
+		}
+
+		/* Actions Footer */
+		.modal-actions {
+			display: flex;
+			gap: 12px;
+		}
+
+		.btn-modal {
+			flex: 1;
+			padding: 10px 16px;
+			border-radius: 8px;
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s ease;
+			border: none;
+		}
+
+		.btn-modal-cancel {
+			background: #f1f5f9;
+			color: #475569;
+		}
+
+		.btn-modal-cancel:hover {
+			background: #e2e8f0;
+			color: #1e293b;
+		}
+
+		.btn-modal-confirm {
+			background: #3b82f6;
+			color: #ffffff;
+			box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+		}
+
+		.btn-modal-confirm:hover {
+			background: #2563eb;
+		}
+	</style>
 </head>
 <body>
-<!-- body content: start here-->
-<div class="row-fluid">
-	<div class="box span12">
-		<div class="box-header" data-original-title>
-			<h2><i class="halflings-icon white edit"></i><span class="break"></span></h2>
+
+<div class="profile-container">
+	<?php if(empty($fromED)){ ?>
+	<div class="box-content" style="margin-bottom: 15px;">
+		<div align="right" class="nav tab-menu nav-tabs" style="padding-top: 3px;"><?php require_once('employee_options.php');?></div>
+	</div>
+	<?php } ?>
+
+	<div class="banner-header">
+		<div class="banner-title">
+			<h2>Employee File Update</h2>
+			<p>Manage official employee information and records</p>
 		</div>
-		<?php if(empty($fromED)){ ?>
-		<div class="box-content">
-			<div align="right" class="nav tab-menu nav-tabs" style="padding-top: 3px;"><?php require_once('employee_options.php');?></div>
-		</div>
-		<?php } ?>
-		<div class="box-content">
-			<form class="form-horizontal" method="post" enctype="multipart/form-data" onSubmit="return ask()">
-				<div align="center" style="padding-bottom: 15px;"><h2>PERSONAL INFORMATION</h2></div>
-				<table border="0" width="98%" align="center">
-					<tr>
-						<td align="center">
-							<div align="center">
-								<?php
-								$fileName = $db->getValue('cert_img','cert_name',array('cert_id'=>$cert_id));
-								if( $fileName && file_exists('../img_emp/'.$fileName)){
-									$file = '../img_emp/'.$fileName;
-									echo '<img height="200" width="200" src="'.$file.'">';
-								}
-								else
-									echo '<img height="200" width="200" src="../img_emp/blank-pic.png">';
-								?>
-								Select <strong>2x2</strong> image to upload: <input type="file" name="image">
-							</div>
-						</td>
-					</tr>
-				</table>
-				<table width="80%" align="center" border="0" class="table table-bordered" style="background-color:#E4E1E1">
-					<tr>
-						<td width="17%" height="30"><div align="right">Employee Number</div></td>
-						<td width="43%"><input type="text" name="txtEmpNo" id="txtEmpNo" class="span6" value="<?php echo $txtEmpNo?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Position</div></td>
-						<td>
-							<select name="selPosition[]" id="selPosition" multiple="multiple" data-rel="chosen" style="width:490px;">
-								<?php 
-								$qPos = $db->select('dep_position','*',array(),'ORDER BY pos_name');
-								while($rPos = $db->fetch_array($qPos)):
-								$dept = $db->getValue('department','dep_name',array('dep_id'=>$rPos['dep_id']));
-								$depName = ($dept) ? '('.$dept.')' : '(no department)';
-								?>
-								<option value="<?php echo $rPos['dp_id']?>" <?php if( isset($arrPosition[$rPos['dp_id']]) )echo 'selected="selected"';?>><?php echo $rPos['pos_name']; echo '&nbsp;&nbsp;'.$depName;?></option>
-								<?php endwhile;?>
-							</select>
-						</td>
-					</tr>
-					<tr style="display:none;">
-						<td height="30"><div align="right">Project / Site Assignment</div></td>
-						<td>
-							<select name="selProjAssign[]" id="selProjAssign" multiple="multiple" data-rel="chosen" style="width:790px;">
-								<?php 
-								$qProj = $db->select('project','*',array(),'ORDER BY proj_name');
-								while($rProj = $db->fetch_array($qProj)):
-								?>
-								<option value="<?php echo $rProj['proj_id']?>" <?php if( isset($arrSiteAssign[$rProj['proj_id']]) )echo 'selected="selected"';?>><?php echo strtoupper($rProj['proj_name']);?></option>
-								<?php endwhile;?>
-							</select>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">First Name</div></td>
-						<td><input type="text" name="txtfName" id="txtfName" class="span6" value="<?php echo $txtfName?>" required/></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Middle Name</div></td>
-						<td><input type="text" name="txtmName" id="txtmName" class="span6" value="<?php echo $txtmName?>" /></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Last Name</div></td>
-						<td><input type="text" name="txtlName" id="txtlName" class="span6" value="<?php echo $txtlName?>"  required/></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Suffix (JR, SR, III)</div></td>
-						<td><input type="text" name="txtExtName" id="txtExtName" class="span6" value="<?php echo $txtExtName?>" /></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Nickname</div></td>
-						<td><input type="text" name="txtNickName" id="txtNickName" class="span6" value="<?php echo $txtNickName?>" /></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Date of Birth</div></td>
-						<td>
-							<a href="javascript:NewCssCal('txBdateDate')"><img src="../js/datepick/cal.gif" width="16" height="16" border="0" alt="Click Here to Pick up the timestamp"></a>
-							<input name="txBdateDate" type="text" class="span6 mytextbox" id="txBdateDate" value="<?php echo $bdate; ?>" style="width: 90px;" readonly>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Birth Place</div></td>
-						<td><input type="text" name="txtBirthPlace" id="txtBirthPlace" class="span6" value="<?php echo $txtBirthPlace?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Gender</div></td>
-						<td>
-							<select name="selGender" id="selGender" style="width: 150px;" required>
-								<option value="">--Select--</option>
-								<option value="Male" <?php if($selGender=='Male')echo 'selected="selected"';?>>Male</option>
-								<option value="Female" <?php if($selGender=='Female')echo 'selected="selected"';?>>Female</option>
-							</select>
-							<span class="help-inline warning" style="font-weight:bold;" id="msgGender" name="msgGender"></span>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Civil Status</div></td>
-						<td>
-							<select name="selCivilStat" id="selCivilStat" style="width: 150px;" required>
-								<option value="">--Select--</option>
-								<option value="Single" <?php if($selCivilStat=='Single')echo 'selected="selected"';?>>Single</option>
-								<option value="Married" <?php if($selCivilStat=='Married')echo 'selected="selected"';?>>Married</option>
-								<option value="Annulled" <?php if($selCivilStat=='Annulled')echo 'selected="selected"';?>>Annulled</option>
-								<option value="Widowed" <?php if($selCivilStat=='Widowed')echo 'selected="selected"';?>>Widowed</option>
-								<option value="Separated" <?php if($selCivilStat=='Separated')echo 'selected="selected"';?>>Separated</option>
-							</select>
-							<span class="help-inline warning" style="font-weight:bold;" id="msgCivilStat" name="msgCivilStat"></span>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Citizenship</div></td>
-						<td>
-							<input type="text" name="txCitizenship" id="txCitizenship" class="span6" value="<?php echo $txCitizenship;?>" autocomplete='off' data-provide="typeahead" data-items="10" data-source='[<?php echo $namesCitezenship;?>]'>
-							<span class="help-inline warning" style="font-weight:bold;" id="msgCitizenship" name="msgCitizenship"></span>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Religion</div></td>
-						<td><input type="text" name="txReligion" id="txReligion" class="span6" value="<?php echo $txReligion;?>" autocomplete='off' data-provide="typeahead" data-items="10" data-source='[<?php echo $namesReligion;?>]'></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Height (m)</div></td>
-						<td><input type="text" name="txHeight" id="txHeight" class="span6" value="<?php echo $txHeight;?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Weight (kg)</div></td>
-						<td><input type="text" name="txWeight" id="txWeight" class="span6" value="<?php echo $txWeight;?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Blood Type</div></td>
-						<td><input type="text" name="txBloodType" id="txBloodType" class="span6" value="<?php echo $txBloodType;?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">TIN</div></td>
-						<td><input type="text" name="txTIN" id="txTIN" class="span6" value="<?php echo $txTIN;?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">PAGIBIG No.</div></td>
-						<td><input type="text" name="txpagibig" id="txpagibig" style="width: 150px;" class="span6" value="<?php echo $txpagibig;?>">&nbsp;&nbsp; Additional Contribution: <input type="text" name="txtPagIbigContrib" id="txtPagIbigContrib" style="width: 144px;" class="span6" value="<?php echo $txtPagIbigContrib?>" onkeyup="FormatCurrency(this);">&nbsp;&nbsp; <input type="checkbox" name="chkPAG" id="chkPAG" <?php if($pagibig_autodeduct==1){echo 'checked';} ?>>&nbsp;&nbsp;<i id="chkPAGDesc" style="cursor:pointer;">Payroll Auto-deduction</i></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">PHILHEALTH No.</div></td>
-						<td><input type="text" name="txphilhealth" id="txphilhealth" style="width: 150px;" class="span6" value="<?php echo $txphilhealth;?>">&nbsp;&nbsp; <input type="checkbox" name="chkPH" id="chkPH" <?php if($philhealth_autodeduct==1){echo 'checked';} ?>>&nbsp;&nbsp;<i id="chkPHDesc" style="cursor:pointer;">Payroll Auto-deduction</i></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">SSS No.</div></td>
-						<td><input type="text" name="txtSSS" id="txtSSS" style="width: 150px;" class="span6" value="<?php echo $txtSSS;?>">&nbsp;&nbsp; <input type="checkbox" name="chkSSS" id="chkSSS" <?php if($sss_autodeduct==1){echo 'checked';} ?>>&nbsp;&nbsp;<i id="chkSSSDesc" style="cursor:pointer;">Payroll Auto-deduction</i></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">GSIS No.</div></td>
-						<td><input type="text" name="txtGSIS" id="txtGSIS" style="width: 150px;" class="span6" value="<?php echo $txtGSIS;?>">&nbsp;&nbsp; <input type="checkbox" name="chkGSIS" id="chkGSIS" <?php if($gsis_autodeduct==1){echo 'checked';} ?>>&nbsp;&nbsp;<i id="chkGSISDesc" style="cursor:pointer;">Payroll Auto-deduction</i></td>
-					</tr>
-					<tr>
-						<td height="30" colspan="2">&nbsp;</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Residential Address</div></td>
-						<td><br>
-							<table>
-								<tr>
-									<td>
-										<select name="selCurProvince" id="selCurProvince" onChange="getCityMun(this.value)">
-											<option value="">Select Province</option>
-											<?php 
-											$qProvince = $db->select('refprovince','*',array(),'ORDER BY provDesc');
-											while($rProv = $db->fetch_array($qProvince)): ?>
-											<option value="<?php echo $rProv['provCode']?>" <?php if($rProv['provCode']==$selCurProvince)echo 'selected="selected"';?>><?php echo $rProv['provDesc']?></option>
-											<?php endwhile;?>
-										</select>
-									</td>
-									<td>
-										<div id="divCurCityMun">
-											<select name="selCurCityMun" id="selCurCityMun">
-												<option value="">Select City/Municipality</option>
-												<?php 
-												$qCityMun = $db->select('refcitymun','*',array('provCode'=>$selCurProvince),'ORDER BY citymunDesc');
-												while($rCityMun = $db->fetch_array($qCityMun)): ?>
-												<option value="<?php echo $rCityMun['citymunCode']?>" <?php if($rCityMun['citymunCode']==$selCurCityMun)echo 'selected="selected"';?>><?php echo $rCityMun['citymunDesc']?></option>
-												<?php endwhile;?>
-											</select>
-										</div>
-									</td>
-									<td>
-										<div id="divCurBrngy">
-											<select id="selCurBrngy" name="selCurBrngy">
-												<option value="">Select Barangay</option>
-												<?php 
-												$qBrgy = $db->select('refbrgy','*',array('citymunCode'=>$selCurCityMun),'ORDER BY brgyDesc');
-												while($rBrgy = $db->fetch_array($qBrgy)): ?>
-												<option value="<?php echo $rBrgy['brgyCode']?>" <?php if($rBrgy['brgyCode']==$selCurBrngy)echo 'selected="selected"';?>><?php echo $rBrgy['brgyDesc']?></option>
-												<?php endwhile;?>
-											</select>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td colspan="2"><input type="text" name="curStreet" id="curStreet" value="<?php echo $curStreet?>" placeholder="Street" style="width: 350px;"></td>
-									<td><input type="text" name="curZipCode" id="curZipCode"  value="<?php echo $curZipCode?>" placeholder="Zip Code"></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Telephone No.</div></td>
-						<td><input type="text" name="curTelNo" id="curTelNo" class="span6" value="<?php echo $curTelNo?>" style="width: 150px;"></td>
-					</tr>
-					<tr>
-						<td height="60" colspan="2">&nbsp;</td>
-					</tr>
-					<tr>
-						<td><div align="right">Permanent Address</div></td>
-						<td><br>
-							<table>
-								<tr>
-									<td>
-										<select name="selProvincePerm" id="selProvincePerm" onChange="getCityMunPerm(this.value)" style="width: 300px;" class="form-control">
-											<option value="">Select Province</option>
-											<?php
-											$qProvince = $db->select('refprovince','*',array(),'ORDER BY provDesc');
-											while($rProv = $db->fetch_array($qProvince)): ?>
-											<option value="<?php echo $rProv['provCode']?>" <?php if($rProv['provCode']==$selProvincePerm)echo 'selected="selected"';?>><?php echo $rProv['provDesc']?></option>
-											<?php endwhile;?>
-										</select>
-									</td>
-									<td>
-										<div id="divCityMunPerm">
-											<select name="selCityMunPerm" id="selCityMunPerm" class="form-control">
-												<option value="">Select City/Municipality</option>
-												<?php 
-												$qCityMun = $db->select('refcitymun','*',array('provCode'=>$selProvincePerm),'ORDER BY citymunDesc');
-												while($rCityMun = $db->fetch_array($qCityMun)): ?>
-												<option value="<?php echo $rCityMun['citymunCode']?>" <?php if($rCityMun['citymunCode']==$selCityMunPerm)echo 'selected="selected"';?>><?php echo $rCityMun['citymunDesc']?></option>
-												<?php endwhile;?>
-											</select>
-										</div>
-									</td>
-									<td>
-										<div id="divBrngyPerm">
-											<select id="selBrngyPerm" name="selBrngyPerm" class="form-control">
-												<option value="">Select Barangay</option>
-												<?php 
-												$qBrgy = $db->select('refbrgy','*',array('citymunCode'=>$selCityMunPerm),'ORDER BY brgyDesc');
-												while($rBrgy = $db->fetch_array($qBrgy)): ?>
-												<option value="<?php echo $rBrgy['brgyCode']?>" <?php if($rBrgy['brgyCode']==$selBrngyPerm)echo 'selected="selected"';?>><?php echo $rBrgy['brgyDesc']?></option>
-												<?php endwhile;?>
-											</select>
-										</div>
-									</td>
-								</tr>
-								<tr>
-									<td colspan="2"><input type="text" name="permStreet" id="permStreet" value="<?php echo $permStreet?>" placeholder="Street" style="width: 350px;"></td>
-									<td><input type="text" name="permZipCode" id="permZipCode"  value="<?php echo $permZipCode?>" placeholder="Zip Code"></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Telephone No.</div></td>
-						<td><input type="text" name="permTelNo" id="permTelNo" class="span6" value="<?php echo $permTelNo?>" style="width: 150px;"></td>
-					</tr>
-					<tr>
-						<td height="60" colspan="2">&nbsp;</td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Email Address</div></td>
-						<td><input type="text" name="txEmail" id="txEmail" class="span6" value="<?php echo $txEmail?>"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">Cellphone No.</div></td>
-						<td><input type="text" name="txCellphone" id="txCellphone" class="span6" value="<?php echo $txCellphone?>" onkeypress="return checkinput(this, event);"></td>
-					</tr>
-					<tr>
-						<td height="30"><div align="right">DATE ACCOMPLISHED</div></td>
-						<td>
-							<a href="javascript:NewCssCal('txAccmplshdDate')"><img src="../js/datepick/cal.gif" width="16" height="16" border="0" alt="Click Here to Pick up the timestamp"></a>
-							<input name="txAccmplshdDate" type="text" class="span6 mytextbox" id="txAccmplshdDate" value="<?php echo $date_accomplished?>" style="width: 90px;" readonly>
-						</td>
-					</tr>
-				</table>
-				<div align="center"><input type="submit" name="btnSave" id="btnSave" value=" SAVE " class="btn btn-small btn-primary"></div>
-			</form>
-		</div>
-	</div><!--/span-->
-</div><!--/row-->
-<!-- body content: end here-->
-<!-- start: JavaScript-->
+	</div>
+
+	<div class="main-card">
+		<form method="post" id="empForm" enctype="multipart/form-data">
+			
+			<div class="avatar-wrapper">
+				<?php
+				$fileName = $db->getValue('cert_img','cert_name',array('cert_id'=>$cert_id));
+				if( $fileName && file_exists('../img_emp/'.$fileName)){
+					$file = '../img_emp/'.$fileName;
+					echo '<img height="120" width="120" src="'.$file.'">';
+				}
+				else
+					echo '<img height="120" width="120" src="../img_emp/blank-pic.png">';
+				?>
+				<div>
+					<span class="section-badge">Profile Photo</span>
+					<div style="font-size: 13px; color: var(--text-muted); margin-bottom: 8px;">Upload standard 2x2 employee identification image:</div>
+					<input type="file" name="image">
+				</div>
+			</div>
+
+			<span class="section-badge">01. Company Information</span>
+			<div class="grid-2col" style="margin-bottom: 25px;">
+				<div class="form-group-custom">
+					<label>Employee ID Number</label>
+					<input type="text" name="txtEmpNo" id="txtEmpNo" value="<?php echo $txtEmpNo?>">
+				</div>
+				<div class="form-group-custom">
+					<label>Designated Position(s)</label>
+					<select name="selPosition[]" id="selPosition" multiple="multiple" data-rel="chosen">
+						<?php 
+						$qPos = $db->select('dep_position','*',array(),'ORDER BY pos_name');
+						while($rPos = $db->fetch_array($qPos)):
+						$dept = $db->getValue('department','dep_name',array('dep_id'=>$rPos['dep_id']));
+						$depName = ($dept) ? '('.$dept.')' : '(no department)';
+						?>
+						<option value="<?php echo $rPos['dp_id']?>" <?php if( isset($arrPosition[$rPos['dp_id']]) )echo 'selected="selected"';?>><?php echo $rPos['pos_name']; echo '&nbsp;&nbsp;'.$depName;?></option>
+						<?php endwhile;?>
+					</select>
+				</div>
+				<div style="display:none;">
+					<select name="selProjAssign[]" id="selProjAssign" multiple="multiple" data-rel="chosen">
+						<?php 
+						$qProj = $db->select('project','*',array(),'ORDER BY proj_name');
+						while($rProj = $db->fetch_array($qProj)):
+						?>
+						<option value="<?php echo $rProj['proj_id']?>" <?php if( isset($arrSiteAssign[$rProj['proj_id']]) )echo 'selected="selected"';?>><?php echo strtoupper($rProj['proj_name']);?></option>
+						<?php endwhile;?>
+					</select>
+				</div>
+			</div>
+
+			<span class="section-badge">02. Personal Profile</span>
+			<div class="grid-2col" style="margin-bottom: 25px;">
+				<div class="form-group-custom">
+					<label>First Name</label>
+					<input type="text" name="txtfName" id="txtfName" value="<?php echo $txtfName?>" required/>
+				</div>
+				<div class="form-group-custom">
+					<label>Middle Name</label>
+					<input type="text" name="txtmName" id="txtmName" value="<?php echo $txtmName?>" />
+				</div>
+				<div class="form-group-custom">
+					<label>Last Name</label>
+					<input type="text" name="txtlName" id="txtlName" value="<?php echo $txtlName?>" required/>
+				</div>
+				<div class="form-group-custom">
+					<label>Suffix (JR, SR, III)</label>
+					<input type="text" name="txtExtName" id="txtExtName" value="<?php echo $txtExtName?>" />
+				</div>
+				<div class="form-group-custom">
+					<label>Nickname</label>
+					<input type="text" name="txtNickName" id="txtNickName" value="<?php echo $txtNickName?>" />
+				</div>
+				<div class="form-group-custom">
+					<label>Date of Birth</label>
+					<div style="display: flex; gap: 8px; align-items: center;">
+						<input name="txBdateDate" type="text" id="txBdateDate" value="<?php echo $bdate; ?>" readonly>
+						<a href="javascript:NewCssCal('txBdateDate')"><img src="../js/datepick/cal.gif" width="18" height="18" border="0" alt="Pick Date"></a>
+					</div>
+				</div>
+				<div class="form-group-custom">
+					<label>Place of Birth</label>
+					<input type="text" name="txtBirthPlace" id="txtBirthPlace" value="<?php echo $txtBirthPlace?>">
+				</div>
+				<div class="form-group-custom">
+					<label>Gender</label>
+					<select name="selGender" id="selGender" required>
+						<option value="">--Select--</option>
+						<option value="Male" <?php if($selGender=='Male')echo 'selected="selected"';?>>Male</option>
+						<option value="Female" <?php if($selGender=='Female')echo 'selected="selected"';?>>Female</option>
+					</select>
+					<span id="msgGender" name="msgGender"></span>
+				</div>
+				<div class="form-group-custom">
+					<label>Civil Status</label>
+					<select name="selCivilStat" id="selCivilStat" required>
+						<option value="">--Select--</option>
+						<option value="Single" <?php if($selCivilStat=='Single')echo 'selected="selected"';?>>Single</option>
+						<option value="Married" <?php if($selCivilStat=='Married')echo 'selected="selected"';?>>Married</option>
+						<option value="Annulled" <?php if($selCivilStat=='Annulled')echo 'selected="selected"';?>>Annulled</option>
+						<option value="Widowed" <?php if($selCivilStat=='Widowed')echo 'selected="selected"';?>>Widowed</option>
+						<option value="Separated" <?php if($selCivilStat=='Separated')echo 'selected="selected"';?>>Separated</option>
+					</select>
+					<span id="msgCivilStat" name="msgCivilStat"></span>
+				</div>
+				<div class="form-group-custom">
+					<label>Citizenship</label>
+					<input type="text" name="txCitizenship" id="txCitizenship" value="<?php echo $txCitizenship;?>" autocomplete='off' data-provide="typeahead" data-items="10" data-source='[<?php echo $namesCitezenship;?>]'>
+					<span id="msgCitizenship" name="msgCitizenship"></span>
+				</div>
+				<div class="form-group-custom">
+					<label>Religion</label>
+					<input type="text" name="txReligion" id="txReligion" value="<?php echo $txReligion;?>" autocomplete='off' data-provide="typeahead" data-items="10" data-source='[<?php echo $namesReligion;?>]'>
+				</div>
+				<div class="form-group-custom">
+					<label>Height (m) / Weight (kg) / Blood Type</label>
+					<div style="display: flex; gap: 10px;">
+						<input type="text" name="txHeight" id="txHeight" value="<?php echo $txHeight;?>" placeholder="Height">
+						<input type="text" name="txWeight" id="txWeight" value="<?php echo $txWeight;?>" placeholder="Weight">
+						<input type="text" name="txBloodType" id="txBloodType" value="<?php echo $txBloodType;?>" placeholder="Blood">
+					</div>
+				</div>
+			</div>
+
+			<span class="section-badge">03. Government Identifiers</span>
+			<div class="grid-2col" style="margin-bottom: 25px;">
+				<div class="form-group-custom">
+					<label>TIN Number</label>
+					<input type="text" name="txTIN" id="txTIN" value="<?php echo $txTIN;?>">
+				</div>
+				<div class="form-group-custom">
+					<label>
+						PAGIBIG No.
+						<span class="checkbox-custom">
+							<input type="checkbox" name="chkPAG" id="chkPAG" <?php if($pagibig_autodeduct==1){echo 'checked';} ?>>
+							<span id="chkPAGDesc">Auto-Deduct</span>
+						</span>
+					</label>
+					<div style="display: flex; gap: 10px;">
+						<input type="text" name="txpagibig" id="txpagibig" value="<?php echo $txpagibig;?>" placeholder="Pagibig No.">
+						<input type="text" name="txtPagIbigContrib" id="txtPagIbigContrib" value="<?php echo $txtPagIbigContrib?>" placeholder="Add'l Contrib" onkeyup="FormatCurrency(this);">
+					</div>
+				</div>
+				<div class="form-group-custom">
+					<label>
+						PhilHealth No.
+						<span class="checkbox-custom">
+							<input type="checkbox" name="chkPH" id="chkPH" <?php if($philhealth_autodeduct==1){echo 'checked';} ?>>
+							<span id="chkPHDesc">Auto-Deduct</span>
+						</span>
+					</label>
+					<input type="text" name="txphilhealth" id="txphilhealth" value="<?php echo $txphilhealth;?>">
+				</div>
+				<div class="form-group-custom">
+					<label>
+						SSS No.
+						<span class="checkbox-custom">
+							<input type="checkbox" name="chkSSS" id="chkSSS" <?php if($sss_autodeduct==1){echo 'checked';} ?>>
+							<span id="chkSSSDesc">Auto-Deduct</span>
+						</span>
+					</label>
+					<input type="text" name="txtSSS" id="txtSSS" value="<?php echo $txtSSS;?>">
+				</div>
+				<div class="form-group-custom">
+					<label>
+						GSIS No.
+						<span class="checkbox-custom">
+							<input type="checkbox" name="chkGSIS" id="chkGSIS" <?php if($gsis_autodeduct==1){echo 'checked';} ?>>
+							<span id="chkGSISDesc">Auto-Deduct</span>
+						</span>
+					</label>
+					<input type="text" name="txtGSIS" id="txtGSIS" value="<?php echo $txtGSIS;?>">
+				</div>
+			</div>
+
+			<span class="section-badge">04. Contact & Address Records</span>
+			<div class="address-card-group">
+				<label style="font-weight:700; font-size:13px; color:var(--text-primary); margin-bottom:10px; display:block;">RESIDENTIAL ADDRESS</label>
+				<div class="grid-2col" style="gap: 10px; margin-bottom: 10px;">
+					<select name="selCurProvince" id="selCurProvince" onChange="getCityMun(this.value)">
+						<option value="">Select Province</option>
+						<?php 
+						$qProvince = $db->select('refprovince','*',array(),'ORDER BY provDesc');
+						while($rProv = $db->fetch_array($qProvince)): ?>
+						<option value="<?php echo $rProv['provCode']?>" <?php if($rProv['provCode']==$selCurProvince)echo 'selected="selected"';?>><?php echo $rProv['provDesc']?></option>
+						<?php endwhile;?>
+					</select>
+					<div id="divCurCityMun">
+						<select name="selCurCityMun" id="selCurCityMun">
+							<option value="">Select City/Municipality</option>
+							<?php 
+							$qCityMun = $db->select('refcitymun','*',array('provCode'=>$selCurProvince),'ORDER BY citymunDesc');
+							while($rCityMun = $db->fetch_array($qCityMun)): ?>
+							<option value="<?php echo $rCityMun['citymunCode']?>" <?php if($rCityMun['citymunCode']==$selCurCityMun)echo 'selected="selected"';?>><?php echo $rCityMun['citymunDesc']?></option>
+							<?php endwhile;?>
+						</select>
+					</div>
+					<div id="divCurBrngy">
+						<select id="selCurBrngy" name="selCurBrngy">
+							<option value="">Select Barangay</option>
+							<?php 
+							$qBrgy = $db->select('refbrgy','*',array('citymunCode'=>$selCurCityMun),'ORDER BY brgyDesc');
+							while($rBrgy = $db->fetch_array($qBrgy)): ?>
+							<option value="<?php echo $rBrgy['brgyCode']?>" <?php if($rBrgy['brgyCode']==$selCurBrngy)echo 'selected="selected"';?>><?php echo $rBrgy['brgyDesc']?></option>
+							<?php endwhile;?>
+						</select>
+					</div>
+					<input type="text" name="curZipCode" id="curZipCode" value="<?php echo $curZipCode?>" placeholder="Zip Code">
+				</div>
+				<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+					<input type="text" name="curStreet" id="curStreet" value="<?php echo $curStreet?>" placeholder="Street Address">
+					<input type="text" name="curTelNo" id="curTelNo" value="<?php echo $curTelNo?>" placeholder="Tel No.">
+				</div>
+			</div>
+
+			<div class="address-card-group">
+				<label style="font-weight:700; font-size:13px; color:var(--text-primary); margin-bottom:10px; display:block;">PERMANENT ADDRESS</label>
+				<div class="grid-2col" style="gap: 10px; margin-bottom: 10px;">
+					<select name="selProvincePerm" id="selProvincePerm" onChange="getCityMunPerm(this.value)">
+						<option value="">Select Province</option>
+						<?php 
+						$qProvince = $db->select('refprovince','*',array(),'ORDER BY provDesc');
+						while($rProv = $db->fetch_array($qProvince)): ?>
+						<option value="<?php echo $rProv['provCode']?>" <?php if($rProv['provCode']==$selProvincePerm)echo 'selected="selected"';?>><?php echo $rProv['provDesc']?></option>
+						<?php endwhile;?>
+					</select>
+					<div id="divCityMunPerm">
+						<select name="selCityMunPerm" id="selCityMunPerm">
+							<option value="">Select City/Municipality</option>
+							<?php 
+							$qCityMun = $db->select('refcitymun','*',array('provCode'=>$selProvincePerm),'ORDER BY citymunDesc');
+							while($rCityMun = $db->fetch_array($qCityMun)): ?>
+							<option value="<?php echo $rCityMun['citymunCode']?>" <?php if($rCityMun['citymunCode']==$selCityMunPerm)echo 'selected="selected"';?>><?php echo $rCityMun['citymunDesc']?></option>
+							<?php endwhile;?>
+						</select>
+					</div>
+					<div id="divBrngyPerm">
+						<select id="selBrngyPerm" name="selBrngyPerm">
+							<option value="">Select Barangay</option>
+							<?php 
+							$qBrgy = $db->select('refbrgy','*',array('citymunCode'=>$selCityMunPerm),'ORDER BY brgyDesc');
+							while($rBrgy = $db->fetch_array($qBrgy)): ?>
+							<option value="<?php echo $rBrgy['brgyCode']?>" <?php if($rBrgy['brgyCode']==$selBrngyPerm)echo 'selected="selected"';?>><?php echo $rBrgy['brgyDesc']?></option>
+							<?php endwhile;?>
+						</select>
+					</div>
+					<input type="text" name="permZipCode" id="permZipCode" value="<?php echo $permZipCode?>" placeholder="Zip Code">
+				</div>
+				<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 10px;">
+					<input type="text" name="permStreet" id="permStreet" value="<?php echo $permStreet?>" placeholder="Street Address">
+					<input type="text" name="permTelNo" id="permTelNo" value="<?php echo $permTelNo?>" placeholder="Tel No.">
+				</div>
+			</div>
+
+			<div class="grid-2col">
+				<div class="form-group-custom">
+					<label>Email Address</label>
+					<input type="text" name="txEmail" id="txEmail" value="<?php echo $txEmail?>">
+				</div>
+				<div class="form-group-custom">
+					<label>Cellphone Number</label>
+					<input type="text" name="txCellphone" id="txCellphone" value="<?php echo $txCellphone?>" onkeypress="return checkinput(this, event);">
+				</div>
+				<div class="form-group-custom">
+					<label>Date Accomplished</label>
+					<div style="display: flex; gap: 8px; align-items: center;">
+						<input name="txAccmplshdDate" type="text" id="txAccmplshdDate" value="<?php echo $date_accomplished?>" readonly>
+						<a href="javascript:NewCssCal('txAccmplshdDate')"><img src="../js/datepick/cal.gif" width="18" height="18" border="0" alt="Pick Date"></a>
+					</div>
+				</div>
+			</div>
+
+			<div class="btn-save-floating">
+				<input type="submit" name="btnSave" id="btnSave" value="Save Changes" class="btn-modern-primary">
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Modern Confirmation Modal -->
+<div id="confirmModalOverlay" class="modal-overlay">
+  <div class="modal-card">
+    <div class="modal-icon-wrapper">
+      <svg class="modal-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    </div>
+    <div class="modal-content">
+      <h3 class="modal-title">Save Changes?</h3>
+      <p class="modal-description">Are you sure you want to update this employee record? All changes will be saved to the database.</p>
+    </div>
+    <div class="modal-actions">
+      <button type="button" id="btnModalCancel" class="btn-modal btn-modal-cancel">Cancel</button>
+      <button type="button" id="btnModalConfirm" class="btn-modal btn-modal-confirm">Yes, Save</button>
+    </div>
+  </div>
+</div>
+
 <script src="../js/jquery-1.9.1.min.js"></script>
 <script src="../js/jquery-migrate-1.0.0.min.js"></script>
 <script src="../js/jquery-ui-1.10.0.custom.min.js"></script>
@@ -654,10 +912,11 @@ $namesReligion .= '"--"';
 <script src="../js/custom.js"></script>
 <script src="../js/wxh.js"></script>
 <script src="../js/thickboxa.js"></script>
-<link rel="stylesheet" type="text/css" href="../css/thickbox.css"/>
 <script src="../js/showPage.js"></script>
+
 <script>
 $(document).ready(function(){
+	// Checkbox toggles
 	$('#chkPHDesc').click(function(){
 		if( $('#chkPH').is(':checked') )
 			$("#chkPH").prop( "checked", false );
@@ -682,8 +941,53 @@ $(document).ready(function(){
 		else
 			$("#chkGSIS").prop( "checked", true );
 	});
+
+	// Modern Modal Form Interception
+	var formToSubmit = null;
+
+	$('#empForm').on('submit', function(e) {
+		var $form = $(this);
+		if (!$form.data('confirmed')) {
+			e.preventDefault();
+			formToSubmit = this;
+			$('#confirmModalOverlay').addClass('active');
+		}
+	});
+
+	// Handle Modal Confirm Button with requestSubmit
+	$('#btnModalConfirm').on('click', function() {
+		if (formToSubmit) {
+			var $form = $(formToSubmit);
+			$form.data('confirmed', true);
+
+			// Append hidden btnSave input if it doesn't already exist
+			if ($form.find('input[name="btnSave"]').length === 0) {
+				$form.append('<input type="hidden" name="btnSave" value="Save Changes">');
+			}
+
+			$('#confirmModalOverlay').removeClass('active');
+
+			// Trigger native form submission reliably
+			if (typeof formToSubmit.requestSubmit === 'function') {
+				formToSubmit.requestSubmit();
+			} else {
+				formToSubmit.submit();
+			}
+		}
+	});
+
+	$('#btnModalCancel, #confirmModalOverlay').on('click', function(e) {
+		if (e.target === this) {
+			$('#confirmModalOverlay').removeClass('active');
+			if (formToSubmit) {
+				$(formToSubmit).data('confirmed', false);
+			}
+			formToSubmit = null;
+		}
+	});
 });
-function getXMLHTTP() { //fuction to return the xml http object
+
+function getXMLHTTP() {
 	var xmlhttp=false; 
 	try{
 		xmlhttp=new XMLHttpRequest();
@@ -711,7 +1015,6 @@ function getCityMun(provId){
 	if(req){
 		req.onreadystatechange = function(){
 			if(req.readyState == 4){
-				// only if "OK"
 				if (req.status == 200){
 					document.getElementById('divCurCityMun').innerHTML=req.responseText;
 					document.getElementById('divCurBrngy').innerHTML='<select name="selCurBrngy" id="selCurBrngy"><option value="">Select Barangay</option></select>';            
@@ -733,7 +1036,6 @@ function getBrngy(cityMunId){
 	if(req){
 		req.onreadystatechange = function(){
 			if(req.readyState == 4){
-				// only if "OK"
 				if (req.status == 200){
 					document.getElementById('divCurBrngy').innerHTML=req.responseText;
 				}else{
@@ -753,7 +1055,6 @@ function getCityMunPerm(provId){
 	if(reqs){
 		reqs.onreadystatechange = function(){
 			if(reqs.readyState == 4){
-				// only if "OK"
 				if(reqs.status == 200){
 					document.getElementById('divCityMunPerm').innerHTML=reqs.responseText;
 					document.getElementById('divBrngyPerm').innerHTML='<select name="selBrngyPerm" id="selBrngyPerm" class="form-control"><option value="">Select Barangay</option></select>';
@@ -774,7 +1075,6 @@ function getBrngyPerm(cityMunId){
 	if(reqss){
 		reqss.onreadystatechange = function(){
 			if(reqss.readyState == 4){
-				// only if "OK"
 				if(reqss.status == 200){
 					document.getElementById('divBrngyPerm').innerHTML=reqss.responseText;
 				}else{
@@ -786,26 +1086,27 @@ function getBrngyPerm(cityMunId){
 		reqss.send(null);
 	}
 }
-function ask(){
-	if(confirm('Do you want to save this information?'))
-		return true;
-	else
-		return false;
+</script>
+
+<script>
+if(document.getElementById("spinner")) {
+	document.getElementById("spinner").style.display = "none";
 }
 </script>
-<script>document.getElementById("spinner").style.display = "none";//$(window).ready(function(){$("#spinner").fadeOut("slow");});</script>
+
 <?php if(isset($_SESSION['notif_success'])){?>
 <script src="../js/notify.min.js"></script>
 <script type="text/javascript">
 $.notify("<?php echo $_SESSION['notif_success'] ?>", {className: "success",autoHideDelay: 3500,globalPosition: 'bottom right'});
 </script>
 <?php unset($_SESSION['notif_success']);} ?>
+
 <?php if(isset($_SESSION['notif_warning'])){?>
 <script src="../js/notify.min.js"></script>
 <script type="text/javascript">
 $.notify("<?php echo $_SESSION['notif_warning'] ?>", {className: "error",autoHideDelay: 3500,globalPosition: 'bottom right'});
 </script>
 <?php unset($_SESSION['notif_warning']);} ?>
-<!-- end: JavaScript-->
+
 </body>
 </html>
