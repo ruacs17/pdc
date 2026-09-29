@@ -570,7 +570,7 @@ $namesReligion .= '"--"';
 
 <div class="profile-container">
 	<?php if(empty($fromED)){ ?>
-	<div class="box-content" style="margin-bottom: 15px;">
+	<div class="box-content" style="padding-top: 40px;">
 		<div align="right" class="nav tab-menu nav-tabs" style="padding-top: 3px;"><?php require_once('employee_options.php');?></div>
 	</div>
 	<?php } ?>

@@ -314,7 +314,7 @@ if($uploaded_file){
 	}
 
 	function diffComp($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',
-		$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn,$actualOtOut,&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
+		$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn=0,$actualOtOut=0,&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
 		$cDate = date('Y-m-d');
 		if( $assignAmIn && $assignAmOut )//compute the required duty mins for morning
 			$dutyHours += functions::min_diff($assignAmIn,$cDate,$assignAmOut,$cDate);

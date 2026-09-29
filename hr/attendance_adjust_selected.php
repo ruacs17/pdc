@@ -649,6 +649,81 @@ $arrPayrollList = array();
 			margin-bottom: 15px;
 			text-align: center;
 		}
+
+		/* Enhanced Modern Modal Dialog Styles */
+		#confirmModal {
+			border-radius: 12px;
+			border: none;
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+			overflow: hidden;
+		}
+
+		#confirmModal .modal-header {
+			background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+			color: #ffffff;
+			padding: 16px 20px;
+			border-bottom: none;
+		}
+
+		#confirmModal .modal-header h3 {
+			font-size: 16px;
+			font-weight: 600;
+			margin: 0;
+			color: #ffffff;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		#confirmModal .modal-header .close {
+			color: #ffffff;
+			opacity: 0.8;
+			text-shadow: none;
+			margin-top: -2px;
+		}
+
+		#confirmModal .modal-header .close:hover {
+			opacity: 1;
+		}
+
+		#confirmModal .modal-body {
+			padding: 24px 20px;
+			background-color: #ffffff;
+		}
+
+		#confirmModal .modal-body p {
+			font-size: 14px;
+			color: var(--text-main);
+			margin: 0;
+			line-height: 1.5;
+		}
+
+		#confirmModal .modal-footer {
+			background-color: #f8fafc;
+			padding: 14px 20px;
+			border-top: 1px solid var(--border-color);
+			display: flex;
+			justify-content: flex-end;
+			gap: 10px;
+		}
+
+		#confirmModal .modal-footer .btn {
+			border-radius: 6px;
+			font-weight: 600;
+			padding: 8px 18px;
+			font-size: 13px;
+		}
+
+		#confirmModal .modal-footer .btn-secondary {
+			background: #ffffff;
+			border: 1px solid var(--border-color);
+			color: var(--text-muted);
+		}
+
+		#confirmModal .modal-footer .btn-secondary:hover {
+			background: #f1f5f9;
+			color: var(--text-main);
+		}
 	</style>
 	<!--[if lt IE 9]>
 	<link id="ie-style" href="../css/ie.css" rel="stylesheet">
@@ -668,7 +743,7 @@ $arrPayrollList = array();
 			<h2><i class="halflings-icon white edit"></i><span class="break"></span>ATTENDANCE ADJUSTMENT</h2>
 		</div>
 		<div class="box-content">
-			<form class="form-horizontal" method="post">
+			<form id="attendanceForm" class="form-horizontal" method="post">
 				<!-- Redesigned Employee Info Panel -->
 				<div class="employee-info-card">
 					<div class="employee-info-item">
@@ -943,7 +1018,10 @@ $arrPayrollList = array();
 					if($countRecord){
 						if($attendance_ready==0 && $att_confirm==0){?>
 				<div align="center" style="padding-top: 40px;">Reason: <textarea name="txRemarks" id="txRemarks" style="width:400px;"></textarea></div>
-				<div align="center" style="padding-top: 20px;"><input type="submit" name="btnSave" id="btnSave" value=" SAVE CHANGES " onClick="return ask()" class="btn btn-small btn-primary"></div>
+				<div align="center" style="padding-top: 20px;">
+					<button type="button" id="btnSaveTrigger" class="btn btn-small btn-primary"> SAVE CHANGES </button>
+					<input type="hidden" name="btnSave" value="1">
+				</div>
 				<?php
 						}
 						else{
@@ -1037,6 +1115,22 @@ $arrPayrollList = array();
 		</div>
 	</div><!--/span-->
 </div><!--/row-->
+
+<!-- Modern Confirmation Dialog Modal -->
+<div class="modal fade hide" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+	<div class="modal-header">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+		<h3 id="confirmModalLabel"><i class="halflings-icon white question-sign"></i> Save Attendance Changes</h3>
+	</div>
+	<div class="modal-body">
+		<p>Are you sure you want to save these attendance adjustments? This action will update the log entries for the employee.</p>
+	</div>
+	<div class="modal-footer">
+		<button class="btn btn-secondary" data-dismiss="modal" aria-hidden="true">Cancel</button>
+		<button id="btnConfirmSubmit" class="btn btn-primary">Confirm & Save</button>
+	</div>
+</div>
+
 <!-- body content: end here-->
 <!-- start: JavaScript-->
 <script src="../js/jquery-1.9.1.min.js"></script>
@@ -1071,12 +1165,6 @@ $arrPayrollList = array();
 <script src="../js/custom.js"></script>
 <script src="../js/timepicker.js"></script>
 <script>
-function ask(){
-	if(confirm('Do you want to save these changes?'))
-		return true;
-	else
-		return false;
-}
 $('#selAmIn').timepicker({
 	time:'<?php echo ($am_in) ? $am_in : '--:--'; ?>',
 	<?php if($attendance_ready==1){echo 'editable: false';} ?>
@@ -1094,6 +1182,17 @@ $('#selPmOut').timepicker({
 	<?php if($attendance_ready==1){echo 'editable: false';} ?>
 });
 
+$(document).ready(function() {
+	$('#btnSaveTrigger').on('click', function(e) {
+		e.preventDefault();
+		$('#confirmModal').modal('show');
+	});
+
+	$('#btnConfirmSubmit').on('click', function() {
+		$('#confirmModal').modal('hide');
+		$('#attendanceForm').submit();
+	});
+});
 </script>
 <?php if(isset($_SESSION['notif_success'])){?>
 <script src="../js/notify.min.js"></script>
