@@ -12,7 +12,7 @@ $fromED = (isset($_REQUEST['fromED']) && !empty($_REQUEST['fromED']) ) ? $_REQUE
 $eid = (isset($_REQUEST['eid']) && !empty($_REQUEST['eid']) ) ? functions::decode($_REQUEST['eid']) : 0;
 $itemEdt = (isset($_REQUEST['eeEdt']) && !empty($_REQUEST['eeEdt']) ) ? functions::decode($_REQUEST['eeEdt']) : 0;
 $itemDel = (isset($_REQUEST['eeDlt']) && !empty($_REQUEST['eeDlt']) ) ? functions::decode($_REQUEST['eeDlt']) : 0;
-$selMon='';$selDay='';$selYr='';$txSalMonth='';$txSalWorkDays='';$txSalDay='';$txSalHour='';$txSalMin='';$selSalType='';$txSalDate='';
+$selFactor=$selMon=$selDay=$selYr=$txSalMonth=$txSalWorkDays=$txSalDay='';$txSalHour='';$txSalMin='';$selSalType='';$txSalDate='';
 if($itemEdt){
 	$qSal = $db->select('emp_salary','*',array('es_id'=>$itemEdt,'emp_id'=>$eid));
 	if( $db->num_rows($qSal) > 0 ){
@@ -70,24 +70,27 @@ if($itemDel){
 if( isset($_POST['btnSave']) ){
 
 	$es_salary = ( isset($_POST['txSalMonth']) && !empty($_POST['txSalMonth']) ) ? functions::moneyToDouble($_POST['txSalMonth']) : 0;
-	$working_days = ( isset($_POST['txSalWorkDays']) && !empty($_POST['txSalWorkDays']) ) ? trim($_POST['txSalWorkDays']) : 0;
 	$es_daily = ( isset($_POST['txSalDay']) && !empty($_POST['txSalDay']) ) ? functions::moneyToDouble($_POST['txSalDay']) : 0;
 	$es_hourly = ( isset($_POST['txSalHour']) && !empty($_POST['txSalHour']) ) ? functions::moneyToDouble($_POST['txSalHour']) : 0;
 	$es_minute = ( isset($_POST['txSalMin']) && !empty($_POST['txSalMin']) ) ? functions::moneyToDouble($_POST['txSalMin']) : 0;
 	$es_type = ( isset($_POST['selSalType']) && !empty($_POST['selSalType']) ) ? $_POST['selSalType'] : 0;
-    
-	if($es_type=='fixed'){
-		$working_days = 26;
-		$es_salary = $es_daily * $working_days;
+    $working_days = ( isset($_POST['selFactor']) && !empty($_POST['selFactor']) ) ? $_POST['selFactor'] : 0;
+
+
+
+
+	if($es_type=='fixed'){//daily laborer
+		$es_salary = ($es_daily*$working_days) / 12;
 		$es_hourly = $es_daily / 8;
 		$es_minute = $es_hourly / 60;
 	}
 	else if($es_type == 'flexible'){
-		$working_days = 26;
-		$es_daily = $es_salary / $working_days;
+		$es_daily = ($es_salary * 12)  / $working_days;
 		$es_hourly = $es_daily / 8;
 		$es_minute = $es_hourly / 60;
 	}
+
+
 
 	$es_date = ( isset($_POST['txStatDate']) && !empty($_POST['txStatDate']) ) ? trim($_POST['txStatDate']) : NULL;
 
@@ -142,7 +145,7 @@ if( isset($_POST['btnSave']) ){
 						<tr style="background-color:#CCC;">
 							<td width="10%"><strong>DATE</strong></td>
 							<td width="10%"><strong>MONTHLY</strong></td>
-							<td width="10%"><strong>DAYS PER MONTH</strong></td>
+							<td width="10%"><strong>WORK DAYS PER YEAR</strong></td>
 							<td width="10%"><strong>DAILY</strong></td>
 							<td width="10%"><strong>HOURLY</strong></td>
 							<td width="10%"><strong>MINUTE</strong></td>
@@ -160,9 +163,9 @@ if( isset($_POST['btnSave']) ){
 							<td><?php echo functions::datearr($r['es_date'])?></td>
 							<td><?php echo functions::formatMoney($r['es_salary'])?></td>
 							<td><?php echo $r['working_days']?></td>
-							<td><?php echo functions::formatMoney($r['es_daily'],'~')?></td>
-							<td><?php echo functions::formatMoney($r['es_hourly'],'~')?></td>
-							<td><?php echo functions::formatMoney($r['es_minute'],'~')?></td>
+							<td><?php echo functions::formatMoney($r['es_daily'],'2')?></td>
+							<td><?php echo functions::formatMoney($r['es_hourly'],'2')?></td>
+							<td><?php echo functions::formatMoney($r['es_minute'],'2')?></td>
 							<td><?php if($r['es_type']=='fixed')echo 'Daily'; elseif($r['es_type']=='flexible')echo 'Monthly';?></td>
 							<td>
 								<div align="center">
@@ -207,6 +210,20 @@ if( isset($_POST['btnSave']) ){
 					<tr id="trDaily">
 						<td height="30"><div align="right">DAILY</div></td>
 						<td><input type="text" name="txSalDay" id="txSalDay" class="span6" value="<?php echo $txSalDay?>" style="width:150px;" onkeyup="FormatCurrency(this);" required></td>
+					</tr>
+					<tr id="trFactor">
+						<td height="30"><div align="right">WORKING DAYS PER WEEK</div></td>
+						<td>
+							<div align="left">
+								<select name="selFactor" id="selFactor" required>
+									<option value="">--select-</option>
+									<option value="365" <?php if($txSalWorkDays=='365'){echo 'selected="selected"';} ?>>7 days/week</option>
+									<option value="313" <?php if($txSalWorkDays=='313'){echo 'selected="selected"';} ?>>6 days/week (Mon-Sat)</option>
+									<option value="287" <?php if($txSalWorkDays=='287'){echo 'selected="selected"';} ?>>5.5 days/week (Mon-Fri Sat Halfday)</option>
+									<option value="261" <?php if($txSalWorkDays=='261'){echo 'selected="selected"';} ?>>5 days/week (Mon-Fri)</option>
+								</select>
+							</div>
+						</td>
 					</tr>
 					<tr>
 						<td height="30"></td>

@@ -20,9 +20,9 @@ $rjv = $db->fetch_array($qjv);
 
 $jvdEdt = $db->select('journal_voucher_detail','*',array('jvd_id'=>$jvd_id));
 $rjvdEdt = $db->fetch_array($jvdEdt);
-$selItem = $rjvdEdt['item_id'];
-$asType = $rjvdEdt['charge_type'];
-$txAmount = ($rjvdEdt['amount']) ? functions::formatMoney($rjvdEdt['amount']) : '';
+$selItem = $rjvdEdt['item_id'] ?? '';
+$asType = $rjvdEdt['charge_type'] ?? '';
+$txAmount = isset($rjvdEdt['amount']) ? functions::formatMoney($rjvdEdt['amount']) : '';
 if($jvd_id_delt && $jv_id){
     $db->delete('journal_voucher_detail',array('jvd_id'=>$jvd_id_delt));
     functions::sendTo($_SERVER['PHP_SELF'].'?jv='.functions::encode($jv_id));

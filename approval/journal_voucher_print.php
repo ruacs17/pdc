@@ -40,6 +40,7 @@ function position($emp_id){
     <link id="bootstrap-style" href="../css/bootstrap.min.css" rel="stylesheet">
     <link href="../css/bootstrap-responsive.min.css" rel="stylesheet">
     <link id="base-style-responsive" href="../css/style-responsive.css" rel="stylesheet">
+    <link href="../css/printerfoot.css" rel="stylesheet">
     <!-- end: CSS -->
     <!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -133,6 +134,12 @@ function position($emp_id){
         </tr>
     </tbody>
 </table>
+<footer>
+    <div style="display: flex;;">
+      <div style="flex: 1;" align="left">Effective: Feb.27, 2023</div>
+      <div style="flex: 1;" align="right">19AFD.FRM021.01-02/23</div>
+    </div>
+</footer>
 <!-- body content: end here-->
 <!-- start: JavaScript-->
 <script src="../js/jquery-1.9.1.min.js"></script>

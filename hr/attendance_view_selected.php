@@ -335,7 +335,7 @@ else{
 								<td height="5" style="padding-left:10px;">
 									<div style="display: flex; justify-content: space-between; align-items: center;">
 										<span><?php echo $dly['dailyName'];?></span>
-										<a id="vw<?php echo $rID?>" class="thickbox btn btn-mini btn-warning" style="cursor: pointer;" title="Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>','Attendance Detail'<?php echo ($attendance_ready==1) ? ",'1'" : '' ?>)"><i class="icon-edit icon-white"></i> Edit</a>
+										<a id="vw<?php echo $rID?>" class="thickbox btn btn-mini btn-warning" style="cursor: pointer;" title="Attendance Manage" data-rel="tooltip" onclick="showThis(this.id,'attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>','Attendance Manage Time In/Out'<?php echo ($attendance_ready==1) ? ",'1'" : '' ?>)"><i class="icon-edit icon-white"></i> Edit</a>
 									</div>
 								</td>
 								<td style="text-align: center !important;"><?php echo $dly['amin'];?></td>
