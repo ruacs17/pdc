@@ -11,6 +11,7 @@ $name = $db->getValue('users','concat(lname,", ",fname," ",mname)',array('userna
 #$logs->save('visit');
 $filename='';$payroll_type='';$selMonFrom='';$selDayFrom='';$selYrFrom=date('Y');$selMonTo='';$selDayTo='';$selYrTo=date('Y');$worker_type='';$eas_name='';
 
+$frmSummary = (isset($_REQUEST['frm']) && !empty($_REQUEST['frm']) ) ? $_REQUEST['frm'] : 0;
 $eatid = (isset($_REQUEST['eatid']) && !empty($_REQUEST['eatid']) ) ? functions::decode($_REQUEST['eatid']) : 0;
 $qEatID = $db->select('emp_attendance','*',array('eat_id'=>$eatid));
 $rEatID = $db->fetch_array($qEatID);
@@ -166,7 +167,7 @@ if($eatid==0){
 						$eat_id = $db->insert('emp_attendance',array('date_added'=>date('Y-m-d'),'date_start'=>$date_start,'date_end'=>$date_end,'att_year'=>$att_year,'att_month'=>$att_month,'proj_id'=>$proj_id,'payroll_type'=>$worker_type,'payroll_no'=>$payroll_no,'payroll_count'=>$last_payroll_no,'note'=>$eas_name,'prepared_by'=>$prepared_by,'checked_by'=>$checked_by,'received_by'=>$received_by,'approved_by'=>$approved_by));
 						if($eat_id){
 							$_SESSION['notif_success']='Attendance Report Successfully Created!';
-							functions::sendTo('attendance_report_add_personnel.php?eatid='.functions::encode($eat_id));
+							functions::sendTo('attendance_report_add_personnel.php?eatid='.functions::encode($eat_id).'&frm='.$frmSummary);
 							die();
 						}
 						else{
@@ -204,6 +205,11 @@ if($eatid==0){
 			</ul>
 		</div>
 		<div class="box-content">
+		<?php if($frmSummary){?>
+		<div align="right">
+			<a id="icnReupload" href="attendance_summary_view.php?eatid=<?php echo functions::encode($eatid)?>" class="btn btn-info" title="Back To Attendance Summary">Back To Attendance Summary</a>&nbsp;
+		</div>
+		<?php } ?>
 			<form class="form-horizontal" method="post" id="frmAtt">
 				<div align="center" style="padding-bottom: 15px;"><h2>ATTENDANCE REPORT</h2></div>
 				<div align="center">

@@ -101,6 +101,35 @@ if( isset($_POST['btnSave']) ){
 		$sunPmIn = ( isset($_POST['sunPmIn']) && !empty($_POST['sunPmIn']) ) ? trim($_POST['sunPmIn']) : NULL;
 		$sunPmOut = ( isset($_POST['sunPmOut']) && !empty($_POST['sunPmOut']) ) ? trim($_POST['sunPmOut']) : NULL;
 
+		$dayCount=0;
+		$dayCount += ( !empty($monAmIn) && !empty($monAmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($monPmIn) && !empty($monPmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($tueAmIn) && !empty($tueAmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($tuePmIn) && !empty($tuePmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($wedAmIn) && !empty($wedAmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($wedPmIn) && !empty($wedPmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($thuAmIn) && !empty($thuAmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($thuPmIn) && !empty($thuPmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($friAmIn) && !empty($friAmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($friPmIn) && !empty($friPmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($satAmIn) && !empty($satAmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($satPmIn) && !empty($satPmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($sunAmIn) && !empty($sunAmOut) ) ? .5 : 0;
+		$dayCount += ( !empty($sunPmIn) && !empty($sunPmOut) ) ? .5 : 0;
+
+		if($dayCount==5)
+			$workingDays=261;
+		else if($dayCount==5.5)
+			$workingDays=287;
+		else if($dayCount==6)
+			$workingDays=313;
+		else if($dayCount==7)
+			$workingDays=365;
+		else if($dayCount==4)
+			$workingDays=261;
+		else
+			$workingDays=156;
+
 		$db->update('emp_timein',array('am_in'=>$monAmIn,'am_out'=>$monAmOut,'pm_in'=>$monPmIn,'pm_out'=>$monPmOut),array('emp_id'=>$eid,'eti_day'=>'Monday','day_no'=>'1'));
 		$db->update('emp_timein',array('am_in'=>$tueAmIn,'am_out'=>$tueAmOut,'pm_in'=>$tuePmIn,'pm_out'=>$tuePmOut),array('emp_id'=>$eid,'eti_day'=>'Tuesday','day_no'=>'2'));
 		$db->update('emp_timein',array('am_in'=>$wedAmIn,'am_out'=>$wedAmOut,'pm_in'=>$wedPmIn,'pm_out'=>$wedPmOut),array('emp_id'=>$eid,'eti_day'=>'Wednesday','day_no'=>'3'));
@@ -112,6 +141,32 @@ if( isset($_POST['btnSave']) ){
 				$db->insert('emp_timein',array('am_in'=>$sunAmIn,'am_out'=>$sunAmOut,'pm_in'=>$sunPmIn,'pm_out'=>$sunPmOut,'emp_id'=>$eid,'eti_day'=>'Sunday','day_no'=>'7'));
 		}
 		$db->update('emp_timein',array('am_in'=>$sunAmIn,'am_out'=>$sunAmOut,'pm_in'=>$sunPmIn,'pm_out'=>$sunPmOut),array('emp_id'=>$eid,'eti_day'=>'Sunday','day_no'=>'7'));
+
+		$qSel = $db->select('emp_salary','*',array('emp_id'=>$eid),'ORDER BY es_date DESC,es_id DESC');
+		$rSel = $db->fetch_array($qSel);
+		$es_id = $rSel['es_id'] ?? NULL;
+		if($es_id){
+			$es_salary = $rSel['es_salary'] ?? NULL;
+			$es_daily = $rSel['es_daily'] ?? NULL;
+			$es_hourly = $rSel['es_hourly'] ?? NULL;
+			$es_minute = $rSel['es_minute'] ?? NULL;
+			$es_date = $rSel['es_date'] ?? NULL;
+			$es_type = $rSel['es_type'] ?? NULL;
+			if($es_type=='fixed'){//daily laborer
+				$es_salary = ($es_daily*$workingDays) / 12;
+				$es_hourly = $es_daily / 8;
+				$es_minute = $es_hourly / 60;
+			}
+			else if($es_type == 'flexible'){
+				$es_daily = ($es_salary * 12)  / $workingDays;
+				$es_hourly = $es_daily / 8;
+				$es_minute = $es_hourly / 60;
+			}
+			if( $es_type && ($es_salary || $es_daily) ){
+				$arrField = array('es_salary'=>$es_salary,'es_daily'=>$es_daily,'es_hourly'=>$es_hourly,'es_minute'=>$es_minute,'working_days'=>$workingDays);
+				$db->update('emp_salary',$arrField,array('emp_id'=>$eid,'es_id'=>$es_id));
+			}
+		}
 		$_SESSION['notif_success']='Duty Hours Assignment Saved!';
 		functions::sendTo(functions::pageName().'?eid='.functions::encode($eid).'&fromED='.$fromED);
 		die();

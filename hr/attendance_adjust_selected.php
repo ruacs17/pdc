@@ -902,12 +902,10 @@ $arrPayrollList = array();
 							</td>
 							<td style="padding: 12px 8px;">
 								<div align="left">
+									<?php if($attendance_ready==0 && $att_confirm==0){?>
 									<input id="selAmIn" type="text" name="selAmIn">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in_default)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><i>(<?php echo $am_in_assign;?>)</i></a>
 									<div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Time log Detected:</div>
 									<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
-										<?php
-										if($attendance_ready==0 && $att_confirm==0){
-										?>
 										<a class="time-log-pill <?php echo ($am_in == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode('--:--')?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>">--:--</a>
 										<?php
 											$found=0;
@@ -925,14 +923,18 @@ $arrPayrollList = array();
 												}
 											endforeach;
 										}
+										else{
+											$am_in_disp = ($am_in) ? date('h:i a',strtotime(date('Y-m-d').' '.$am_in)) : '--:--';
+											echo '<div align="center"><strong>'.$am_in_disp.'</strong> <i>('.$am_in_assign.')</i></div>';
+										}
 										?>
 									</div>
 								</div>
 							</td>
 							<td style="padding: 12px 8px;">
 								<div align="left">
-									<input id="selAmOut" type="text" name="selAmOut">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out_default)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><i>(<?php echo $am_out_assign;?>)</i></a>
 									<?php if($attendance_ready==0 && $att_confirm==0){?>
+									<input id="selAmOut" type="text" name="selAmOut">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out_default)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><i>(<?php echo $am_out_assign;?>)</i></a>
 									<div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Time log Detected:</div>
 									<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
 										<a class="time-log-pill <?php echo ($am_out == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode('--:--')?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>">--:--</a>
@@ -951,15 +953,19 @@ $arrPayrollList = array();
 												<?php
 												}
 											endforeach;
+										}
+										else{
+											$am_out_disp = ($am_out) ? date('h:i a',strtotime(date('Y-m-d').' '.$am_out)) : '--:--';
+											echo '<div align="center"><strong>'.$am_out_disp.'</strong> <i>('.$am_out_assign.')</i></div>';
+										}
 										?>
 									</div>
-									<?php } ?>
 								</div>
 							</td>
 							<td style="padding: 12px 8px;">
 								<div align="left">
-									<input id="selPmIn" type="text" name="selPmIn">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in_default)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><i>(<?php echo $pm_in_assign;?>)</i></a>
 									<?php if($attendance_ready==0 && $att_confirm==0){ ?>
+									<input id="selPmIn" type="text" name="selPmIn">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in_default)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><i>(<?php echo $pm_in_assign;?>)</i></a>
 									<div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Time log Detected:</div>
 									<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
 										<a class="time-log-pill <?php echo ($pm_in == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode('--:--')?>&tmPmOut=<?php echo functions::encode($pm_out)?>">--:--</a>
@@ -978,15 +984,19 @@ $arrPayrollList = array();
 												<?php
 												}
 											endforeach;
+										}
+										else{
+											$pm_in_disp = ($pm_in) ? date('h:i a',strtotime(date('Y-m-d').' '.$pm_in)) : '--:--';
+											echo '<div align="center"><strong>'.$pm_in_disp.'</strong> <i>('.$pm_in_assign.')</i></div>';
+										}
 										?>
 									</div>
-									<?php } ?>
 								</div>
 							</td>
 							<td style="padding: 12px 8px;">
 								<div align="left">
-									<input id="selPmOut" type="text" name="selPmOut">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&empid=<?php echo functions::encode($emp_id)?>&tmPmOut=<?php echo functions::encode($pm_out_default)?>"><i>(<?php echo $pm_out_assign;?>)</i></a>
 									<?php if($attendance_ready==0 && $att_confirm==0){?>
+									<input id="selPmOut" type="text" name="selPmOut">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&empid=<?php echo functions::encode($emp_id)?>&tmPmOut=<?php echo functions::encode($pm_out_default)?>"><i>(<?php echo $pm_out_assign;?>)</i></a>
 									<div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Time log Detected:</div>
 									<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
 										<a class="time-log-pill <?php echo ($pm_out == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&empid=<?php echo functions::encode($emp_id)?>&tmPmOut=<?php echo functions::encode('--:--')?>">--:--</a>
@@ -1005,9 +1015,13 @@ $arrPayrollList = array();
 												<?php
 												}
 											endforeach;
+										}
+										else{
+											$pm_out_disp = ($pm_out) ? date('h:i a',strtotime(date('Y-m-d').' '.$pm_out)) : '--:--';
+											echo '<div align="center"><strong>'.$pm_out_disp.'</strong> <i>('.$pm_out_assign.')</i></div>';
+										}
 										?>
 									</div>
-									<?php } ?>
 								</div>
 							</td>
 						</tr>

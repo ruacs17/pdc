@@ -340,9 +340,10 @@ endwhile;
 			<form class="form-horizontal" method="post">
 				<?php if($attendance_ready==0){?>
 				<div align="right" style="padding-bottom:10px;">
-					<a id="icnReupload" href="attendance_report_add_attlog_option.php?eatid=<?php echo functions::encode($eatid)?>&frm=1" class="btn btn-info" title="Upload Updated Att. Log"><i class="icon-upload-alt white upload-alt"></i></a>&nbsp;
+					<a id="icnReupload" href="attendance_report_add_attlog_option.php?eatid=<?php echo functions::encode($eatid)?>&frm=1" class="btn btn-success" title="Upload Updated Att. Log"><i class="icon-upload-alt white upload-alt"></i></a>&nbsp;
 					<a id="icnRefresh" href="?eatid=<?php echo functions::encode($eatid)?>&pr=t" class="btn btn-info" title="Re calculate attendance"><i class="halflings-icon white refresh"></i></a>&nbsp;
 					<a id="icnSignatory" class="btn btn-info thickbox" title="Manage Signatory" data-rel="tooltip" onclick="showThis(this.id,'attendance_report_signatory.php?eatid=<?php echo functions::encode($eatid);?>','Attendance Detail')"><i class="halflings-icon white user"></i></a>&nbsp;
+					<a id="edtRpt" class="btn btn-warning" title="Manage Report" data-rel="tooltip" href="attendance_report_add_charge.php?eatid=<?php echo functions::encode($eatid);?>&frm=1"><i class="halflings-icon white edit"></i></a>&nbsp;
 				</div>
 				<?php }?>
 				<div class="info-panel">
@@ -366,6 +367,10 @@ endwhile;
 						<tr>
 							<td height="30px">Period Covered</td>
 							<td><strong><?php echo functions::datearr($date_start).' - '.functions::datearr($date_end);?></strong></td>
+						</tr>
+						<tr>
+							<td height="30px">Attendance Type</td>
+							<td><strong><?php echo strtoupper($worker_type);?></strong></td>
 						</tr>
 						<tr>
 							<td height="30px">Confirm Status</td>

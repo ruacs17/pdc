@@ -300,6 +300,14 @@ else{
 				<br>
 				<?php if($has_attendance){?>
 				<div style="overflow-x: auto;">
+				<div align="left">
+					<table cellspacing="4" cellpadding="6" border='0' align="left">
+						<tr>
+							<td width="25" height='30'><div style="background-color:#fcf8e3; width:20px;">&nbsp;</div></td>
+							<td>Altered</td>
+						</tr>
+					</table>
+				</div>
 					<table width="100%" align="center" border="0" class="table table-bordered table-stripedx table-hover" style="font-size: 12px;">
 						<thead>
 							<tr style="background-color:#f5f5f5">
@@ -335,7 +343,7 @@ else{
 								<td height="5" style="padding-left:10px;">
 									<div style="display: flex; justify-content: space-between; align-items: center;">
 										<span><?php echo $dly['dailyName'];?></span>
-										<a id="vw<?php echo $rID?>" class="thickbox btn btn-mini btn-warning" style="cursor: pointer;" title="Attendance Manage" data-rel="tooltip" onclick="showThis(this.id,'attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>','Attendance Manage Time In/Out'<?php echo ($attendance_ready==1) ? ",'1'" : '' ?>)"><i class="icon-edit icon-white"></i> Edit</a>
+										<a id="vw<?php echo $rID?>" class="thickbox btn btn-mini btn-<?php echo ($attendance_ready==1) ? 'info':'warning'; ?>" style="cursor: pointer;" title="Attendance Manage" data-rel="tooltip" onclick="showThis(this.id,'attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>','Attendance Manage Time In/Out'<?php echo ($attendance_ready==1) ? ",'1'" : '' ?>)"><?php if($attendance_ready==1){echo '<i class="halflings-icon search white"></i>';}else{echo '<i class="icon-edit icon-white"></i> Edit';} ?></a>
 									</div>
 								</td>
 								<td style="text-align: center !important;"><?php echo $dly['amin'];?></td>

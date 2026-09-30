@@ -31,77 +31,14 @@ if($lf_id){
 	$leave_allowed = ($rLC['allowed_days']==0) ? 'unli' : 'limited';
 	$leave_allowed_days = $rLC['allowed_days'];
 	if($db->getValue('leave_config_add','count(*)',array('lc_id'=>$lc_id))){
-		$dateRegular = $db->getValue('emp_work_status','ews_date',array('emp_id'=>$emp_id,'ews_stat'=>'Regular'));
+		#$dateRegular = $db->getValue('emp_work_status','ews_date',array('emp_id'=>$emp_id,'ews_stat'=>'Regular'));
+		$dateRegular = $db->getValue('emp_work_status','ews_date',array('emp_id'=>$emp_id),'ORDER BY ews_date LIMIT 1');//start counting in the hired date
 		$yearService = functions::year_diff(date('Y-m-d'),$dateRegular);
 		$leave_allowed_days = $db->getValue('leave_config_add','allowed_days',array('lc_id'=>$lc_id),'AND "'.$yearService.'" BETWEEN service_year_from AND service_year_to');
 	}
 	$work_start =  $db->getValue('emp_work_status','ews_date',array('emp_id'=>$emp_id),'ORDER BY ews_date ASC LIMIT 1');
 }
-/*
-function leave_avail_term($emp_id,$dateFile){
-	global $db;
-	$term='';
-	$allow_with_pay='';
-	$arrResult = array();
-	$not_applicable=0;
-	$date_leave_start='';
-	$date_leave_end='';
-	$date_refer='';$date_regular='';
-    $emp_work_stat = $db->getValue('employee','work_status',array('emp_id'=>$emp_id));
-	if( $emp_work_stat=='Regular' ){
-		$date_regular = $db->getValue('emp_work_status','ews_date',array('emp_id'=>$emp_id,'ews_stat'=>'Regular'),'ORDER BY ews_date DESC LIMIT 1');
-	}
-	else if( $emp_work_stat=='Contractual' ){
-		$date_refer = $db->getValue('emp_work_status','ews_date',array('emp_id'=>$emp_id,'ews_stat'=>'Contractual'),'ORDER BY ews_date DESC LIMIT 1');
-	}
-	else if( $emp_work_stat=='Probationary' ){
-		$date_refer = $db->getValue('emp_work_status','ews_date',array('emp_id'=>$emp_id,'ews_stat'=>'Probationary'),'ORDER BY ews_date DESC LIMIT 1');
-	}
-	else
-		$not_applicable=1;
 
-	if($not_applicable==0){
-
-		$allow_with_pay=0;
-		if($date_regular){
-			$years_regular = functions::year_diff($date_regular,date('Y-m-d'));
-			if($years_regular)
-				$allow_with_pay=1;
-		}
-
-		$date_reference = ($allow_with_pay==1) ? $date_regular : $date_refer;
-		$date_reference = ($date_regular) ? $date_regular : $date_refer;
-		$month_date_hired_reference = substr($date_reference, 4, 6);//-12-15
-
-		$dateFile_month_date =  substr($dateFile, 5, 5);
-		$date_file_year = substr($dateFile, 0, 4);
-
-		if( functions::year_diff(($date_file_year-1).$month_date_hired_reference,$dateFile)==0 ){//less than a year
-			$term = ($date_file_year-1).'-'.$date_file_year;
-			$date_leave_start = ($date_file_year-1).$month_date_hired_reference;
-			$date_leave_end = ($date_file_year).$month_date_hired_reference;
-		}
-		else{//If is year or greater
-			$term = $date_file_year.'-'.($date_file_year+1);
-			$date_leave_start = ($date_file_year).$month_date_hired_reference;
-			$date_leave_end = ($date_file_year+1).$month_date_hired_reference;
-		}
-		$arr_dle = explode('-', $date_leave_end);
-		$yy = isset($arr_dle[0]) ? $arr_dle[0] : 0;
-		$mm = isset($arr_dle[1]) ? $arr_dle[1] : 0;
-		$dd = isset($arr_dle[2]) ? $arr_dle[2] : 0;
-		$date_leave_end = date('Y-m-d',mktime(0,0,0,$mm,$dd - 1,$yy));
-	}
-	return array('term'=>$term,'allow_with_pay'=>$allow_with_pay,'term_start'=>$date_leave_start,'term_end'=>$date_leave_end);
-}
-$leave_avail = leave_avail_term($emp_id,$dateFile);
-$term = isset($leave_avail['term']) ? $leave_avail['term'] : '';
-$term_start = isset($leave_avail['term_start']) ? $leave_avail['term_start'] : '';
-$term_end = isset($leave_avail['term_end']) ? $leave_avail['term_end'] : '';
-
-$leave_date_from = $term_start;
-$leave_date_to = $term_end;
-*/
 $arrTerm = array();
 if( $initialTerm = date('Y',strtotime($dateFile)) )
 	$arrTerm[$initialTerm]=$initialTerm;
@@ -111,7 +48,7 @@ while($rTrm = $db->fetch_array($qTrm)):
 	$arrTerm[$rTrm['term']]=$rTrm['term'];
 endwhile;
 
-function diffComp($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn,$actualOtOut,&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
+function diffComp($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn=0,$actualOtOut=0,&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
 	$cDate = date('Y-m-d');
 	if( $assignAmIn && $assignAmOut )
 		$dutyHours += functions::min_diff($assignAmIn,$cDate,$assignAmOut,$cDate);
@@ -233,7 +170,7 @@ $chkAM='';$chkPM='';
 if($itmIDEdt){
 	$qDelLeave = $db->select('leave_file_detail','*',array('lfd_id'=>$itmIDEdt));
 	$rDL = $db->fetch_array($qDelLeave);
-	$lfd_date = $rDL['lfd_date'];
+	$lfd_date = $rDL['lfd_date'] ?? NULL;
 
 	//check if there is other adjustments
 	$eaa = $db->getValue('emp_attendance_adjustment','count(*)',array('emp_id'=>$emp_id,'eta_date'=>$lfd_date));
@@ -368,18 +305,18 @@ if( isset($_POST['btnSave']) ){
 					$eatd_id = $db->getValue('emp_attendance_detail','eatd_id',array('emp_id'=>$emp_id,'eat_date'=>$cDate));
 					$leave_name = $leave_type;
 					$remarks = $leave_name.' : '.$leave_reason;
-
-					$qATD = $db->select('emp_attendance_detail','*',array('eatd_id'=>$eatd_id));
-					$rATD = $db->fetch_array($qATD);
-					$dayName = $rATD['eat_day'];
-
-					$arrField = array(
-					'eatd_id'=>$eatd_id,'emp_id'=>$emp_id,'eta_date'=>$cDate,'eta_day'=>$rATD['eat_day'],
-					'am_in_org'=>$rATD['am_in'],'am_out_org'=>$rATD['am_out'],
-					'pm_in_org'=>$rATD['pm_in'],'pm_out_org'=>$rATD['pm_out'],
-					'ot_in'=>$rATD['ot_in'],'ot_out'=>$rATD['ot_out'],
-					'duty_min_org'=>$rATD['duty_min'],'ot_min_org'=>$rATD['ot_min'],'late_min_org'=>$rATD['late_min'],'under_min_org'=>$rATD['under_min'],
-					'change_date'=>date('Y-m-d'),'change_time'=>date('H:i:s'),'remarks'=>$remarks);
+					if($eatd_id){
+						$qATD = $db->select('emp_attendance_detail','*',array('eatd_id'=>$eatd_id));
+						$rATD = $db->fetch_array($qATD);
+						$dayName = $rATD['eat_day'] ?? NULL;
+						$arrField = array(
+						'eatd_id'=>$eatd_id,'emp_id'=>$emp_id,'eta_date'=>$cDate,'eta_day'=>$rATD['eat_day'],
+						'am_in_org'=>$rATD['am_in'],'am_out_org'=>$rATD['am_out'],
+						'pm_in_org'=>$rATD['pm_in'],'pm_out_org'=>$rATD['pm_out'],
+						'ot_in'=>$rATD['ot_in'],'ot_out'=>$rATD['ot_out'],
+						'duty_min_org'=>$rATD['duty_min'],'ot_min_org'=>$rATD['ot_min'],'late_min_org'=>$rATD['late_min'],'under_min_org'=>$rATD['under_min'],
+						'change_date'=>date('Y-m-d'),'change_time'=>date('H:i:s'),'remarks'=>$remarks);
+					}
 
 					$qLv = $db->select('leave_file_detail','*',array('lfd_id'=>$lfdID));
 					$rLv = $db->fetch_array($qLv);
@@ -398,32 +335,37 @@ if( isset($_POST['btnSave']) ){
 					$pm_in_assign = ($rETI['pm_in']) ? $rETI['pm_in'] : NULL;
 					$pm_out_assign = ($rETI['pm_out']) ? $rETI['pm_out'] : NULL;
 
-					diffComp($am_in_new,$am_in_assign,$am_out_new,$am_out_assign,$pm_in_new,$pm_in_assign,$pm_out_new,$pm_out_assign,$rATD['ot_in'],$rATD['ot_out'],$late_min_new,$under_min_new,$duty_min_new,$ot_min_new);
-
+					if($eatd_id){
+						diffComp($am_in_new,$am_in_assign,$am_out_new,$am_out_assign,$pm_in_new,$pm_in_assign,$pm_out_new,$pm_out_assign,$rATD['ot_in'],$rATD['ot_out'],$late_min_new,$under_min_new,$duty_min_new,$ot_min_new);
+					}
 					//update the attendance record with the new detail
 					if($leave_with_pay==1){
-						$arrField = array_merge($arrField,array('am_in_new'=>$am_in_new,'am_out_new'=>$am_out_new,'pm_in_new'=>$pm_in_new,'pm_out_new'=>$pm_out_new,'duty_min_new'=>$duty_min_new,'ot_min_new'=>$ot_min_new,'late_min_new'=>$late_min_new,'under_min_new'=>$under_min_new,'refer_id'=>$lfdID));
-						//insert the original attendance record to the adjustment table
-						$inserted_etaID = $db->insert('emp_attendance_adjustment',$arrField);
-						$is_holiday = ( $db->getValue('emp_attendance_detail','is_holiday',array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id))===1) ? 3 : 2;
-						$db->update('emp_attendance_detail',array(
-						'am_in'=>$am_in_new,'am_in_assign'=>$am_in_assign,'am_out'=>$am_out_new,'am_out_assign'=>$am_out_assign,
-						'pm_in'=>$pm_in_new,'pm_in_assign'=>$pm_in_assign,'pm_out'=>$pm_out_new,'pm_out_assign'=>$pm_out_assign,
-						'ot_in'=>$rATD['ot_in'],'ot_out'=>$rATD['ot_out'],
-						'duty_min'=>$duty_min_new,'ot_min'=>$ot_min_new,'late_min'=>$late_min_new,'under_min'=>$under_min_new,'is_holiday'=>$is_holiday),array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id));
+						if($eatd_id){
+							$arrField = array_merge($arrField,array('am_in_new'=>$am_in_new,'am_out_new'=>$am_out_new,'pm_in_new'=>$pm_in_new,'pm_out_new'=>$pm_out_new,'duty_min_new'=>$duty_min_new,'ot_min_new'=>$ot_min_new,'late_min_new'=>$late_min_new,'under_min_new'=>$under_min_new,'refer_id'=>$lfdID));
+							//insert the original attendance record to the adjustment table
+							$inserted_etaID = $db->insert('emp_attendance_adjustment',$arrField);
+							$is_holiday = ( $db->getValue('emp_attendance_detail','is_holiday',array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id))===1) ? 3 : 2;
+							$db->update('emp_attendance_detail',array(
+							'am_in'=>$am_in_new,'am_in_assign'=>$am_in_assign,'am_out'=>$am_out_new,'am_out_assign'=>$am_out_assign,
+							'pm_in'=>$pm_in_new,'pm_in_assign'=>$pm_in_assign,'pm_out'=>$pm_out_new,'pm_out_assign'=>$pm_out_assign,
+							'ot_in'=>$rATD['ot_in'],'ot_out'=>$rATD['ot_out'],
+							'duty_min'=>$duty_min_new,'ot_min'=>$ot_min_new,'late_min'=>$late_min_new,'under_min'=>$under_min_new,'is_holiday'=>$is_holiday),array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id));
+						}
 					}
 					else{
 						$under_min = functions::min_diff($am_in_assign,$cDate,$am_out_assign,$cDate);
 						$under_min += functions::min_diff($pm_in_assign,$cDate,$pm_out_assign,$cDate);
-						$arrField = array_merge($arrField,array('am_in_new'=>NULL,'am_out_new'=>NULL,'pm_in_new'=>NULL,'pm_out_new'=>NULL,'duty_min_new'=>0,'ot_min_new'=>$ot_min_new,'late_min_new'=>0,'under_min_new'=>$under_min,'refer_id'=>$lfdID));
-						//insert the original attendance record to the adjustment table
-						$inserted_etaID = $db->insert('emp_attendance_adjustment',$arrField);
-						$is_holiday = ( $db->getValue('emp_attendance_detail','is_holiday',array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id))===1) ? 3 : 2;
-						$db->update('emp_attendance_detail',array(
-						'am_in'=>NULL,'am_in_assign'=>$am_in_assign,'am_out'=>NULL,'am_out_assign'=>$am_out_assign,
-						'pm_in'=>NULL,'pm_in_assign'=>$pm_in_assign,'pm_out'=>NULL,'pm_out_assign'=>$pm_out_assign,
-						'ot_in'=>$rATD['ot_in'],'ot_out'=>$rATD['ot_out'],
-						'duty_min'=>0,'ot_min'=>$ot_min_new,'late_min'=>0,'under_min'=>$under_min,'is_holiday'=>$is_holiday),array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id));
+						if($eatd_id){
+							$arrField = array_merge($arrField,array('am_in_new'=>NULL,'am_out_new'=>NULL,'pm_in_new'=>NULL,'pm_out_new'=>NULL,'duty_min_new'=>0,'ot_min_new'=>$ot_min_new,'late_min_new'=>0,'under_min_new'=>$under_min,'refer_id'=>$lfdID));
+							//insert the original attendance record to the adjustment table
+							$inserted_etaID = $db->insert('emp_attendance_adjustment',$arrField);
+							$is_holiday = ( $db->getValue('emp_attendance_detail','is_holiday',array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id))===1) ? 3 : 2;
+							$db->update('emp_attendance_detail',array(
+							'am_in'=>NULL,'am_in_assign'=>$am_in_assign,'am_out'=>NULL,'am_out_assign'=>$am_out_assign,
+							'pm_in'=>NULL,'pm_in_assign'=>$pm_in_assign,'pm_out'=>NULL,'pm_out_assign'=>$pm_out_assign,
+							'ot_in'=>$rATD['ot_in'],'ot_out'=>$rATD['ot_out'],
+							'duty_min'=>0,'ot_min'=>$ot_min_new,'late_min'=>0,'under_min'=>$under_min,'is_holiday'=>$is_holiday),array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id));
+						}
 					}
 				}//end check if there is attendance already
 				else{

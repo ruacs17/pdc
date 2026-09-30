@@ -17,7 +17,7 @@ if( isset($_POST['btnSubmit']) ){
 	functions::sendTo(functions::pageName());
 	die();
 }
-$term = (isset($_SESSION['leave_term'])) ? $_SESSION['leave_term'] : '';
+$selYr = $term = (isset($_SESSION['leave_term'])) ? $_SESSION['leave_term'] : date('Y');
 $emp_id = (isset($_SESSION['leave_empID'])) ? $_SESSION['leave_empID'] : '';
 
 $arrLeaveType=array();
@@ -219,10 +219,11 @@ function leaveDetails($lf_id){
 						
 						while($rEmp = $db->fetch_array($qEmp)):
 							$countEmp++;
-							$date_regular = $db->getValue('emp_work_status','ews_date',array('emp_id'=>$rEmp['emp_id'],'ews_stat'=>'Regular'),'ORDER BY ews_date DESC LIMIT 1');
+							#$date_regular = $db->getValue('emp_work_status','ews_date',array('emp_id'=>$rEmp['emp_id'],'ews_stat'=>'Regular'),'ORDER BY ews_date DESC LIMIT 1');
+							$date_regular = $db->getValue('emp_work_status','ews_date',array('emp_id'=>$rEmp['emp_id']),'ORDER BY ews_date LIMIT 1');//start counting in the hired date
 							$allow_with_pay=0;
 							if($date_regular){
-								$years_regular = functions::year_diff($date_regular,date('Y-m-d'));
+								$years_regular = functions::year_diff($date_regular,date($selYr.'-m-d'));
 								if($years_regular)
 									$allow_with_pay=1;
 							}
@@ -234,7 +235,8 @@ function leaveDetails($lf_id){
 								foreach($arrLeaveType as $lid):
 
 									if($date_regular){
-										$yearService = functions::year_diff(date('Y-m-d'),$date_regular);
+										#$yearService = functions::year_diff(date('Y-m-d'),$date_regular);
+										$yearService = functions::year_diff($date_regular,date($selYr.'-m-d'));
 										$leave_allowed_days = $db->getValue('leave_config_add','allowed_days',array('lc_id'=>$lid['leave_id']),'AND "'.$yearService.'" BETWEEN service_year_from AND service_year_to');
 									}
 									else

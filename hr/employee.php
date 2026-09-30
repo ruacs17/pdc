@@ -105,13 +105,40 @@ $qDisp = $db->select('employee','*',array('emp_id'=>$searchVal));
 						</td>
 						<td>
 							<div align="center">
-							<?php
-							$qStat = $db->select('emp_work_status','*',array('emp_id'=>$rDisp['emp_id']),'ORDER BY ews_date DESC, ews_id DESC LIMIT 1');
-							$rStat = $db->fetch_array($qStat);
-							echo '<strong>'.$rStat['ews_stat'].'</strong>';
-							echo ($rStat['project_based']) ? '<div>(<i>Project Based</i>)</div>' : '';
-							echo '<br>'.functions::datearr($rStat['ews_date']);
-							?>
+								<?php
+								$qStat = $db->select('emp_work_status','*',array('emp_id'=>$rDisp['emp_id']),'ORDER BY ews_date DESC, ews_id DESC LIMIT 1');
+								$rStat = $db->fetch_array($qStat);
+								echo '<strong>'.$rStat['ews_stat'].'</strong>';
+								echo '<div>'.functions::datearr($rStat['ews_date']).'</div>';
+								echo ($rStat['project_based']) ? '<div>(<i>Project Based</i>)</div>' : '';
+								
+								$date_hired=$rStat['ews_date'];
+
+								$datehired = $db->getValue('emp_work_status','ews_date',array('emp_id'=>$rDisp['emp_id']),'ORDER BY ews_date, ews_id DESC LIMIT 1');
+								$datetime1 = new DateTime($datehired);
+								$datetime2 = new DateTime(date('Y-m-d'));
+								$interval = $datetime1->diff($datetime2);
+								$intrval_year = $interval->format('%y');
+								$intrval_month = $interval->format('%m');
+								$intrval_day = $interval->format('%d');
+								$diffInMonths = ($intrval_year * 12) + $intrval_month;
+								$display_yr=$display_mn=$display_day='';
+								if($intrval_year){
+									$display_yr = ($intrval_year > 1) ? $intrval_year.' Years, ' : $intrval_year.' Year, ';
+								}
+								if($intrval_month){
+									$display_mn = ($intrval_month > 1) ? $intrval_month.' Months, ' : $intrval_month.' Month, ';
+								}
+								if($intrval_day){
+									$display_day = ($intrval_day > 1) ? $intrval_day.' Days ' : $intrval_day.' Day ';
+								}
+								$intval = ($datehired=='0000-00-00' || $datehired=='') ? '----' : $display_yr.$display_mn.$display_day;
+								?>
+								<div align="left" style="padding-top:20px;">Date Hired: <?php echo functions::datearr($datehired); ?></div>
+								<div align="left" style="padding-top:5px;">Length of Service: </div>
+								<div align="left">Year: <?php echo $intrval_year ?></div>
+								<div align="left">Month: <?php echo $intrval_month ?></div>
+								<div align="left">Day: <?php echo $intrval_day ?></div>
 							</div>
 						</td>
 						<td>

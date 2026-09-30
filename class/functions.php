@@ -572,7 +572,7 @@ class functions{
 		/*$dateFrom = new DateTime($date_from.' 00:00:00');
 		$dateTo = $dateFrom->diff(new DateTime($date_to.' 23:59:00'));
 		return $dateTo->y;*/
-		$diff = abs(strtotime($date_to)-strtotime($date_from));
+		$diff = @abs(strtotime($date_to)-strtotime($date_from));
 		return $years = floor($diff / (365*60*60*24));
 	}
 

@@ -47,9 +47,8 @@ if( !empty($eatid) && ($confirmed==0) ){
 	$totalAbsentAmount=0;$sal_type='';
 	$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','DISTINCT eas_id.emp_id',array('eat_id'=>$eatid),'AND eas_id.emp_id=emp.emp_id ORDER BY lname,fname');
 	#echo $db->last_query.'<br>';
-	#$eatid=162;
-	#$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','DISTINCT eas_id.emp_id',array('eat_id'=>162,'emp.emp_id'=>1213),'AND eas_id.emp_id=emp.emp_id ORDER BY lname,fname');
-	#$qEmps = $db->query('SELECT DISTINCT eas_id.emp_id FROM emp_attendance_detail WHERE emp_id=1213 AND eat_id=162 AND eat_date BETWEEN "2026-06-26" AND "2026-07-10";');
+	// $eatid=153;$empid=605;
+	// $qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','DISTINCT eas_id.emp_id',array('eat_id'=>$eatid,'emp.emp_id'=>$empid),'AND eas_id.emp_id=emp.emp_id ORDER BY lname,fname');
 	while( $rEmps = $db->fetch_array($qEmps)):
 		$totalAbsentAmount=0;$totalAbsent=0;$absent_amount=0;
 		$emp_id = $rEmps['emp_id'];
@@ -73,6 +72,7 @@ if( !empty($eatid) && ($confirmed==0) ){
 		$wage_day=0;$wage_hour=0;$wage_minute=0;$duty_amount=0;
 		$empRegDutyMins=0;$empRegOTMins=0;$empUnderMins=0;$empLateMins=0;
 		$qSal = $db->select('emp_salary','*',array('emp_id'=>$emp_id),'AND es_date <= "'.$date_end.'" ORDER BY es_date DESC, es_id DESC LIMIT 1');
+		#echo $db->last_query;
 		$rSal = $db->fetch_array($qSal);
 		$txSalMonth = ($rSal['es_salary']) ? $rSal['es_salary'] : 0;
 		$wage_day = ($rSal['es_daily']) ? $rSal['es_daily'] : 0;

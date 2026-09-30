@@ -418,7 +418,10 @@ if( isset($_REQUEST['c']) ){
 						?>
 						<tr id="rw<?php echo $memberID?>" <?php echo $pd['bgColor']?>>
 							<td height="30px" class="padleft">
-								<a id="vw<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Payroll Detail" data-rel="tooltip" onclick="showThis(this.id,'payroll_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>','Attendance Detail','1')"><?php echo $countEmp.'. '.$pd['name'];#echo $countEmp.'. '.$pd['emp_id'].' - '.$pd['name'];?></a>
+								<div style="display: flex; justify-content: space-between; align-items: center;">
+									<a id="vw<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'payroll_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>','Attendance Detail','1')"><?php echo $countEmp.'. '.$pd['name'];#echo $countEmp.'. '.$pd['emp_id'].' - '.$pd['name'];?></a>
+									<a id="vw2<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'payroll_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>','Attendance Detail','1')"><i class="halflings-icon search"></i></a>
+								</div>
 							</td>
 							<td class="padleft"><?php echo $pd['position'];?></td>
 							<td><div align="center" <?php if(empty($sal_day)){echo 'title="Salary Undefined"';}else{echo 'title="'.functions::formatMoney($sal_day,"~").'"';} ?>><?php echo ($sal_day) ? functions::formatMoney($sal_day) : '??';?></div></td>

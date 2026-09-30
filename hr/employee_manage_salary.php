@@ -76,9 +76,6 @@ if( isset($_POST['btnSave']) ){
 	$es_type = ( isset($_POST['selSalType']) && !empty($_POST['selSalType']) ) ? $_POST['selSalType'] : 0;
     $working_days = ( isset($_POST['selFactor']) && !empty($_POST['selFactor']) ) ? $_POST['selFactor'] : 0;
 
-
-
-
 	if($es_type=='fixed'){//daily laborer
 		$es_salary = ($es_daily*$working_days) / 12;
 		$es_hourly = $es_daily / 8;
@@ -89,8 +86,6 @@ if( isset($_POST['btnSave']) ){
 		$es_hourly = $es_daily / 8;
 		$es_minute = $es_hourly / 60;
 	}
-
-
 
 	$es_date = ( isset($_POST['txStatDate']) && !empty($_POST['txStatDate']) ) ? trim($_POST['txStatDate']) : NULL;
 

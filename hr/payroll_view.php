@@ -460,22 +460,22 @@ if( isset($_REQUEST['c']) ){
 								<td height="30px" class="padleft"><a id="vw<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Payroll Detail" data-rel="tooltip" onclick="showThis(this.id,'payroll_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>','Attendance Detail','1')"><?php echo $countEmp.'. '.$pd['name'];?></a></td>
 								<?php if($salary_type){ ?>
 								<td class="padright"><div align="right"><?php echo functions::formatMoney($pd['salary']);?></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['regular_amount'],'~');?>"><?php echo functions::formatMoney($pd['regular_amount']);?></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['overtime_amount'],'~');?>"><?php echo functions::formatMoney($pd['overtime_amount']);?></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['addons'],'~');?>"><a id="addons<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Add-ons" data-rel="tooltip" onclick="showThis(this.id,'payroll_addon_manage.php?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&pr=pr','Add-ons Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['addons']);?></a></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['gross_pay'],'~');?>"><?php echo functions::formatMoney($pd['gross_pay']);?></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['absent_amount'],'~');?>"><a id="vwAbsnt<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" onclick="showThis(this.id,'payroll_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&absntVw=1','Absent Detail','1')"><?php echo functions::formatMoney($pd['absent_amount']);?></a></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['regular_amount'],'4');?>"><?php echo functions::formatMoney($pd['regular_amount']);?></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['overtime_amount'],'4');?>"><?php echo functions::formatMoney($pd['overtime_amount']);?></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['addons'],'4');?>"><a id="addons<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Add-ons" data-rel="tooltip" onclick="showThis(this.id,'payroll_addon_manage.php?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&pr=pr','Add-ons Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['addons']);?></a></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['gross_pay'],'4');?>"><?php echo functions::formatMoney($pd['gross_pay']);?></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['absent_amount'],'4');?>"><a id="vwAbsnt<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" onclick="showThis(this.id,'payroll_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&absntVw=1','Absent Detail','1')"><?php echo functions::formatMoney($pd['absent_amount']);?></a></div></td>
 								<td class="padright">
 									<?php $pa_id = $db->getValue('payroll_adjustment','pa_id',array('emp_id'=>$pd['emp_id'],'eat_id'=>$eatid,'adjustment_name'=>'SSS'));?>
-									<div align="right" title="<?php echo functions::formatMoney($pd['sss_contribution'],'~');?>"><a id="ss<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Deduction" data-rel="tooltip" onclick="showThis(this.id,'payroll_deduction_manage_benefit.php?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&edtID=<?php echo functions::encode($pa_id);?>&pr=pr','Contribution Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['sss_contribution']);?></a></div>
+									<div align="right" title="<?php echo functions::formatMoney($pd['sss_contribution'],'4');?>"><a id="ss<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Deduction" data-rel="tooltip" onclick="showThis(this.id,'payroll_deduction_manage_benefit.php?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&edtID=<?php echo functions::encode($pa_id);?>&pr=pr','Contribution Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['sss_contribution']);?></a></div>
 								</td>
 								<td class="padright">
 									<?php $pa_id_ph = $db->getValue('payroll_adjustment','pa_id',array('emp_id'=>$pd['emp_id'],'eat_id'=>$eatid,'adjustment_name'=>'Philhealth'));?>
-									<div align="right" title="<?php echo functions::formatMoney($pd['philhealth_contribution'],'~');?>"><a id="ph<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Deduction" data-rel="tooltip" onclick="showThis(this.id,'payroll_deduction_manage_benefit.php?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&edtID=<?php echo functions::encode($pa_id_ph);?>&pr=pr','Contribution Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['philhealth_contribution']);?></a></div>
+									<div align="right" title="<?php echo functions::formatMoney($pd['philhealth_contribution'],'4');?>"><a id="ph<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Deduction" data-rel="tooltip" onclick="showThis(this.id,'payroll_deduction_manage_benefit.php?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&edtID=<?php echo functions::encode($pa_id_ph);?>&pr=pr','Contribution Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['philhealth_contribution']);?></a></div>
 								</td>
 								<td class="padright">
 									<?php $pa_id_pagibig = $db->getValue('payroll_adjustment','pa_id',array('emp_id'=>$pd['emp_id'],'eat_id'=>$eatid,'adjustment_name'=>'Pagibig'));?>
-									<div align="right" title="<?php echo functions::formatMoney($pd['pagibig_contribution'],'~');?>"><a id="pg<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Deduction" data-rel="tooltip" onclick="showThis(this.id,'payroll_deduction_manage_benefit.php?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&edtID=<?php echo functions::encode($pa_id_pagibig);?>&pr=pr','Contribution Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['pagibig_contribution']);?></a></div>
+									<div align="right" title="<?php echo functions::formatMoney($pd['pagibig_contribution'],'4');?>"><a id="pg<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Deduction" data-rel="tooltip" onclick="showThis(this.id,'payroll_deduction_manage_benefit.php?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&edtID=<?php echo functions::encode($pa_id_pagibig);?>&pr=pr','Contribution Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['pagibig_contribution']);?></a></div>
 								</td>
 								<?php
 									foreach ($arrDeductionName as $deductionName): 
@@ -485,10 +485,10 @@ if( isset($_REQUEST['c']) ){
 									else
 										$arrDeductionTotal[$deductionName]=$deductValue;
 								?>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($deductValue,'~');?>"><?php if(($confirmed==1 || $statReady==1)){echo ($deductValue) ? functions::formatMoney($deductValue):'';}else{ echo functions::formatMoney($deductValue);}?></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($deductValue,'4');?>"><?php if(($confirmed==1 || $statReady==1)){echo ($deductValue) ? functions::formatMoney($deductValue):'';}else{ echo functions::formatMoney($deductValue);}?></div></td>
 								<?php endforeach; ?>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['total_deduction'],'~');?>"><a id="deduct<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Other Deduction" data-rel="tooltip" onclick="showThis(this.id,'<?php echo $deduction_page;?>?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&absntAmnt=<?php echo functions::encode($pd['absent_amount'])?>&pr=pr','Contribution Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['total_deduction']);?></a></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['net_pay'],'~');?>"><?php echo '<strong>'.functions::formatMoney($pd['net_pay']).'</strong>';?></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['total_deduction'],'4');?>"><a id="deduct<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Other Deduction" data-rel="tooltip" onclick="showThis(this.id,'<?php echo $deduction_page;?>?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&absntAmnt=<?php echo functions::encode($pd['absent_amount'])?>&pr=pr','Contribution Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['total_deduction']);?></a></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['net_pay'],'4');?>"><?php echo '<strong>'.functions::formatMoney($pd['net_pay']).'</strong>';?></div></td>
 								<td><div align="center"><input type="checkbox" class="chkDel" name="chkDel[<?php echo $memberID; ?>]" id="chkDel[<?php echo $memberID; ?>]" value="<?php echo functions::encode($memberID); ?>" <?php if($confirmed){echo 'disabled';} ?> onClick="statIndi(this.value)" <?php echo ($statReady) ? 'checked':''; ?>></div></td>
 								<?php }else{ ?>
 								<td colspan="13"><div align="left">--Unidentified Salary Type--</div></td>
@@ -525,19 +525,19 @@ if( isset($_REQUEST['c']) ){
 							<tr>
 								<td></td>
 								<td></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalRegularPay,'~');?>"><strong><?php echo functions::formatMoney($totalRegularPay);?></strong></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalOTPay,'~');?>"><strong><?php echo functions::formatMoney($totalOTPay);?></strong></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalAddonsPay,'~');?>"><strong><?php echo functions::formatMoney($totalAddonsPay);?></strong></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalGrossPay,'~');?>"><strong><?php echo functions::formatMoney($totalGrossPay);?></strong></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalAbsentPay,'~');?>"><strong><?php echo functions::formatMoney($totalAbsentPay);?></strong></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalSSSPay,'~');?>"><strong><?php echo functions::formatMoney($totalSSSPay);?></strong></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalPHPay,'~');?>"><strong><?php echo functions::formatMoney($totalPHPay);?></strong></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalHMDFPay,'~');?>"><strong><?php echo functions::formatMoney($totalHMDFPay);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalRegularPay,'4');?>"><strong><?php echo functions::formatMoney($totalRegularPay);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalOTPay,'4');?>"><strong><?php echo functions::formatMoney($totalOTPay);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalAddonsPay,'4');?>"><strong><?php echo functions::formatMoney($totalAddonsPay);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalGrossPay,'4');?>"><strong><?php echo functions::formatMoney($totalGrossPay);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalAbsentPay,'4');?>"><strong><?php echo functions::formatMoney($totalAbsentPay);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalSSSPay,'4');?>"><strong><?php echo functions::formatMoney($totalSSSPay);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalPHPay,'4');?>"><strong><?php echo functions::formatMoney($totalPHPay);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalHMDFPay,'4');?>"><strong><?php echo functions::formatMoney($totalHMDFPay);?></strong></div></td>
 								<?php foreach ($arrDeductionName as $deductionName): ?>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($arrDeductionTotal[$deductionName],'~');?>"><strong><?php echo functions::formatMoney($arrDeductionTotal[$deductionName]);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($arrDeductionTotal[$deductionName],'4');?>"><strong><?php echo functions::formatMoney($arrDeductionTotal[$deductionName]);?></strong></div></td>
 								<?php endforeach; ?>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalAllDeduction,'~');?>"><strong><?php echo functions::formatMoney($totalAllDeduction);?></strong></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalNetAmount,'~');?>"><strong><?php echo functions::formatMoney($totalNetAmount);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalAllDeduction,'4');?>"><strong><?php echo functions::formatMoney($totalAllDeduction);?></strong></div></td>
+								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($totalNetAmount,'4');?>"><strong><?php echo functions::formatMoney($totalNetAmount);?></strong></div></td>
 								<td class="padright"><div align="right">&nbsp;</div></td>
 							</tr>
 						</tbody>
