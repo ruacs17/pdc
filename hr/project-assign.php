@@ -40,7 +40,7 @@ if($p_id){
 	.group-assign-container {
 		width: 100% !important;
 		max-width: 100% !important;
-		padding: 15px 20px 30px 20px;
+		/*padding: 15px 20px 30px 20px;*/
 		box-sizing: border-box;
 	}
 
@@ -81,7 +81,7 @@ if($p_id){
 		border-radius: 16px;
 		border: 1px solid var(--border-subtle);
 		box-shadow: 0 10px 25px -5px rgba(61, 35, 20, 0.05);
-		overflow: hidden;
+		overflow: visible;
 		box-sizing: border-box;
 	}
 

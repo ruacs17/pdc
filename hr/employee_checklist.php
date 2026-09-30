@@ -43,7 +43,6 @@ $file = ($fileName && file_exists('../img_emp/'.$fileName) ) ? $fileName : 'blan
 	<link id="base-style-responsive" href="../css/style-responsive.css" rel="stylesheet">
 	<script src="../js/inputInt.js"></script>
 	<!-- end: CSS -->
-	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
 	<link id="ie-style" href="../css/ie.css" rel="stylesheet">
 	<![endif]-->
@@ -53,95 +52,307 @@ $file = ($fileName && file_exists('../img_emp/'.$fileName) ) ? $fileName : 'blan
 	<!-- start: Favicon -->
 	<link rel="shortcut icon" href="../img/favicon.png">
 	<!-- end: Favicon -->
+
 	<style type="text/css">
-	body{background-color: #FFF;}
-	.table-wrapper thead tr:nth-child(1) th { background: #DDD;position: sticky; top: 0px; }
+		body {
+			background-color: #f8fafc;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			color: #1e293b;
+			padding: 20px;
+		}
+
+		.checklist-container {
+			max-width: 1100px;
+			margin: 0 auto;
+		}
+
+		/* Header & Profile Card Styling */
+		.page-header-title {
+			text-align: center;
+			margin-bottom: 24px;
+		}
+
+		.page-header-title h2 {
+			font-size: 24px;
+			font-weight: 700;
+			color: #0f172a;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin: 0;
+		}
+
+		.profile-card {
+			background: #ffffff;
+			border: 1px solid #e2e8f0;
+			border-radius: 12px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+			padding: 24px;
+			margin-bottom: 24px;
+			display: flex;
+			align-items: center;
+			gap: 30px;
+		}
+
+		@media (max-width: 768px) {
+			.profile-card {
+				flex-direction: column;
+				text-align: center;
+			}
+		}
+
+		.profile-avatar-wrapper {
+			flex-shrink: 0;
+		}
+
+		.profile-avatar {
+			width: 140px;
+			height: 140px;
+			border-radius: 12px;
+			object-fit: cover;
+			border: 3px solid #f1f5f9;
+			box-shadow: 0 4px 8px rgba(0,0,0,0.06);
+		}
+
+		.profile-info-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 16px;
+			width: 100%;
+		}
+
+		@media (max-width: 600px) {
+			.profile-info-grid {
+				grid-template-columns: repeat(1, 1fr);
+			}
+		}
+
+		.info-item {
+			background: #f8fafc;
+			border: 1px solid #e2e8f0;
+			padding: 10px 14px;
+			border-radius: 8px;
+		}
+
+		.info-label {
+			font-size: 10px;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: #64748b;
+			display: block;
+			margin-bottom: 4px;
+		}
+
+		.info-value {
+			font-size: 14px;
+			font-weight: 600;
+			color: #0f172a;
+		}
+
+		/* Enhanced Table Styling */
+		.table-wrapper {
+			background: #ffffff;
+			border: 1px solid #e2e8f0;
+			border-radius: 12px;
+			box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+			overflow: hidden;
+		}
+
+		.custom-table {
+			width: 100%;
+			border-collapse: collapse;
+			margin: 0;
+		}
+
+		.custom-table thead tr {
+			background-color: #f1f5f9 !important;
+		}
+
+		.custom-table th {
+			padding: 14px 16px;
+			font-size: 11px;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: #475569;
+			border-bottom: 2px solid #e2e8f0;
+			position: sticky;
+			top: 0;
+			z-index: 10;
+		}
+
+		.custom-table td {
+			padding: 12px 16px;
+			font-size: 13px;
+			color: #334155;
+			border-bottom: 1px solid #f1f5f9;
+			vertical-align: middle;
+		}
+
+		.custom-table tbody tr:last-child td {
+			border-bottom: none;
+		}
+
+		.custom-table tbody tr:hover td {
+			background-color: #f0f9ff !important;
+		}
+
+		/* Status Badges */
+		.badge-status {
+			display: inline-block;
+			padding: 4px 12px;
+			border-radius: 20px;
+			font-size: 11px;
+			font-weight: 700;
+			text-transform: uppercase;
+		}
+
+		.badge-done {
+			background-color: #dcfce7;
+			color: #15803d;
+			border: 1px solid #bbf7d0;
+		}
+
+		.badge-not-done {
+			background-color: #fef2f2;
+			color: #b91c1c;
+			border: 1px solid #fecaca;
+		}
+
+		/* Interactive Document View Button */
+		.btn-doc-view {
+			display: inline-flex;
+			align-items: center;
+			gap: 4px;
+			color: #0284c7;
+			font-weight: 600;
+			font-size: 12px;
+			text-decoration: none !important;
+			padding: 4px 8px;
+			border-radius: 4px;
+			transition: background 0.2s ease;
+		}
+
+		.btn-doc-view:hover {
+			background: #e0f2fe;
+			color: #0369a1;
+		}
+
+		/* Action Edit Button Override */
+		.btn-edit-action {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			width: 30px;
+			height: 30px;
+			border-radius: 6px;
+			background: #fef3c7;
+			color: #d97706 !important;
+			border: 1px solid #fde68a;
+			transition: all 0.2s ease;
+		}
+
+		.btn-edit-action:hover {
+			background: #d97706;
+			color: #ffffff !important;
+			border-color: #d97706;
+		}
 	</style>
 </head>
-<body bgcolor="#FFFFFF">
-<!-- body content: start here-->
-<div align="center">
-<table width="90%" border="0" align="center">
-	<tr>
-		<td>
-			<div align="center" style="padding-bottom:30px;"><h2>201 FILE CHECKLIST</h2></div>
-			<table width="90%" border="0" style="font-size:12px;">
+<body>
+
+<div class="checklist-container">
+	<div class="page-header-title">
+		<h2>201 File Checklist</h2>
+	</div>
+
+	<!-- Profile Information Card -->
+	<div class="profile-card">
+		<div class="profile-avatar-wrapper">
+			<img class="profile-avatar" src="../img_emp/<?php echo $file;?>" alt="Employee Picture">
+		</div>
+		<div class="profile-info-grid">
+			<div class="info-item">
+				<span class="info-label">ID Number</span>
+				<span class="info-value"><?php echo $txtEmpNo ?: '--';?></span>
+			</div>
+			<div class="info-item">
+				<span class="info-label">Last Name</span>
+				<span class="info-value"><?php echo $txtlName ?: '--';?></span>
+			</div>
+			<div class="info-item">
+				<span class="info-label">First Name</span>
+				<span class="info-value"><?php echo $txtfName ?: '--';?></span>
+			</div>
+			<div class="info-item">
+				<span class="info-label">Middle Name</span>
+				<span class="info-value"><?php echo $txtmName ?: '--';?></span>
+			</div>
+			<div class="info-item">
+				<span class="info-label">Suffix</span>
+				<span class="info-value"><?php echo $txtExtName ?: '--';?></span>
+			</div>
+			<div class="info-item">
+				<span class="info-label">Nickname</span>
+				<span class="info-value"><?php echo $txtNickName ?: '--';?></span>
+			</div>
+		</div>
+	</div>
+
+	<!-- Checklist Data Table -->
+	<div class="table-wrapper">
+		<table id="tblist" class="custom-table <?php if(!isset($_SESSION['notif_id'])){echo 'table-bordered';} ?>">
+			<thead>
 				<tr>
-					<td><div align="right" style="padding-right:20px;"><img width="200" height="200" src="../img_emp/<?php echo $file;?>"></div></td>
-					<td>
-						<div align="left" style="padding:20px 0px 0px 20px;">
-							<table class="table">
-								<tr>
-									<th width="30%"><div align="left">ID Number</div></th>
-									<td><?php echo $txtEmpNo;?></td>
-								</tr>
-								<tr>
-									<th><div align="left">LAST NAME</div></th>
-									<td><?php echo $txtlName;?></td>
-								</tr>
-								<tr>
-									<th><div align="left">FIRST NAME</div></th>
-									<td><?php echo $txtfName;?></td>
-								</tr>
-								<tr>
-									<th><div align="left">MIDDLE NAME</div></th>
-									<td><?php echo $txtmName;?></td>
-								</tr>
-								<tr>
-									<th><div align="left">Suffix (JR, SR, III)</div></th>
-									<td><?php echo $txtExtName;?></td>
-								</tr>
-								<tr>
-									<th><div align="left">NICK NAME</div></th>
-									<td><?php echo $txtNickName;?></td>
-								</tr>
-							</table>
-						</div>
+					<th width="30%">Checklist Requirement</th>
+					<th width="15%" style="text-align: center;">Status</th>
+					<th width="20%" style="text-align: center;">File Attachment</th>
+					<th width="25%" style="text-align: center;">Remarks</th>
+					<th width="10%" style="text-align: center;">Manage</th>
+				</tr>
+			</thead>
+			<tbody>
+				<?php
+				$countHours=0;$countSeminar=0;$count=0;
+				$q = $db->select('emp_201_reference','*',array(),'ORDER BY e2r_name');
+				while($r = $db->fetch_array($q)):
+					$rID = 0;
+					$refID = $r['e2r_id'];
+					$status = $db->getValue('emp_201','e2_status',array('emp_id'=>$eid,'e2r_id'=>$refID));
+					$e201_file = $db->getValue('emp_201','e2_file',array('emp_id'=>$eid,'e2r_id'=>$refID));
+					$remarks = $db->getValue('emp_201','remarks',array('emp_id'=>$eid,'e2r_id'=>$refID));
+				?>
+				<tr id="rw<?php echo $refID?>">
+					<td><strong><?php echo $r['e2r_name'];?></strong></td>
+					<td style="text-align: center;">
+						<?php if($status): ?>
+							<span class="badge-status badge-done">Done</span>
+						<?php else: ?>
+							<span class="badge-status badge-not-done">Not Done</span>
+						<?php endif; ?>
+					</td>
+					<td style="text-align: center;">
+						<?php if($db->getValue('emp_201_docs','count(*)',array('e2r_id'=>$refID,'emp_id'=>$eid))){ ?>
+							<a id="vwpcs<?php echo $count++?>" style="cursor: pointer;" class="btn-doc-view thickbox" title="Document View" data-rel="tooltip" onclick="showThis(this.id,'employee_checklist_manage_view.php?e2r_id=<?php echo functions::encode($refID);?>&eid=<?php echo functions::encode($eid);?>','View Document','1')">
+								<i class="halflings-icon file"></i> View Document
+							</a>
+						<?php } else { ?>
+							<span style="color: #cbd5e1;">--</span>
+						<?php } ?>
+					</td>
+					<td style="text-align: center; color: #64748b;"><?php echo $remarks ?: '<span style="color:#cbd5e1;">--</span>';?></td>
+					<td style="text-align: center;">
+						<a id="edit<?php echo $count++?>" class="btn-edit-action thickbox" title="Modify Employee Checklist Detail" data-rel="tooltip" onclick="showThis(this.id,'employee_checklist_manage.php?eid=<?php echo functions::encode($eid);?>&refID=<?php echo functions::encode($refID);?>','Employee Checklist Update')">
+							<i class="halflings-icon pencil"></i>
+						</a>
 					</td>
 				</tr>
-			</table>
-			<div class="table-wrapper">
-				<table width="100%" align="center" border="0" class="table <?php if(!isset($_SESSION['notif_id'])){echo 'table-bordered';} ?> table-hover" style="font-size: 12px;">
-					<thead>
-						<tr style="background-color:#ececec">
-							<th width="25%"><strong>CHECKLIST</strong></th>
-							<th width="20%"><div align="center"><strong>STATUS</strong></div></th>
-							<th width="20%"><div align="center"><strong>FILE</strong></div></th>
-							<th width="20%"><div align="center"><strong>REMARKS</strong></div></th>
-							<th width="10%"><div align="center"><strong>MANAGE</strong></div></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php
-						$countHours=0;$countSeminar=0;$count=0;
-						$q = $db->select('emp_201_reference','*',array(),'ORDER BY e2r_name');
-						while($r = $db->fetch_array($q)):
-							$rID = 0;
-							$refID = $r['e2r_id'];
-							$status = $db->getValue('emp_201','e2_status',array('emp_id'=>$eid,'e2r_id'=>$refID));
-							$e201_file = $db->getValue('emp_201','e2_file',array('emp_id'=>$eid,'e2r_id'=>$refID));
-							$remarks = $db->getValue('emp_201','remarks',array('emp_id'=>$eid,'e2r_id'=>$refID));
-						?>
-						<tr id="rw<?php echo $refID?>">
-							<td><?php echo $r['e2r_name'];?></td>
-							<td><div align="center"><?php echo ($status) ? 'Done' : 'Not Done';?></div></td>
-							<td>
-								<?php if($db->getValue('emp_201_docs','count(*)',array('e2r_id'=>$refID,'emp_id'=>$eid))){ ?>
-								<div align="center"><a id="vwpcs<?php echo $count++?>" style="cursor: pointer;" class="thickbox" title="Document View" data-rel="tooltip" onclick="showThis(this.id,'employee_checklist_manage_view.php?e2r_id=<?php echo functions::encode($refID);?>&eid=<?php echo functions::encode($eid);?>','View Document','1')">View Document</a></div>
-								<?php } ?>
-							</td>
-							<td><div align="center"><?php echo $remarks;?></div></td>
-							<td><div align="center"><a id="edit<?php echo  $count++?>" class="btn btn-mini btn-warning thickbox" title="Modify Employee Checklist Detail" data-rel="tooltip" onclick="showThis(this.id,'employee_checklist_manage.php?eid=<?php echo functions::encode($eid);?>&refID=<?php echo functions::encode($refID);?>','Employee Checklist Update')"><i class="halflings-icon white pencil"></i></a></div></td>
-						</tr>
-						<?php endwhile;?>
-					</tbody>
-				</table>
-			</div>
-		</td>
-	</tr>
-</table><br><br>
+				<?php endwhile;?>
+			</tbody>
+		</table>
+	</div>
 </div>
-<!-- body content: end here-->
+
 <!-- start: JavaScript-->
 <script src="../js/jquery-1.9.1.min.js"></script>
 <script src="../js/jquery-migrate-1.0.0.min.js"></script>
@@ -177,12 +388,13 @@ $file = ($fileName && file_exists('../img_emp/'.$fileName) ) ? $fileName : 'blan
 <script src="../js/thickboxa.js"></script>
 <link rel="stylesheet" type="text/css" href="../css/thickbox.css"/>
 <script src="../js/showPage.js"></script>
+
 <?php if(isset($_SESSION['notif_id'])){ ?>
 <script src="../js/jcentr.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 	$('#rw<?php echo $_SESSION['notif_id'] ?>').centerView();
-	$('#rw<?php echo $_SESSION['notif_id'] ?>').css('border','3px solid green');
+	$('#rw<?php echo $_SESSION['notif_id'] ?>').css('border','3px solid #10b981');
 	$("#rw<?php echo $_SESSION['notif_id'] ?>").animate({borderColor:"#87EAC1"}, 4000);
 	$("#rw<?php echo $_SESSION['notif_id'] ?>").animate({borderColor:""}, 4000);
 	window.setTimeout(function(){$('#tblist').addClass('table-bordered');}, 5000);

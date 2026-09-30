@@ -14,7 +14,7 @@
                             <ul>
                                 <li><a class="submenu" href="employee.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-list"></i><span class="hidden-tablet"> List</span></a></li>
                                 <li><a class="submenu" href="201_reference.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-book"></i><span class="hidden-tablet"> 201 Manage</span></a></li>
-                                <li><a class="submenu" href="assignment.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-group"></i><span class="hidden-tablet"> Group</span></a></li>
+                                <li><a class="submenu" href="assignment.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-group"></i><span class="hidden-tablet"> Attendance Group</span></a></li>
                                 <li><a class="submenu" href="project-assign.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-building"></i><span class="hidden-tablet"> Project Assignment</span></a></li>
                             </ul>
                         </li>

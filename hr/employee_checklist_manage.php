@@ -58,12 +58,10 @@ if( isset($_POST['btnSave']) && $emp_id && $e2r_id ){
 		$actionTaken=1;
 	}
 	$e2_id = $db->getValue('emp_201','e2_id',array('e2r_id'=>$e2r_id,'emp_id'=>$emp_id));
-	#echo '<br>'.$db->last_query;
 
 	if( isset($_FILES['image']) ){
 		$uploaddir = '../img_emp/';
 		$max_size = 4000 * 1024; // 500 KB
-		// Generates random filename and extension 
 		function tempnam_sfx($path, $suffix){
 			do{
 				$file = $path."/".mt_rand().$suffix;
@@ -81,10 +79,8 @@ if( isset($_POST['btnSave']) && $emp_id && $e2r_id ){
 				$file_tmp = $_FILES["image"]["tmp_name"][$key];
 				$file_size = $_FILES["image"]["size"][$key];
 				$file_type = $_FILES["image"]["type"][$key];
-				// Process image with GD library
 				$verifyimg = getimagesize($_FILES['image']['tmp_name'][$key]);
 
-				// Make sure the MIME type is an image
 				$pattern = "#^(image/)[^\s\n<]+$#i";
 
 				if( !preg_match($pattern, $verifyimg['mime']) ){
@@ -94,10 +90,8 @@ if( isset($_POST['btnSave']) && $emp_id && $e2r_id ){
 					functions::say("Image reached the limit size!");
 				}
 				else{
-					// Rename both the image and the extension 
 					$uploadfile = tempnam_sfx($uploaddir, ".jpg");
 
-					// Upload the file to a secure directory with the new name and extension
 					if (move_uploaded_file($file_tmp, $uploadfile)) {
 						$di_id = $db->insert('doc_img',array('doc_name'=>basename($uploadfile),'doc_org_name'=>basename($file_name),'mime_type'=>$file_type));
 						$db->insert('emp_201_docs',array('e2_id'=>$e2_id,'e2r_id'=>$e2r_id,'emp_id'=>$emp_id,'di_id'=>$di_id));
@@ -129,7 +123,6 @@ if( isset($_POST['btnSave']) && $emp_id && $e2r_id ){
 	<link id="base-style-responsive" href="../css/style-responsive.css" rel="stylesheet">
 	<script src="../js/inputInt.js"></script>
 	<!-- end: CSS -->
-	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
 	<link id="ie-style" href="../css/ie.css" rel="stylesheet">
 	<![endif]-->
@@ -138,122 +131,477 @@ if( isset($_POST['btnSave']) && $emp_id && $e2r_id ){
 	<![endif]-->
 	<!-- start: Favicon -->
 	<link rel="shortcut icon" href="../img/favicon.png">
-	<style type="text/css">
-	body{background-color: #FFF;}
-	</style>
 	<!-- end: Favicon -->
-</head>
-<body bgcolor="#FFFFFF">
-<!-- body content: start here-->
-<div align="center">
-<form class="form-horizontal" method="post" enctype="multipart/form-data">
-	<table  width="90%" border="0" align="center">
-		<tr>
-			<td>
-				<div align="center" style="padding-bottom:30px;"><h2>PERSONAL DATA SHEET</h2></div>
-				<table width="90%" border="0" style="font-size:12px;">
-					<tr>
-						<td><div align="right" style="padding-right:20px;"><img width="200" height="200" src="../img_emp/<?php echo $file;?>"></div></td>
-						<td>
-							<div align="left" style="padding:20px 0px 0px 20px;">
-								<table class="table">
-									<tr>
-										<th width="30%"><div align="left">ID Number</div></th>
-										<td><?php echo $txtEmpNo;?></td>
-									</tr>
-									<tr>
-										<th><div align="left">LAST NAME</div></th>
-										<td><?php echo $txtlName;?></td>
-									</tr>
-									<tr>
-										<th><div align="left">FIRST NAME</div></th>
-										<td><?php echo $txtfName;?></td>
-									</tr>
-									<tr>
-										<th><div align="left">MIDDLE NAME</div></th>
-										<td><?php echo $txtmName;?></td>
-									</tr>
-									<tr>
-										<th><div align="left">Suffix (JR, SR, III)</div></th>
-										<td><?php echo $txtExtName;?></td>
-									</tr>
-									<tr>
-										<th><div align="left">NICK NAME</div></th>
-										<td><?php echo $txtNickName;?></td>
-									</tr>
-								</table>
-							</div>
-						</td>
-					</tr>
-				</table>
-				<table width="100%" align="center" border="0" class="table table-bordered" style="font-size: 12px;">
-					<thead>
-						<tr style="background-color:#ececec">
-							<th width="25%"><strong>CHECKLIST</strong></th>
-							<th width="20%"><div align="center"><strong>STATUS</strong></div></th>
-							<th width="20%"><div align="center"><strong>FILE</strong></div></th>
-							<th width="20%"><div align="center"><strong>REMARKS</strong></div></th>
-							<th width="10%"></th>
-						</tr>
-					</thead>
-					<tbody>
-						<?php
-						$countHours=0;$countSeminar=0;
-						$q = $db->select('emp_201_reference','*',array('e2r_id'=>$e2r_id),'ORDER BY e2r_name');
-						while($r = $db->fetch_array($q)):
-							$rID = 0;
-							$refID = $r['e2r_id'];
-						?>
-						<tr>
-							<td><?php echo $r['e2r_name'];?></td>
-							<td>
-								<div align="left" style="padding-left:40px;">
-									<label><input type="radio" name="rdoDone" value="1" <?php if($status=='1'){echo 'checked="checked"';}?>> Done<br></label>
-									<label><input type="radio" name="rdoDone" value="0" <?php if($status=='0'){echo 'checked="checked"';}?>> Not Done</label>
-								</div>
-							</td>
-							<td>
-								<div align="center">
 
-									<?php
-									$countPic=0;
-									$qpc = $db->select('emp_201_docs docs, doc_img img','*',array('e2r_id'=>$e2r_id,'emp_id'=>$emp_id),'AND docs.di_id=img.di_id');
-									while( $rpc = $db->fetch_array($qpc)):
-										$fileName = $rpc['doc_name'];
-										$countPic++;
-										if($fileName && file_exists('../img_emp/'.$fileName) ){
+	<style type="text/css">
+		body {
+			background-color: #f8fafc;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			color: #1e293b;
+			padding: 24px 16px;
+		}
+
+		.checklist-container {
+			max-width: 820px;
+			margin: 0 auto;
+		}
+
+		.page-header-title {
+			text-align: center;
+			margin-bottom: 24px;
+		}
+
+		.page-header-title h2 {
+			font-size: 22px;
+			font-weight: 700;
+			color: #0f172a;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin: 0;
+		}
+
+		/* Profile Card */
+		.profile-card {
+			background: #ffffff;
+			border: 1px solid #e2e8f0;
+			border-radius: 12px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+			padding: 20px;
+			margin-bottom: 24px;
+			display: flex;
+			align-items: center;
+			gap: 24px;
+		}
+
+		@media (max-width: 640px) {
+			.profile-card {
+				flex-direction: column;
+				text-align: center;
+			}
+		}
+
+		.profile-avatar-wrapper {
+			flex-shrink: 0;
+		}
+
+		.profile-avatar {
+			width: 110px;
+			height: 110px;
+			border-radius: 10px;
+			object-fit: cover;
+			border: 3px solid #f1f5f9;
+		}
+
+		.profile-info-grid {
+			display: grid;
+			grid-template-columns: repeat(3, 1fr);
+			gap: 12px;
+			width: 100%;
+		}
+
+		@media (max-width: 600px) {
+			.profile-info-grid {
+				grid-template-columns: repeat(2, 1fr);
+			}
+		}
+
+		.info-item {
+			background: #f8fafc;
+			border: 1px solid #e2e8f0;
+			padding: 8px 12px;
+			border-radius: 6px;
+		}
+
+		.info-label {
+			font-size: 10px;
+			font-weight: 700;
+			text-transform: uppercase;
+			color: #64748b;
+			display: block;
+			margin-bottom: 2px;
+		}
+
+		.info-value {
+			font-size: 13px;
+			font-weight: 600;
+			color: #0f172a;
+		}
+
+		/* Checklist Card Component */
+		.checklist-card {
+			background: #ffffff;
+			border: 1px solid #e2e8f0;
+			border-radius: 12px;
+			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+			overflow: hidden;
+		}
+
+		.checklist-card-header {
+			background: #f8fafc;
+			padding: 16px 24px;
+			border-bottom: 1px solid #e2e8f0;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.checklist-card-title {
+			font-size: 16px;
+			font-weight: 700;
+			color: #0f172a;
+			margin: 0;
+		}
+
+		.checklist-card-body {
+			padding: 24px;
+			display: flex;
+			flex-direction: column;
+			gap: 20px;
+		}
+
+		/* Side-by-Side Horizontal Form Rows */
+		.form-horizontal-row {
+			display: flex;
+			align-items: flex-start;
+			gap: 20px;
+		}
+
+		@media (max-width: 640px) {
+			.form-horizontal-row {
+				flex-direction: column;
+				gap: 8px;
+			}
+		}
+
+		.field-label {
+			width: 160px;
+			flex-shrink: 0;
+			font-size: 12px;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: #475569;
+			padding-top: 8px;
+		}
+
+		.field-content {
+			flex: 1;
+			width: 100%;
+		}
+
+		/* Status Radio Pill Group */
+		.status-radio-group {
+			display: flex;
+			gap: 12px;
+			max-width: 280px;
+		}
+
+		.radio-label {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			gap: 8px;
+			background: #ffffff;
+			border: 1px solid #cbd5e1;
+			padding: 8px 16px;
+			border-radius: 6px;
+			cursor: pointer;
+			font-size: 13px;
+			font-weight: 600;
+			color: #475569;
+			transition: all 0.2s ease;
+		}
+
+		.radio-label:hover {
+			background: #f8fafc;
+			border-color: #94a3b8;
+		}
+
+		.radio-label input[type="radio"] {
+			margin: 0;
+		}
+
+		/* Status Badges */
+		.badge-status {
+			display: inline-block;
+			padding: 4px 12px;
+			border-radius: 20px;
+			font-size: 11px;
+			font-weight: 700;
+			text-transform: uppercase;
+		}
+
+		.badge-done {
+			background-color: #dcfce7;
+			color: #15803d;
+			border: 1px solid #bbf7d0;
+		}
+
+		.badge-not-done {
+			background-color: #fef2f2;
+			color: #b91c1c;
+			border: 1px solid #fecaca;
+		}
+
+		/* Document Attachments Box */
+		.document-box-container {
+			background: #f8fafc;
+			border: 1px solid #e2e8f0;
+			border-radius: 8px;
+			padding: 16px;
+		}
+
+		.doc-gallery {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 12px;
+			margin-bottom: 12px;
+		}
+
+		.doc-card {
+			background: #ffffff;
+			border: 1px solid #e2e8f0;
+			border-radius: 6px;
+			padding: 6px;
+			text-align: center;
+		}
+
+		.doc-thumb {
+			width: 85px;
+			height: 85px;
+			object-fit: cover;
+			border-radius: 4px;
+			border: 1px solid #f1f5f9;
+			display: block;
+		}
+
+		.btn-remove-doc {
+			display: inline-block;
+			margin-top: 6px;
+			color: #ef4444;
+			font-size: 11px;
+			font-weight: 600;
+			text-decoration: none !important;
+			padding: 2px 6px;
+			border-radius: 4px;
+			background: #fef2f2;
+			border: 1px solid #fecaca;
+		}
+
+		.btn-remove-doc:hover {
+			background: #ef4444;
+			color: #ffffff;
+		}
+
+		.btn-view-all {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			color: #0284c7 !important;
+			font-weight: 600;
+			font-size: 12px;
+			text-decoration: none !important;
+			margin-bottom: 12px;
+		}
+
+		/* File Input */
+		.file-input-wrapper {
+			font-size: 12px;
+			color: #64748b;
+		}
+
+		.file-input-wrapper input[type="file"] {
+			margin-top: 4px;
+			font-size: 12px;
+			display: block;
+		}
+
+		/* Textarea Control */
+		.custom-textarea {
+			width: 100%;
+			box-sizing: border-box;
+			border: 1px solid #cbd5e1;
+			border-radius: 6px;
+			padding: 10px 12px;
+			font-size: 13px;
+			color: #1e293b;
+			resize: vertical;
+			min-height: 80px;
+			outline: none;
+			transition: border-color 0.2s ease;
+		}
+
+		.custom-textarea:focus {
+			border-color: #0284c7;
+			box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.1);
+		}
+
+		/* Footer Actions */
+		.checklist-card-footer {
+			background: #f8fafc;
+			padding: 14px 24px;
+			border-top: 1px solid #e2e8f0;
+			display: flex;
+			justify-content: flex-end;
+		}
+
+		.btn-save-action {
+			background-color: #0284c7;
+			color: #ffffff !important;
+			font-weight: 600;
+			padding: 8px 20px;
+			border-radius: 6px;
+			border: none;
+			cursor: pointer;
+			box-shadow: 0 2px 4px rgba(2, 132, 199, 0.15);
+			transition: background-color 0.2s ease;
+		}
+
+		.btn-save-action:hover {
+			background-color: #0369a1;
+		}
+	</style>
+</head>
+<body>
+
+<div class="checklist-container">
+	<div class="page-header-title">
+		<h2>Personal Data Sheet</h2>
+	</div>
+
+	<form class="form-horizontal" method="post" enctype="multipart/form-data">
+		<!-- Employee Information Overview -->
+		<div class="profile-card">
+			<div class="profile-avatar-wrapper">
+				<img class="profile-avatar" src="../img_emp/<?php echo $file;?>" alt="Employee Picture">
+			</div>
+			<div class="profile-info-grid">
+				<div class="info-item">
+					<span class="info-label">ID Number</span>
+					<span class="info-value"><?php echo $txtEmpNo ?: '--';?></span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Last Name</span>
+					<span class="info-value"><?php echo $txtlName ?: '--';?></span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">First Name</span>
+					<span class="info-value"><?php echo $txtfName ?: '--';?></span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Middle Name</span>
+					<span class="info-value"><?php echo $txtmName ?: '--';?></span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Suffix</span>
+					<span class="info-value"><?php echo $txtExtName ?: '--';?></span>
+				</div>
+				<div class="info-item">
+					<span class="info-label">Nickname</span>
+					<span class="info-value"><?php echo $txtNickName ?: '--';?></span>
+				</div>
+			</div>
+		</div>
+
+		<!-- Checklist Item Form View -->
+		<?php
+		$q = $db->select('emp_201_reference','*',array('e2r_id'=>$e2r_id),'ORDER BY e2r_name');
+		while($r = $db->fetch_array($q)):
+			$refID = $r['e2r_id'];
+		?>
+		<div class="checklist-card">
+			<div class="checklist-card-header">
+				<h3 class="checklist-card-title"><?php echo $r['e2r_name'];?></h3>
+				<?php if($status == '1'): ?>
+					<span class="badge-status badge-done">Done</span>
+				<?php else: ?>
+					<span class="badge-status badge-not-done">Not Done</span>
+				<?php endif; ?>
+			</div>
+
+			<div class="checklist-card-body">
+				<!-- Row 1: Status -->
+				<div class="form-horizontal-row">
+					<label class="field-label">Status</label>
+					<div class="field-content">
+						<div class="status-radio-group">
+							<label class="radio-label">
+								<input type="radio" name="rdoDone" value="1" <?php if($status=='1'){echo 'checked="checked"';}?>>
+								<span>Done</span>
+							</label>
+							<label class="radio-label">
+								<input type="radio" name="rdoDone" value="0" <?php if($status=='0'){echo 'checked="checked"';}?>>
+								<span>Not Done</span>
+							</label>
+						</div>
+					</div>
+				</div>
+
+				<!-- Row 2: Documents -->
+				<div class="form-horizontal-row">
+					<label class="field-label">Attachments</label>
+					<div class="field-content">
+						<div class="document-box-container">
+							<?php
+							$countPic=0;
+							$qpc = $db->select('emp_201_docs docs, doc_img img','*',array('e2r_id'=>$e2r_id,'emp_id'=>$emp_id),'AND docs.di_id=img.di_id');
+							if($qpc):
+							?>
+							<div class="doc-gallery">
+								<?php
+								while( $rpc = $db->fetch_array($qpc)):
+									$fileName = $rpc['doc_name'];
+									$countPic++;
+									if($fileName && file_exists('../img_emp/'.$fileName) ){
 										$file = '../img_emp/'.$fileName;
-									?>
-										<div style="padding-top:50px;">
-											<div>
-												<a id="vwpc<?php echo $rpc['di_id']?>" style="cursor: pointer;" class="thickbox" title="Document View" onclick="showThis(this.id,'employee_checklist_manage_view.php?e2r_id=<?php echo functions::encode($e2r_id);?>&eid=<?php echo functions::encode($emp_id);?>&diid=<?php echo functions::encode($rpc['di_id']);?>','View Document','1')"><img height="200" width="200" src="<?php echo $file ?>" style="border:3px solid #1B2F4E;border-radius:3px;"></a>
-											</div>
-											<div><a href="?eid=<?php echo functions::encode($emp_id)?>&refID=<?php echo functions::encode($e2r_id)?>&fid=<?php echo functions::encode($rpc['di_id'])?>" onClick="askDel()">Remove</a></div>
-										</div>
-									<?php
-										}
-									endwhile;
-									?>
-									<?php if($countPic){ ?>
-									<div style="padding-top:50px;">
-										<a id="vwpc" style="cursor: pointer;" class="thickbox" title="Document View" data-rel="tooltip" onclick="showThis(this.id,'employee_checklist_manage_view.php?e2r_id=<?php echo functions::encode($e2r_id);?>&eid=<?php echo functions::encode($emp_id);?>','View Document','1')">View All Document</a>
+								?>
+									<div class="doc-card">
+										<a id="vwpc<?php echo $rpc['di_id']?>" style="cursor: pointer;" class="thickbox" title="Document View" onclick="showThis(this.id,'employee_checklist_manage_view.php?e2r_id=<?php echo functions::encode($e2r_id);?>&eid=<?php echo functions::encode($emp_id);?>&diid=<?php echo functions::encode($rpc['di_id']);?>','View Document','1')">
+											<img class="doc-thumb" src="<?php echo $file ?>">
+										</a>
+										<a class="btn-remove-doc" href="?eid=<?php echo functions::encode($emp_id)?>&refID=<?php echo functions::encode($e2r_id)?>&fid=<?php echo functions::encode($rpc['di_id'])?>" onClick="return askDel();">Remove</a>
 									</div>
-									<?php } ?>
-									<div style="padding-top:50px;">Select image to upload: <input type="file" name="image[]" accept="image/png, image/gif, image/jpeg, image/jpg, image/bmp" multiple></div>
+								<?php
+									}
+								endwhile;
+								?>
+							</div>
+							<?php endif; ?>
+
+							<?php if($countPic){ ?>
+								<div>
+									<a id="vwpc" style="cursor: pointer;" class="btn-view-all thickbox" title="Document View" data-rel="tooltip" onclick="showThis(this.id,'employee_checklist_manage_view.php?e2r_id=<?php echo functions::encode($e2r_id);?>&eid=<?php echo functions::encode($emp_id);?>','View Document','1')">
+										<i class="halflings-icon file"></i> View All Uploaded Documents
+									</a>
 								</div>
-							</td>
-							<td><div align="center"><textarea name="txRemarks"><?php echo $remarks?></textarea></div></td>
-							<td><div align="center"><input type="submit" name="btnSave" id="btnSave" value=" SAVE " class="btn btn-small btn-primary" onClick="if(confirm('Do you want to save this information?')){return true;}else{return false;}"></div></td>
-						</tr>
-						<?php endwhile;?>
-					</tbody>
-				</table><br><br>
-			</td>
-		</tr>
-	</table>
-</form>
+							<?php } ?>
+
+							<div class="file-input-wrapper">
+								<span>Select files to upload:</span>
+								<input type="file" name="image[]" accept="image/png, image/gif, image/jpeg, image/jpg, image/bmp" multiple>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Row 3: Remarks -->
+				<div class="form-horizontal-row">
+					<label class="field-label">Remarks</label>
+					<div class="field-content">
+						<textarea class="custom-textarea" name="txRemarks" placeholder="Enter remarks or notes here..."><?php echo $remarks?></textarea>
+					</div>
+				</div>
+			</div>
+
+			<div class="checklist-card-footer">
+				<input type="submit" name="btnSave" id="btnSave" value="Save Changes" class="btn-save-action" onClick="if(confirm('Do you want to save this information?')){return true;}else{return false;}">
+			</div>
+		</div>
+		<?php endwhile;?>
+	</form>
 </div>
-<!-- body content: end here-->
+
 <!-- start: JavaScript-->
 <script src="../js/jquery-1.9.1.min.js"></script>
 <script src="../js/jquery-migrate-1.0.0.min.js"></script>
@@ -289,24 +637,24 @@ if( isset($_POST['btnSave']) && $emp_id && $e2r_id ){
 <script src="../js/thickboxa.js"></script>
 <link rel="stylesheet" type="text/css" href="../css/thickbox.css"/>
 <script src="../js/showPage.js"></script>
+
 <?php if(isset($_SESSION['notif_success'])){?>
 <script src="../js/notify.min.js"></script>
 <script type="text/javascript">
 $.notify("<?php echo $_SESSION['notif_success'] ?>", {className: "success",autoHideDelay: 3500,globalPosition: 'bottom right'});
 </script>
 <?php unset($_SESSION['notif_success']);} ?>
+
 <?php if(isset($_SESSION['notif_warning'])){?>
 <script src="../js/notify.min.js"></script>
 <script type="text/javascript">
 $.notify("<?php echo $_SESSION['notif_warning'] ?>", {className: "error",autoHideDelay: 3500,globalPosition: 'bottom right'});
 </script>
 <?php unset($_SESSION['notif_warning']);} ?>
+
 <script type="text/javascript">
 function askDel(){
-	if(confirm('Do you want to remove this file?'))
-		return true;
-	else
-		return false;
+	return confirm('Do you want to remove this file?');
 }
 </script>
 <!-- end: JavaScript-->

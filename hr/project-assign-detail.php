@@ -388,6 +388,11 @@ function work_status($emp_id){
 				die();
 			}
 		}
+		else{
+			functions::say('Please fill up the form properly!');
+			functions::sendTo(functions::pageName().'?projid='.functions::encode($projid));
+			die();
+		}
 	}
 	?>
 </head>
@@ -449,13 +454,12 @@ function work_status($emp_id){
 						<thead>
 							<tr>
 								<th width="4%" style="text-align: center;">#</th>
-								<th width="12%" class="tdpadleft" align="left">ID Number</th>
-								<th width="28%" class="tdpadleft" align="left">Name</th>
-								<th width="26%" class="tdpadleft" align="left">Position</th>
-								<th width="22%" class="tdpadleft" align="left">Status</th>
-								<th width="8%" style="text-align: center;">
-									<input type="checkbox" name="checkAll" id="checkAll" value="all">
-								</th>
+								<th width="8%" class="tdpadleft" align="left">ID Number</th>
+								<th width="20%" class="tdpadleft" align="left">Name</th>
+								<th width="20%" class="tdpadleft" align="left">Position</th>
+								<th width="15%" class="tdpadleft" align="left">Duration</th>
+								<th width="20%" class="tdpadleft" align="left">Status</th>
+								<th width="8%" style="text-align: center;"><input type="checkbox" name="checkAll" id="checkAll" value="all"></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -470,6 +474,7 @@ function work_status($emp_id){
 								<td class="tdpadleft" style="font-weight: 600;"><?php echo $rDisp['emp_no']?></td>
 								<td class="tdpadleft" style="font-weight: 600; color: var(--theme-brown-primary);"><?php echo $rDisp['lname'].', '.$rDisp['fname']?></td>
 								<td class="tdpadleft"><?php echo position($rDisp['emp_id'])?></td>
+								<td class="tdpadleft" style="font-weight: 600;"><?php echo !empty($rDisp['date_started']) ? functions::datearr($rDisp['date_started']) : '---';?> - <?php echo !empty($rDisp['date_ended']) ? functions::datearr($rDisp['date_ended']) : '---';?></td>
 								<td class="tdpadleft">
 									<?php echo work_status($rDisp['emp_id'])?>
 									<a id="adcworkstat<?php echo $rID;?>" href="#" class="thickbox status-edit-btn" title="Manage Status" onclick="showThis(this.id,'employee_add_work_stat.php?eid=<?php echo functions::encode($rDisp['emp_id'])?>&fromED=t','Work Status')">
@@ -482,7 +487,7 @@ function work_status($emp_id){
 							</tr>
 							<?php endwhile;?>
 							<tr style="background: #f7f2ed;">
-								<td colspan="5">&nbsp;</td>
+								<td colspan="6">&nbsp;</td>
 								<td style="text-align: center; padding: 10px 0;">
 									<input type="submit" class="btn-danger-remove" name="btnRemoved" id="btnRemoved" value="Remove">
 								</td>
