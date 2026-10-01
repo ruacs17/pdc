@@ -116,7 +116,7 @@ $arrMember = array();
 
 $qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','eas_id.emp_id,eas_id.att_ready',array('eat_id'=>$eatid),'AND eas_id.emp_id=emp.emp_id GROUP BY eas_id.emp_id,eas_id.att_ready ORDER BY lname,fname');
 while( $rEmps = $db->fetch_array($qEmps)):
-	$dayAbsent=$totalDayPresent=$totalDayAbsent=$totalAbsent=$totalDayRequired=0;
+	$totalTardy=$dayAbsent=$totalDayPresent=$totalDayAbsent=$totalAbsent=$totalDayRequired=0;
 	$arrMember[$rEmps['emp_id']]=$rEmps['att_ready'];
 	$empRegDutyHours=0;$empOTDutyHours=0;$empUnderDutyHours=0;$empLateDutyHours=0;$empAbsentHours=0;
 	$emp_id = $rEmps['emp_id'];
@@ -171,11 +171,18 @@ while( $rEmps = $db->fetch_array($qEmps)):
 					$dayPresent+=.5;
 			}
 			$totalDayPresent+=$dayPresent;
-		endwhile;
+
+
+			$totalTardy += $tardy = $rA['late_min']+$rA['under_min'];
+			if($rA['am_absent'])
+				$totalTardy -= $rA['am_absent_min'];
+			if($rA['pm_absent'])
+				$totalTardy -= $rA['pm_absent_min'];
+			endwhile;
 	}
 	$bgColor = ($rEmps['att_ready']==1) ? '' : 'bgcolor="#FBD490"';
 	$empAbsentHours = $empUnderDutyHours + $empLateDutyHours;
-	$arrPayrollList[$emp_id] = array('emp_id'=>$emp_id,'emp_no'=>$emp_no,'name'=>$name,'position'=>$position,'regular_hours'=>$empRegDutyHours,'overtime_hours'=>$empOTDutyHours,'undertime_hours'=>$empUnderDutyHours,'late_hours'=>$empLateDutyHours,'absentHours'=>$empAbsentHours,'totalDayPresent'=>$totalDayPresent,'totalDayAbsent'=>$totalDayAbsent,'totalDayRequired'=>$totalDayRequired,'bgColor'=>$bgColor);
+	$arrPayrollList[$emp_id] = array('emp_id'=>$emp_id,'emp_no'=>$emp_no,'name'=>$name,'position'=>$position,'regular_hours'=>$empRegDutyHours,'overtime_hours'=>$empOTDutyHours,'undertime_hours'=>$empUnderDutyHours,'late_hours'=>$empLateDutyHours,'totalTardy'=>$totalTardy,'absentHours'=>$empAbsentHours,'totalDayPresent'=>$totalDayPresent,'totalDayAbsent'=>$totalDayAbsent,'totalDayRequired'=>$totalDayRequired,'bgColor'=>$bgColor);
 endwhile;
 ?>
 <!DOCTYPE html>
@@ -391,8 +398,9 @@ endwhile;
 								<th width="10%"><div align="right">Rendered Days</div></th>
 								<th width="10%"><div align="right">Absent Days</div></th>
 								<th width="10%"><div align="right">Required Days</div></th>
-								<th width="10%"><div align="right">Overtime Hours</div></th>
-								<th width="11%"><div align="right">Total Duty (HOURS)</div></th>
+								<th width="10%"><div align="center">Overtime<br>Hours</div></th>
+								<th width="11%"><div align="center">Total Duty<br>(HOURS)</div></th>
+								<th width="11%"><div align="center">Total Tardy/Under<br>(HOURS)</div></th>
 								<th width="11%"><div align="center"><?php if($attendance_ready==0){?><a href="#" onClick="statAll('1')">Verify All</a>&nbsp;|&nbsp;<a href="#" onClick="statAll('2')">Unverify All</a><?php }else{echo 'Verified';} ?></div></th>
 							</tr>
 						</thead>
@@ -412,7 +420,10 @@ endwhile;
 								$projBased = (isset($rStat['project_based']) && $rStat['project_based']==1) ? 'Project Based' : '';
 
 								$has_travel = $db->getValue('travel_personnel tv, travel_order tro, travel_order_detail tod','count(*)',array('personnel_id'=>$pd['emp_id']),'AND travel_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'" AND tro.to_id=tod.to_id AND tv.to_id=tro.to_id ORDER BY act_time_from');
-								$has_travel = ($has_travel) ? '&nbsp;&nbsp;<i class="icon-truck text-info" title="Has Travel Order"></i>' : '';
+								$has_travel = ($has_travel) ? '&nbsp;&nbsp;<i class="icon-truck icon-info" title="Has Travel Order" style="cursor:pointer;"></i>' : '';
+								$has_leave = $db->getValue('leave_file lf,leave_file_detail lfd','count(lfd.lfd_id)',array('lf.emp_id'=>$pd['emp_id']),'AND lf.lf_id=lfd.lf_id AND lfd.lfd_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'"');
+								#echo $db->last_query;
+								$has_leave = ($has_leave) ? '&nbsp;&nbsp;<i class="icon-plane icon-info" title="Has Leave Application" style="cursor:pointer;"></i>' : '';
 						?>
 							<tr id="rw<?php echo $memberID?>" <?php echo $pd['bgColor']?>>
 								<td height="30px" style="vertical-align: top; padding-top: 10px; padding-bottom: 10px;">
@@ -421,7 +432,7 @@ endwhile;
 											<a id="vw<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; font-weight: 600; font-size: 13px; color: #1e293b;" title="Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><?php echo $countEmp.'. '.$pd['name'];?></a>
 											<a id="vw2<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; color: #2563eb;text-decoration:none;" title="View Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><i class="icon-search" style="font-size: 14px;"></i></a>
 										</div>
-										<div><?php echo ($attendance_ready) ? '' : $has_travel;?></div>
+										<div><?php echo $has_travel.' '.$has_leave;?></div>
 									</div>
 									<div style="padding-left: 15px; margin-top: 3px; font-size: 11.5px; color: #475569; border-left: 2px solid #cbd5e1;">
 										<div style="font-weight: 500; color: #334155;"><?php echo $pd['position'];?></div>
@@ -436,13 +447,15 @@ endwhile;
 								<td><div align="right"><?php echo ($pd['totalDayPresent'] > 1) ? $pd['totalDayPresent'].' days' : $pd['totalDayPresent'].' day';?></div></td>
 								<td><div align="right"><?php echo ($pd['totalDayAbsent'] > 1) ? $pd['totalDayAbsent'].' days' : $pd['totalDayAbsent'].' day';?></div></td>
 								<td><div align="right"><?php echo ($pd['totalDayRequired'] > 1) ? $pd['totalDayRequired'].' days' : $pd['totalDayRequired'].' day';?></div></td>
-								<td><div align="right"><?php echo ($pd['overtime_hours']) ? ' ('.functions::min_to_hour($pd['overtime_hours']).')' : '';?></div></td>
-								<td><div align="right"><?php echo ($totalDutyHours) ? ' ('.functions::min_to_hour($totalDutyHours).')' : '';?></div></td>
+								<td><div align="center"><?php echo ($pd['overtime_hours']) ? functions::min_to_hour($pd['overtime_hours']) : '';?></div></td>
+								<td><div align="center"><?php echo ($totalDutyHours) ? functions::min_to_hour($totalDutyHours) : '';?></div></td>
+								<td><div align="center"><?php echo ($pd['totalTardy']) ? functions::min_to_hour($pd['totalTardy']) : '';?></div></td>
 								<td><div align="center"><input type="checkbox" class="chkDel" name="chkDel[<?php echo $memberID; ?>]" id="chkDel[<?php echo $memberID; ?>]" value="<?php echo functions::encode($memberID); ?>" <?php if($attendance_ready){echo 'disabled';}?> onClick="statIndi(this.value)" <?php echo ($statReady) ? 'checked':''; ?>></div></td>
 							</tr>
 						<?php }else{?>
 							<tr>
 								<td height="30px" style="vertical-align: top;"><?php echo $countEmp.'. '.$db->getValue('employee','concat(lname,", ",fname)',array('emp_id'=>$memberID));?></td>
+								<td><div align="right">-------</div></td>
 								<td><div align="right">-------</div></td>
 								<td><div align="right">-------</div></td>
 								<td><div align="right">-------</div></td>

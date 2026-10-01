@@ -103,10 +103,10 @@ else{
 		if($holi_leave==1)
 			$holiLvNote = '&nbsp;&nbsp;<span class="label label-info" title="Holiday"><i class="icon-gift icon-white"></i></span>';
 		else if($holi_leave==2)
-			$holiLvNote = '&nbsp;&nbsp;<span class="label label-info" title="Leave"><i class="icon-plane icon-white"></i></span>';
+			$holiLvNote = '&nbsp;&nbsp;<span class="label label-info" title="Has Leave Application"><i class="icon-plane icon-white"></i></span>';
 		else if($holi_leave==3)
 			$holiLvNote = '&nbsp;&nbsp;<span class="label label-info" title="Holiday and Leave"><i class="icon-truck icon-white"></i></span>';
-		$has_travel = isset($arr_emptravel[$rA['eat_date']]) ? '&nbsp;&nbsp;<span class="label label-warning" title="Travel Order"><i class="icon-truck icon-white"></i></span>' : '';
+		$has_travel = isset($arr_emptravel[$rA['eat_date']]) ? '&nbsp;&nbsp;<span class="label label-warning" title="has Travel Order"><i class="icon-truck icon-white"></i></span>' : '';
 		
 		$dailyName = functions::datearr($rA['eat_date']).'<br><span class="muted">('.$rA['eat_day'].')</span>'.$has_travel.$holiLvNote;
 		$amin = ($rA['am_in']) ? functions::MilToTwelve($rA['am_in']) : '<span class="text-error">--:--</span>';
@@ -132,22 +132,30 @@ else{
 		$otDutyHours += $rA['ot_min'];
 		$totalDutyHours += $rA['duty_min']+$rA['ot_min'];
 		$totalAbsent += $rA['late_min'] + $rA['under_min'];
-		$totalDayAbsent += $dayAbsent = ($rA['am_absent'] + $rA['pm_absent']); 
+		$am_absent=$rA['am_absent'];
+		$pm_absent=$rA['pm_absent'];
+		$totalDayAbsent += $dayAbsent = ($am_absent + $pm_absent); 
 		$dayPresent=0;
 		if( !empty($rA['am_in_assign']) && !empty($rA['am_out_assign']) ){
 			$totalDayRequired+=.5;
-			if( empty($rA['am_absent']) )
+			if( empty($am_absent) )
 				$dayPresent+=.5;
 		}
 		if( !empty($rA['pm_in_assign']) && !empty($rA['pm_out_assign']) ){
 			$totalDayRequired+=.5;
-			if( empty($rA['pm_absent']) )
+			if( empty($pm_absent) )
 				$dayPresent+=.5;
 		}
+		$tardy = $rA['late_min']+$rA['under_min'];
+		if($rA['am_absent'])
+			$tardy -= $rA['am_absent_min'];
+		if($rA['pm_absent'])
+			$tardy -= $rA['pm_absent_min'];
+
 		$totalDayPresent+=$dayPresent;
 		$otin = ($rA['ot_in']) ? functions::MilToTwelve($rA['ot_in']) : functions::MilToTwelve($db->getValue('attendance_overtime_detail','actual_start_time',array('emp_id'=>$rA['emp_id'],'actual_start_date'=>$rA['eat_date'])));
 		$otout = ($rA['ot_out']) ? functions::MilToTwelve($rA['ot_out']) : functions::MilToTwelve($db->getValue('attendance_overtime_detail','actual_end_time',array('emp_id'=>$rA['emp_id'],'actual_start_date'=>$rA['eat_date'])));
-		$arrDailyAttendance[] = array('eatd_id'=>$rA['eatd_id'],'dailyName'=>$dailyName,'amin'=>$amin,'amout'=>$amout,'pmin'=>$pmin,'pmout'=>$pmout,'otin'=>$otin,'otout'=>$otout,'dutyHours'=>$rA['duty_min'],'otHours'=>$rA['ot_min'],'late'=>$rA['late_min'],'undertime'=>$rA['under_min'],'dayAbsent'=>$dayAbsent,'dayPresent'=>$dayPresent,'totalDutyHours'=>$totalDutyHours,'bgColor'=>$bgColor);
+		$arrDailyAttendance[] = array('eatd_id'=>$rA['eatd_id'],'dailyName'=>$dailyName,'amin'=>$amin,'amout'=>$amout,'pmin'=>$pmin,'pmout'=>$pmout,'otin'=>$otin,'otout'=>$otout,'dutyHours'=>$rA['duty_min'],'otHours'=>$rA['ot_min'],'late'=>$rA['late_min'],'undertime'=>$rA['under_min'],'tardy'=>$tardy,'dayAbsent'=>$dayAbsent,'dayPresent'=>$dayPresent,'totalDutyHours'=>$totalDutyHours,'bgColor'=>$bgColor,'isHoliday'=>$rA['is_holiday']);
 	endwhile;
 }
 // print_r($arrDayAbsent);
@@ -331,22 +339,24 @@ else{
 								<td width="11%" style="text-align: center !important;"><small>Out<br><i>Actual (Assigned)</i></small></td>
 								<td width="11%" style="text-align: center !important;"><small>In<br><i>Actual (Assigned)</i></small></td>
 								<td width="11%" style="text-align: center !important;"><small>Out<br><i>Actual (Assigned)</i></small></td>
-								<td width="7%" class="text-center"><small>In</small></td>
-								<td width="7%" class="text-center"><small>Out</small></td>
-								<td width="7%" class="text-center"><small>Duty</small></td>
-								<td width="7%" class="text-center"><small>Overtime</small></td>
-								<td width="7%" class="text-center"><small>Late</small></td>
-								<td width="7%" class="text-center"><small>Under</small></td>
+								<td width="7%" style="text-align: center !important;"><small>In</small></td>
+								<td width="7%" style="text-align: center !important;"><small>Out</small></td>
+								<td width="7%" style="text-align: center !important;"><small>Duty</small></td>
+								<td width="7%" style="text-align: center !important;"><small>Overtime</small></td>
+								<td width="7%" style="text-align: center !important;"><small>Tardy/Under</small></td>
+								<td width="7%" style="text-align: center !important;"><small>Absent(day)</small></td>
 							</tr>
 						</thead>
 						<tbody>
 						<?php
-						$totalAbsent=0;$totalLate=0;$totalUnder=0;
+						$totalDayAbsent=$totalTardy=$totalAbsent=0;$totalLate=0;$totalUnder=0;
 						foreach($arrDailyAttendance as $dly):
 							$totalAbsent += ($dly['late'] + $dly['undertime']);
 							$totalLate += $dly['late'];
 							$totalUnder += $dly['undertime'];
 							$rID = $dly['eatd_id'];
+							$totalTardy+=$dly['tardy'];
+							$totalDayAbsent+=$dly['dayAbsent'];
 						?>
 							<tr <?php echo $dly['bgColor'];?>>
 								<td height="5" style="padding-left:10px;">
@@ -359,20 +369,20 @@ else{
 								<td style="text-align: center !important;"><?php echo $dly['amout'];?></td>
 								<td style="text-align: center !important;"><?php echo $dly['pmin'];?></td>
 								<td style="text-align: center !important;"><?php echo $dly['pmout'];?></td>
-								<td class="text-center"><?php echo $dly['otin'];?></td>
-								<td class="text-center"><?php echo $dly['otout'];?></td>
-								<td class="text-center"><?php echo ($dly['dutyHours']) ? functions::min_to_hour($dly['dutyHours']) : '';?></td>
-								<td class="text-center"><?php echo ($dly['otHours']) ? functions::min_to_hour($dly['otHours']) : '';?></td>
-								<td class="text-center"><?php echo ($dly['late']) ? '<span class="text-error">'.functions::min_to_hour($dly['late']).'</span>' : '';?></td>
-								<td class="text-center"><?php echo ($dly['undertime']) ? '<span class="text-warning">'.functions::min_to_hour($dly['undertime']).'</span>' : '';?></td>
+								<td style="text-align: center !important;"><?php echo $dly['otin'];?></td>
+								<td style="text-align: center !important;"><?php echo $dly['otout'];?></td>
+								<td style="text-align: center !important;"><?php echo ($dly['dutyHours']) ? functions::min_to_hour($dly['dutyHours']) : '';?></td>
+								<td style="text-align: center !important;"><?php echo ($dly['otHours']) ? functions::min_to_hour($dly['otHours']) : '';?></td>
+								<td style="text-align: center !important;"><?php echo ($dly['tardy']) ? '<span>'.functions::min_to_hour($dly['tardy']).'</span>' : '';?></td>
+								<td style="text-align: center !important;"><?php echo ($dly['dayAbsent']) ? '<span>'.$dly['dayAbsent'].'</span>' : '';?></td>
 							</tr>
 						<?php endforeach;?>
 							<tr style="background-color: #f9f9f9; font-weight: bold;">
-								<td colspan="7" class="text-right">TOTALS:</td>
-								<td class="text-center"><?php echo ($regularDutyHours) ? functions::min_to_hour($regularDutyHours) : '';?></td>
-								<td class="text-center"><?php echo ($otDutyHours) ? functions::min_to_hour($otDutyHours) : '';?></td>
-								<td class="text-center text-error"><?php echo ($totalLate) ? functions::min_to_hour($totalLate) : '';?></td>
-								<td class="text-center text-warning"><?php echo ($totalUnder) ? functions::min_to_hour($totalUnder) : '';?></td>
+								<td style="text-align: right !important;" colspan="7" class="text-right">TOTAL</td>
+								<td style="text-align: center !important;" class="text-center"><?php echo ($regularDutyHours) ? functions::min_to_hour($regularDutyHours) : '';?></td>
+								<td style="text-align: center !important;" class="text-center"><?php echo ($otDutyHours) ? functions::min_to_hour($otDutyHours) : '';?></td>
+								<td style="text-align: center !important;" class="text-center text-warning"><?php echo ($totalTardy) ? functions::min_to_hour($totalTardy) : '';?></td>
+								<td style="text-align: center !important;" class="text-center text-error"><?php echo ($totalDayAbsent) ? $totalDayAbsent : '';?></td>
 							</tr>
 						</tbody>
 					</table>

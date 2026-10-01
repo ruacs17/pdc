@@ -47,7 +47,91 @@ $qTrm = $db->select('leave_file_detail','DISTINCT term',array('lf_id'=>$lf_id));
 while($rTrm = $db->fetch_array($qTrm)):
 	$arrTerm[$rTrm['term']]=$rTrm['term'];
 endwhile;
+	function absentDay($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',&$am_absent=0,&$pm_absent=0,&$am_absent_min=0,&$pm_absent_min=0){
+		$cDate = date('Y-m-d');
+		if( $assignAmIn && $assignAmOut ){//If there is required time in and out
+			//Count Minutes LATE
+			if($actualAmIn){//If there is time in
+				if( strtotime($actualAmIn) > strtotime($assignAmIn) &&  strtotime($actualAmIn) <= strtotime($assignAmOut) ){//Actual in is between assign in and out
+					$am_absent_min += functions::min_diff($assignAmIn,$cDate,$actualAmIn,$cDate);//Minutes from assign in to actual in
+				}
+				else if( strtotime($actualAmIn) > strtotime($assignAmOut) ){ // Actual in is beyond assign out
+					$am_absent_min += functions::min_diff($assignAmIn,$cDate,$assignAmOut,$cDate);//Count the required minutes for morning duty.
+				}
+			}
 
+			//Count Minutes UNDERTIME
+			if($actualAmOut){//If there is morning time out
+				if( strtotime($actualAmOut) < strtotime($assignAmOut) && strtotime($actualAmOut) > strtotime($assignAmIn) ){//Actual out is between assign in and out
+					$am_absent_min += functions::min_diff($actualAmOut,$cDate,$assignAmOut,$cDate);//Minutes from Actual Out to Assign Out.
+				}
+				else if( strtotime($actualAmOut) < strtotime($assignAmIn) ){//Actual out is less then assign in
+					$am_absent_min += functions::min_diff($assignAmIn,$cDate,$assignAmOut,$cDate);//Count the required minutes for morning duty.
+				}
+			}
+			else if( $actualAmIn ){//if there is no morning out but there is morning time in
+				if( strtotime($actualAmIn) > strtotime($assignAmOut) ){//if time in is greater than assign in
+					//Do nothing It's already been deducted by late.
+				}
+				else if( strtotime($actualAmIn) > strtotime($assignAmIn) && strtotime($actualAmIn) < strtotime($assignAmOut)){//Actual in is between assign in and out
+					$am_absent_min += functions::min_diff($actualAmIn,$cDate,$assignAmOut,$cDate);
+				}
+				else{//if time in is before morning assign in and after morning assign out
+					$am_absent_min += functions::min_diff($assignAmIn,$cDate,$assignAmOut,$cDate);
+				}
+			}
+			else{//If there's no actual out.
+				$am_absent_min += functions::min_diff($assignAmIn,$cDate,$assignAmOut,$cDate);
+			}
+			if( $am_absent_min ){
+				$requiredMins = functions::min_diff($assignAmIn,$cDate,$assignAmOut,$cDate);
+				if( $am_absent_min >= $requiredMins )
+					$am_absent=.5;
+				else
+					$am_absent=0;
+			}
+		}
+
+		if( $assignPmIn && $assignPmOut ){
+			if($actualPmIn){
+				if( strtotime($actualPmIn) > strtotime($assignPmIn) &&  strtotime($actualPmIn) <= strtotime($assignPmOut) ){//Actual in is between assign in and out
+					$pm_absent_min += functions::min_diff($assignPmIn,$cDate,$actualPmIn,$cDate);
+				}
+				else if( strtotime($actualPmIn) > strtotime($assignPmOut) ){ // Actual in is beyond assign out
+					$pm_absent_min += functions::min_diff($assignPmIn,$cDate,$assignPmOut,$cDate);
+				}
+			}
+			if($actualPmOut){
+				if( strtotime($actualPmOut) < strtotime($assignPmOut) && strtotime($actualPmOut) > strtotime($assignPmIn) ){//Actual out is between assign in and out
+					$pm_absent_min += functions::min_diff($actualPmOut,$cDate,$assignPmOut,$cDate);
+				}
+				else if( strtotime($actualPmOut) < strtotime($assignPmIn) ){//Actual out is less then assign in
+					$pm_absent_min += functions::min_diff($assignPmIn,$cDate,$assignPmOut,$cDate);
+				}
+			}
+			else if( $actualPmIn ){
+				if( strtotime($actualPmIn) > strtotime($assignPmOut) ){//Actual in is greather than assign out.
+				//Do nothing It's already been deducted by late.
+				}
+				else if( strtotime($actualPmIn) > strtotime($assignPmIn) && strtotime($actualPmIn) < strtotime($assignPmOut)){//Actual in is between assign in and out
+					$pm_absent_min += functions::min_diff($actualPmIn,$cDate,$assignPmOut,$cDate);
+				}
+				else{
+					$pm_absent_min += functions::min_diff($assignPmIn,$cDate,$assignPmOut,$cDate);
+				}
+			}
+			else{//If there's no actual out.
+				$pm_absent_min += functions::min_diff($assignPmIn,$cDate,$assignPmOut,$cDate);
+			}
+			if( $pm_absent_min ){
+				$requiredMins = functions::min_diff($assignPmIn,$cDate,$assignPmOut,$cDate);
+				if( $pm_absent_min >= $requiredMins )
+					$pm_absent=.5;
+				else
+					$pm_absent=0;
+			}
+		}
+	}
 function diffComp($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn=0,$actualOtOut=0,&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
 	$cDate = date('Y-m-d');
 	if( $assignAmIn && $assignAmOut )
@@ -212,7 +296,8 @@ if($itmIDEdt){
 		}
 		else if( $eaa == 1 && $eea_leave ){//if there is only one record of adjustment, this means only the leave adjustment.
 			//restore the original value of time in's and out's
-			$is_holiday = ($rLA['is_holiday']===1) ? 3 : 2;
+			#$is_holiday = ($rLA['is_holiday']===1) ? 3 : 2;
+			$is_holiday=NULL;
 			$db->update('emp_attendance_detail',
 						array('am_in'=>$rLA['am_in_org'],'am_out'=>$rLA['am_out_org'],'pm_in'=>$rLA['pm_in_org'],'pm_out'=>$rLA['pm_out_org'],
 						'duty_min'=>$rLA['duty_min_org'],'ot_min'=>$rLA['ot_min_org'],'late_min'=>$rLA['late_min_org'],'under_min'=>$rLA['under_min_org'],'is_holiday'=>$is_holiday),
@@ -289,11 +374,14 @@ if( isset($_POST['btnSave']) ){
 
 		//Allow to take a leave
 		if( $allow_leave_record ){
+			$lfdID = NULL;
+			if( $db->getValue('leave_file_detail','count(lf_id)',array('lf_id'=>$lf_id,'emp_id'=>$emp_id,'lfd_date'=>$txDateSelect,'time_am'=>$chkAM,'time_pm'=>$chkPM))==0 ){
+				$lfdID = $db->insert('leave_file_detail',array('lf_id'=>$lf_id,'emp_id'=>$emp_id,'lfd_date'=>$txDateSelect,
+				'time_am'=>$chkAM,'time_am_from'=>$time_am_from,'time_am_to'=>$time_am_to,
+				'time_pm'=>$chkPM,'time_pm_from'=>$time_pm_from,'time_pm_to'=>$time_pm_to,
+				'leave_count'=>$leave_count,'leave_mins'=>$leave_mins,'term'=>$term,'term_start'=>$term_start,'term_end'=>$term_end));				
+			}
 
-			$lfdID = $db->insert('leave_file_detail',array('lf_id'=>$lf_id,'emp_id'=>$emp_id,'lfd_date'=>$txDateSelect,
-			'time_am'=>$chkAM,'time_am_from'=>$time_am_from,'time_am_to'=>$time_am_to,
-			'time_pm'=>$chkPM,'time_pm_from'=>$time_pm_from,'time_pm_to'=>$time_pm_to,
-			'leave_count'=>$leave_count,'leave_mins'=>$leave_mins,'term'=>$term,'term_start'=>$term_start,'term_end'=>$term_end));
 
 			if($lfdID){
 				$cDate=$txDateSelect;
@@ -305,6 +393,8 @@ if( isset($_POST['btnSave']) ){
 					$eatd_id = $db->getValue('emp_attendance_detail','eatd_id',array('emp_id'=>$emp_id,'eat_date'=>$cDate));
 					$leave_name = $leave_type;
 					$remarks = $leave_name.' : '.$leave_reason;
+					$am_in=$am_out=$pm_in=$pm_out=$ot_in=$ot_out=$dutyHours=$otHours=$late=$undertime=NULL;
+					$pm_absent_min=$am_absent_min=$am_absent=$pm_absent=0;
 					if($eatd_id){
 						$qATD = $db->select('emp_attendance_detail','*',array('eatd_id'=>$eatd_id));
 						$rATD = $db->fetch_array($qATD);
@@ -316,16 +406,23 @@ if( isset($_POST['btnSave']) ){
 						'ot_in'=>$rATD['ot_in'],'ot_out'=>$rATD['ot_out'],
 						'duty_min_org'=>$rATD['duty_min'],'ot_min_org'=>$rATD['ot_min'],'late_min_org'=>$rATD['late_min'],'under_min_org'=>$rATD['under_min'],
 						'change_date'=>date('Y-m-d'),'change_time'=>date('H:i:s'),'remarks'=>$remarks);
+						$am_in=$rATD['am_in'];
+						$am_out=$rATD['am_out'];
+						$pm_in=$rATD['pm_in'];
+						$pm_out=$rATD['pm_out'];
+						$ot_in=$rATD['ot_in'];
+						$ot_out=$rATD['ot_out'];
+						$dutyHours=$rATD['duty_min'];
+						$otHours=$rATD['ot_min'];
+						$late=$rATD['late_min'];
+						$undertime=$rATD['under_min'];
 					}
 
 					$qLv = $db->select('leave_file_detail','*',array('lfd_id'=>$lfdID));
 					$rLv = $db->fetch_array($qLv);
-
-					$late_min_new=0;$under_min_new=0;$duty_min_new=0;$ot_min_new=0;
-					$am_in_new = ($rLv['time_am_from']) ? $rLv['time_am_from'] : $rATD['am_in'];
-					$am_out_new = ($rLv['time_am_to']) ? $rLv['time_am_to'] : $rATD['am_out'];
-					$pm_in_new = ($rLv['time_pm_from']) ? $rLv['time_pm_from'] : $rATD['pm_in'];
-					$pm_out_new = ($rLv['time_pm_to']) ? $rLv['time_pm_to'] : $rATD['pm_out'];
+					$hasAmLeave = $rLv['time_am'];
+					$hasPmLeave = $rLv['time_pm'];
+					$late_min_new=$under_min_new=$duty_min_new=$ot_min_new=0;
 
 					//get the employee assign time in and time out
 					$qETI = $db->select('emp_timein','*',array('emp_id'=>$emp_id,'eti_day'=>$dayName));
@@ -334,44 +431,68 @@ if( isset($_POST['btnSave']) ){
 					$am_out_assign = ($rETI['am_out']) ? $rETI['am_out'] : NULL;
 					$pm_in_assign = ($rETI['pm_in']) ? $rETI['pm_in'] : NULL;
 					$pm_out_assign = ($rETI['pm_out']) ? $rETI['pm_out'] : NULL;
+					$am_in_new=$am_out_new=$pm_in_new=$pm_out_new=NULL;
+					if($eatd_id){//if there's already an attendance record
+						$arrFieldInsert = array('eatd_id'=>$eatd_id,'emp_id'=>$emp_id,'eta_date'=>$cDate,'eta_day'=>$dayName,'am_in_org'=>$am_in,'am_out_org'=>$am_out,'pm_in_org'=>$pm_in,'pm_out_org'=>$pm_out,'ot_in'=>$ot_in,'ot_out'=>$ot_out,'duty_min_org'=>$dutyHours,'ot_min_org'=>$otHours,'late_min_org'=>$late,'under_min_org'=>$undertime,'change_date'=>date('Y-m-d'),'change_time'=>date('H:i:s'),'remarks'=>$remarks,'refer_id'=>$lfdID);
+						if($leave_with_pay==0){
+							if($hasAmLeave && $hasPmLeave){//Whole day leave, null the actual in/out, zero the duty/under/late mins, except the OT
+								$am_in_new=$am_out_new=$pm_in_new=$pm_out_new=NULL;
+								diffComp($am_in_new,$am_in_assign,$am_out_new,$am_out_assign,$pm_in_new,$pm_in_assign,$pm_out_new,$pm_out_assign,$ot_in,$ot_out,$late_min_new,$under_min_new,$duty_min_new,$ot_min_new);
+								absentDay($am_in_new,$am_in_assign,$am_out_new,$am_out_assign,$pm_in_new,$pm_in_assign,$pm_out_new,$pm_out_assign,$am_absent,$pm_absent,$am_absent_min,$pm_absent_min);
+							}
+							else if($hasAmLeave){//Morning only leave, make assigned in/out as actual am in/out so that no minutes deductions in morning
+								$am_in_new=$am_out_new=NULL;
+								diffComp($am_in_new,$am_in_assign,$am_out_new,$am_out_assign,$pm_in,$pm_in_assign,$pm_out,$pm_out_assign,$ot_in,$ot_out,$late_min_new,$under_min_new,$duty_min_new,$ot_min_new);
+								absentDay($am_in_new,$am_in_assign,$am_out_new,$am_out_assign,$pm_in,$pm_in_assign,$pm_out,$pm_out_assign,$am_absent,$pm_absent,$am_absent_min,$pm_absent_min);
+								$pm_in_new=$pm_in;$pm_out_new=$pm_out;
+							}
+							else if($hasPmLeave){//Afternoon only leave, make assigned in/out as actual am in/out so that no minutes deductions in morning
+								$pm_in_new=$pm_out_new=NULL;
+								diffComp($am_in,$am_in_assign,$am_out,$am_out_assign,$pm_in_new,$pm_in_assign,$pm_out_new,$pm_out_assign,$ot_in,$ot_out,$late_min_new,$under_min_new,$duty_min_new,$ot_min_new);
+								absentDay($am_in,$am_in_assign,$am_out,$am_out_assign,$pm_in_new,$pm_in_assign,$pm_out_new,$pm_out_assign,$am_absent,$pm_absent,$am_absent_min,$pm_absent_min);
+								$am_in_new=$am_in;$am_out_new=$am_out;
+							}
+						}
+						else if($leave_with_pay){
+							if($hasAmLeave && $hasPmLeave){//Whole day leave, null the actual in/out, zero the duty/under/late mins, except the OT
+								diffComp($am_in_assign,$am_in_assign,$am_out_assign,$am_out_assign,$pm_in_assign,$pm_in_assign,$pm_out_assign,$pm_out_assign,$ot_in,$ot_out,$late_min_new,$under_min_new,$duty_min_new,$ot_min_new);
+								$am_in_new=$am_out_new=$pm_in_new=$pm_out_new=NULL;
+							}
+							else if($hasAmLeave){//Morning only leave, make assigned in/out as actual am in/out so that no minutes deductions in morning
+								diffComp($am_in_assign,$am_in_assign,$am_out_assign,$am_out_assign,$pm_in,$pm_in_assign,$pm_out,$pm_out_assign,$ot_in,$ot_out,$late_min_new,$under_min_new,$duty_min_new,$ot_min_new);
+								$am_in_new=$am_out_new=NULL;
+								absentDay($am_in_assign,$am_in_assign,$am_out_assign,$am_out_assign,$pm_in,$pm_in_assign,$pm_out,$pm_out_assign,$am_absent,$pm_absent,$am_absent_min,$pm_absent_min);
+								$pm_in_new=$pm_in;$pm_out_new=$pm_out;
+							}
+							else if($hasPmLeave){//Afternoon only leave, make assigned in/out as actual am in/out so that no minutes deductions in morning
+								diffComp($am_in_new,$am_in_assign,$am_out_new,$am_out_assign,$pm_in_assign,$pm_in_assign,$pm_out_assign,$pm_out_assign,$ot_in,$ot_out,$late_min_new,$under_min_new,$duty_min_new,$ot_min_new);
+								$pm_in_new=$pm_out_new=NULL;
+								absentDay($am_in,$am_in_assign,$am_out,$am_out_assign,$pm_in_assign,$pm_in_assign,$pm_out_assign,$pm_out_assign,$am_absent,$pm_absent,$am_absent_min,$pm_absent_min);
+								$am_in_new=$am_in;$am_out_new=$am_out;
+							}
+						}
 
-					if($eatd_id){
-						diffComp($am_in_new,$am_in_assign,$am_out_new,$am_out_assign,$pm_in_new,$pm_in_assign,$pm_out_new,$pm_out_assign,$rATD['ot_in'],$rATD['ot_out'],$late_min_new,$under_min_new,$duty_min_new,$ot_min_new);
-					}
-					//update the attendance record with the new detail
-					if($leave_with_pay==1){
-						if($eatd_id){
-							$arrField = array_merge($arrField,array('am_in_new'=>$am_in_new,'am_out_new'=>$am_out_new,'pm_in_new'=>$pm_in_new,'pm_out_new'=>$pm_out_new,'duty_min_new'=>$duty_min_new,'ot_min_new'=>$ot_min_new,'late_min_new'=>$late_min_new,'under_min_new'=>$under_min_new,'refer_id'=>$lfdID));
-							//insert the original attendance record to the adjustment table
-							$inserted_etaID = $db->insert('emp_attendance_adjustment',$arrField);
-							$is_holiday = ( $db->getValue('emp_attendance_detail','is_holiday',array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id))===1) ? 3 : 2;
-							$db->update('emp_attendance_detail',array(
-							'am_in'=>$am_in_new,'am_in_assign'=>$am_in_assign,'am_out'=>$am_out_new,'am_out_assign'=>$am_out_assign,
-							'pm_in'=>$pm_in_new,'pm_in_assign'=>$pm_in_assign,'pm_out'=>$pm_out_new,'pm_out_assign'=>$pm_out_assign,
-							'ot_in'=>$rATD['ot_in'],'ot_out'=>$rATD['ot_out'],
-							'duty_min'=>$duty_min_new,'ot_min'=>$ot_min_new,'late_min'=>$late_min_new,'under_min'=>$under_min_new,'is_holiday'=>$is_holiday),array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id));
-						}
-					}
-					else{
-						$under_min = functions::min_diff($am_in_assign,$cDate,$am_out_assign,$cDate);
-						$under_min += functions::min_diff($pm_in_assign,$cDate,$pm_out_assign,$cDate);
-						if($eatd_id){
-							$arrField = array_merge($arrField,array('am_in_new'=>NULL,'am_out_new'=>NULL,'pm_in_new'=>NULL,'pm_out_new'=>NULL,'duty_min_new'=>0,'ot_min_new'=>$ot_min_new,'late_min_new'=>0,'under_min_new'=>$under_min,'refer_id'=>$lfdID));
-							//insert the original attendance record to the adjustment table
-							$inserted_etaID = $db->insert('emp_attendance_adjustment',$arrField);
-							$is_holiday = ( $db->getValue('emp_attendance_detail','is_holiday',array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id))===1) ? 3 : 2;
-							$db->update('emp_attendance_detail',array(
-							'am_in'=>NULL,'am_in_assign'=>$am_in_assign,'am_out'=>NULL,'am_out_assign'=>$am_out_assign,
-							'pm_in'=>NULL,'pm_in_assign'=>$pm_in_assign,'pm_out'=>NULL,'pm_out_assign'=>$pm_out_assign,
-							'ot_in'=>$rATD['ot_in'],'ot_out'=>$rATD['ot_out'],
-							'duty_min'=>0,'ot_min'=>$ot_min_new,'late_min'=>0,'under_min'=>$under_min,'is_holiday'=>$is_holiday),array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id));
-						}
-					}
+
+						//Check if there is adjustments already with this kind of leave
+						$qAttAdj = $db->select('emp_attendance_adjustment','*',array('emp_id'=>$emp_id,'eta_date'=>$cDate,'refer_id'=>$lfdID));
+						$rAA = $db->fetch_array($qAttAdj);
+						$eta_id = $rAA['eta_id'] ?? NULL;
+
+						$arrField = array_merge($arrField,array('am_in_new'=>$am_in_new,'am_out_new'=>$am_out_new,'pm_in_new'=>$pm_in_new,'pm_out_new'=>$pm_out_new,'duty_min_new'=>$duty_min_new,'ot_min_new'=>$ot_min_new,'late_min_new'=>$late_min_new,'under_min_new'=>$under_min_new,'refer_id'=>$lfdID));
+						//insert the original attendance record to the adjustment table
+						$inserted_etaID = $db->insert('emp_attendance_adjustment',$arrField);
+						$is_holiday = ( $db->getValue('emp_attendance_detail','is_holiday',array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id))===1) ? 3 : 2;
+						$db->update('emp_attendance_detail',array(
+						'am_in'=>$am_in_new,'am_in_assign'=>$am_in_assign,'am_out'=>$am_out_new,'am_out_assign'=>$am_out_assign,
+						'pm_in'=>$pm_in_new,'pm_in_assign'=>$pm_in_assign,'pm_out'=>$pm_out_new,'pm_out_assign'=>$pm_out_assign,
+						'ot_in'=>$ot_in,'ot_out'=>$ot_out,'am_absent'=>$am_absent,'am_absent_min'=>$am_absent_min,'pm_absent'=>$pm_absent,'pm_absent_min'=>$pm_absent_min,
+						'duty_min'=>$duty_min_new,'ot_min'=>$ot_min_new,'late_min'=>$late_min_new,'under_min'=>$under_min_new,'is_holiday'=>$is_holiday),array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id));
+						#echo $db->last_query;
+					}//if($eatd_id){
 				}//end check if there is attendance already
 				else{
 					functions::say('attendance ready! cannot change attendance.');
 				}
-
 				$_SESSION['notif_success']='Leave day Added!';
 				functions::sendTo(functions::pageName().'?lf='.functions::encode($lf_id));
 				die();

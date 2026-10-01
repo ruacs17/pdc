@@ -167,6 +167,7 @@ if( isset($_POST['btnAdd']) ){
 		$qInsert = $db->query($q);
 		$insertID = $db->insert_id();
 		if($insertID){
+			$_SESSION['notif_success']="Leave Form successfully created.";
 			functions::sendTo('leave_file_manage_detail.php?lf='.functions::encode($insertID));
 			die();
 		}
