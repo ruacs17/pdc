@@ -45,21 +45,23 @@ if( !empty($eatid) && ($confirmed==0) ){
 
 
 	$totalAbsentAmount=0;$sal_type='';
-	$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','DISTINCT eas_id.emp_id',array('eat_id'=>$eatid),'AND eas_id.emp_id=emp.emp_id ORDER BY lname,fname');
+	#$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','DISTINCT eas_id.emp_id',array('eat_id'=>$eatid),'AND eas_id.emp_id=emp.emp_id ORDER BY lname,fname');
 	#echo $db->last_query.'<br>';
-	// $eatid=153;$empid=605;
-	// $qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','DISTINCT eas_id.emp_id',array('eat_id'=>$eatid,'emp.emp_id'=>$empid),'AND eas_id.emp_id=emp.emp_id ORDER BY lname,fname');
+	$eatid=152;$empid=217;
+	$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','DISTINCT eas_id.emp_id',array('eat_id'=>$eatid,'emp.emp_id'=>$empid),'AND eas_id.emp_id=emp.emp_id ORDER BY lname,fname');
 	while( $rEmps = $db->fetch_array($qEmps)):
 		$totalAbsentAmount=0;$totalAbsent=0;$absent_amount=0;
 		$emp_id = $rEmps['emp_id'];
 
 		//Get Employee Filed Leave
 		$arrEmpLeaves=array();
-		$qLeaveDates = $db->select('leave_file_detail','*',array('emp_id'=>$emp_id),'AND lfd_date BETWEEN "'.$date_start.'" AND "'.$date_end.'"');
+		#$qLeaveDates = $db->select('leave_file_detail','*',array('emp_id'=>$emp_id),'AND lfd_date BETWEEN "'.$date_start.'" AND "'.$date_end.'"');
+		$qLeaveDates = $db->preparedQ('SELECT * FROM leave_config lc,leave_file lf, leave_file_detail lfd WHERE lc.lc_id=lf.lc_id AND lf.lf_id=lfd.lf_id AND lc.with_pay=1 AND lf.emp_id=? AND lfd.lfd_date BETWEEN ? AND ?',array($emp_id,$date_start,$date_end));
 		while($rLD = $db->fetch_array($qLeaveDates)):
 			$arrEmpLeaves[$rLD['lfd_date']]=$rLD['lfd_id'];
 		endwhile;
-
+		print_r($arrEmpLeaves);
+die();
 		$qEmpDeduct = $db->select('employee','*',array('emp_id'=>$emp_id));
 		$rED = $db->fetch_array($qEmpDeduct);
 		$pagibig_autodeduct = $rED['pagibig_autodeduct'];
@@ -124,8 +126,6 @@ if( !empty($eatid) && ($confirmed==0) ){
 				$base_salary=0;
 				if($sal_type=='flexible'){
 					$semiMonthSal = ($txSalMonth) ? ($txSalMonth/2) : 0;
-					#$required_min = $db->getValue('emp_attendance_detail','sum(duty_min + late_min + under_min)',array('emp_id'=>$emp_id,'eat_id'=>$eatid),'AND eat_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'" ORDER BY eat_date');
-					#$wage_minute = ($semiMonthSal && $required_min) ? ($semiMonthSal/$required_min) : 0;
 				}
 				$qEmpAtt = $db->select('emp_attendance_detail','*',array('emp_id'=>$emp_id,'eat_id'=>$eatid),'AND eat_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'" ORDER BY eat_date');
 				while($rA = $db->fetch_array($qEmpAtt)):
@@ -135,7 +135,7 @@ if( !empty($eatid) && ($confirmed==0) ){
 					$att_date = $rA['eat_date'];
 
 					$ot_amount = $empRegOTMins * $wage_minute;
-					#$duty_amount = ($sal_type=='fixed') ? $empRegDutyMins * $wage_minute : $wage_day;
+
 					$duty_amount = $empRegDutyMins * $wage_minute;
 					//if no duty minutes rendered, it means absent all day, then the absent amount should be equivalent to daily wage
 					if($rA['am_in_assign'] || $rA['am_out_assign'] || $rA['pm_in_assign'] || $rA['pm_out_assign']){
@@ -154,6 +154,9 @@ if( !empty($eatid) && ($confirmed==0) ){
 						$work_status = $db->getValue('emp_work_status','ews_stat',array('emp_id'=>$emp_id),'AND ews_date <= "'.$att_date.'" ORDER BY ews_date DESC, ews_id DESC LIMIT 1');
 						$project_based = $db->getValue('emp_work_status','project_based',array('emp_id'=>$emp_id,'ews_stat'=>$work_status),'ORDER BY ews_date DESC LIMIT 1');
 					}
+
+					//***********LEAVE WITH PAY CHECKING****************
+					//***********LEAVE WITH PAY CHECKING END****************
 
 					//***********HOLIDAY CHECK****************
 					$addPercent=0;
@@ -242,7 +245,6 @@ if( !empty($eatid) && ($confirmed==0) ){
 							}//End: Only Regular, Probationary and Regular/Probationary Project Based can avail the premium of Holiday.							
 						}
 					}//End: If there is a holiday
-
 					//***********END HOLIDAY CHECK************
 
 					$db->update('emp_attendance_detail',array('eat_id'=>$eatid,'wage_day'=>$wage_day*$retain,'wage_hour'=>$wage_hour*$retain,'wage_minute'=>$wage_minute*$retain,'duty_amount'=>$duty_amount,'ot_amount'=>$ot_amount,'absent_amount'=>$absent_amount),array('emp_id'=>$emp_id,'eat_date'=>$att_date,'eat_id'=>$eatid));
@@ -479,9 +481,6 @@ if( !empty($eatid) && ($confirmed==0) ){
 				if($sal_type=='flexible')
 					$totalAbsentAmount = ($txSalMonth / 2);
 				$db->delete('payroll_adjustment',array('emp_id'=>$emp_id,'eat_id'=>$eatid));
-				// $db->delete('payroll_adjustment',array('emp_id'=>$emp_id,'eat_id'=>$eatid,'adjustment_name'=>'SSS','adjustment_type'=>'deduction','adjustment_mode'=>'system'));
-				// $db->delete('payroll_adjustment',array('emp_id'=>$emp_id,'eat_id'=>$eatid,'adjustment_name'=>'Philhealth','adjustment_type'=>'deduction','adjustment_mode'=>'system'));
-				// $db->delete('payroll_adjustment',array('emp_id'=>$emp_id,'eat_id'=>$eatid,'adjustment_name'=>'Pagibig','adjustment_type'=>'deduction','adjustment_mode'=>'system'));
 			}
 
 			//------------Premium Deduction End
@@ -500,15 +499,15 @@ else{
 	die();
 }
 
-if($fromPayroll){
-	$_SESSION['notif_success']='Calculating Done!';
-	functions::sendTo('payroll_view.php?eatid='.functions::encode($eatid));
-	die();
-}
-else{
-	$_SESSION['notif_success']='Calculating Done!';
-	functions::sendTo('attendance_summary_view.php?eatid='.functions::encode($eatid));
-	die();
-}
+// if($fromPayroll){
+// 	$_SESSION['notif_success']='Calculating Done!';
+// 	functions::sendTo('payroll_view.php?eatid='.functions::encode($eatid));
+// 	die();
+// }
+// else{
+// 	$_SESSION['notif_success']='Calculating Done!';
+// 	functions::sendTo('attendance_summary_view.php?eatid='.functions::encode($eatid));
+// 	die();
+// }
 
 ?>

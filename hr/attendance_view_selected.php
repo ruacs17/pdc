@@ -98,8 +98,17 @@ else{
 		$amin='';$amout='';$pmin='';$pmout='';
 		$amDutyHrs=0;
 		$emp_no = $db->getValue('employee','emp_no',array('emp_id'=>$rA['emp_id']));
-		$has_travel = isset($arr_emptravel[$rA['eat_date']]) ? '&nbsp;&nbsp;<span class="label label-warning" title="has travel"><i class="icon-truck icon-white"></i> Travel</span>' : '';
-		$dailyName = functions::datearr($rA['eat_date']).'<br><span class="muted">('.$rA['eat_day'].')</span>'.$has_travel;
+		$holi_leave = $rA['is_holiday'];//1-Holiday 2-Leave 3-Both
+		$holiLvNote='';
+		if($holi_leave==1)
+			$holiLvNote = '&nbsp;&nbsp;<span class="label label-info" title="Holiday"><i class="icon-gift icon-white"></i></span>';
+		else if($holi_leave==2)
+			$holiLvNote = '&nbsp;&nbsp;<span class="label label-info" title="Leave"><i class="icon-plane icon-white"></i></span>';
+		else if($holi_leave==3)
+			$holiLvNote = '&nbsp;&nbsp;<span class="label label-info" title="Holiday and Leave"><i class="icon-truck icon-white"></i></span>';
+		$has_travel = isset($arr_emptravel[$rA['eat_date']]) ? '&nbsp;&nbsp;<span class="label label-warning" title="Travel Order"><i class="icon-truck icon-white"></i></span>' : '';
+		
+		$dailyName = functions::datearr($rA['eat_date']).'<br><span class="muted">('.$rA['eat_day'].')</span>'.$has_travel.$holiLvNote;
 		$amin = ($rA['am_in']) ? functions::MilToTwelve($rA['am_in']) : '<span class="text-error">--:--</span>';
 		$amin .= ($rA['am_in_assign']) ? ' <br><small class="muted">('.functions::MilToTwelve($rA['am_in_assign']).')</small>' : ' <br><small class="muted">(--:--)</small>';
 
