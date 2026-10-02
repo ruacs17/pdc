@@ -224,7 +224,7 @@ function work_status($emp_id){
 							<?php endwhile;?>
 							<tr>
 								<td colspan="5">&nbsp;</td>
-								<td><div align="center" style="padding:10px;"><input type="submit" class="btn btn-small btn-danger" name="btnRemoved" id="btnRemoved" value="Removed"></div></td>
+								<td><div align="center" style="padding:10px;"><input type="submit" class="btn btn-small btn-danger" name="btnRemoved" id="btnRemoved" value="Remove"></div></td>
 							</tr>
 						</tbody>
 					</table>

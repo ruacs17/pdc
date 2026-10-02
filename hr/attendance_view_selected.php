@@ -101,12 +101,12 @@ else{
 		$holi_leave = $rA['is_holiday'];//1-Holiday 2-Leave 3-Both
 		$holiLvNote='';
 		if($holi_leave==1)
-			$holiLvNote = '&nbsp;&nbsp;<span class="label label-info" title="Holiday"><i class="icon-gift icon-white"></i></span>';
+			$holiLvNote = '&nbsp;&nbsp;<span title="Holiday"><i class="icon-gift icon-white"></i></span>';
 		else if($holi_leave==2)
-			$holiLvNote = '&nbsp;&nbsp;<span class="label label-info" title="Has Leave Application"><i class="icon-plane icon-white"></i></span>';
+			$holiLvNote = '&nbsp;&nbsp;<span title="Has Leave Application"><i class="icon-plane icon-white"></i></span>';
 		else if($holi_leave==3)
-			$holiLvNote = '&nbsp;&nbsp;<span class="label label-info" title="Holiday and Leave"><i class="icon-truck icon-white"></i></span>';
-		$has_travel = isset($arr_emptravel[$rA['eat_date']]) ? '&nbsp;&nbsp;<span class="label label-warning" title="has Travel Order"><i class="icon-truck icon-white"></i></span>' : '';
+			$holiLvNote = '&nbsp;&nbsp;<span title="Holiday and Leave"><i class="icon-truck icon-white"></i></span>';
+		$has_travel = isset($arr_emptravel[$rA['eat_date']]) ? '&nbsp;&nbsp;<span title="has Travel Order"><i class="icon-truck icon-white"></i></span>' : '';
 		
 		$dailyName = functions::datearr($rA['eat_date']).'<br><span class="muted">('.$rA['eat_day'].')</span>'.$has_travel.$holiLvNote;
 		$amin = ($rA['am_in']) ? functions::MilToTwelve($rA['am_in']) : '<span class="text-error">--:--</span>';
@@ -291,22 +291,11 @@ else{
 									$totalDuty = ($regularDutyHours + $otDutyHours);
 									?>
 									<tr>
-										<td class="text-center">
-											<?php
-											#echo $regDays = ($regularDutyHours) ? number_format(($regularDutyHours/$hoursPerDay),2) : '0';
-											echo ($totalDayPresent > 1) ? $totalDayPresent.' days' : $totalDayPresent.' day';
-											#echo ($regularDutyHours) ? '<br><small class="muted">('.functions::min_to_hour($regularDutyHours).')</small>' : '';
-											?>
-										</td>
-										<td class="text-center">
-											<?php echo ($totalDayAbsent > 1) ? $totalDayAbsent.' days' : $totalDayAbsent.' day';?>
-										</td>
-										<td class="text-center">
-											<?php echo ($totalDayRequired > 1) ? $totalDayRequired.' days' : $totalDayRequired.' day';?>
-										</td>
+										<td class="text-center"><?php echo ($totalDayPresent > 1) ? $totalDayPresent.' days' : $totalDayPresent.' day';?></td>
+										<td class="text-center"><?php echo ($totalDayAbsent > 1) ? $totalDayAbsent.' days' : $totalDayAbsent.' day';?></td>
+										<td class="text-center"><?php echo ($totalDayRequired > 1) ? $totalDayRequired.' days' : $totalDayRequired.' day';?></td>
 										<td class="text-center"><?php echo ($otDutyHours) ? functions::min_to_hour($otDutyHours) : '0 hr';?></td>
-										<td class="text-center"><strong><?php echo ($totalDuty) ? functions::min_to_hour($totalDuty) : '0 hr';?></strong>
-										</td>
+										<td class="text-center"><strong><?php echo ($totalDuty) ? functions::min_to_hour($totalDuty) : '0 hr';?></strong></td>
 									</tr>
 								</tbody>
 							</table>
@@ -317,15 +306,17 @@ else{
 				<br>
 				<?php if($has_attendance){?>
 				<div style="overflow-x: auto;">
-				<div align="left">
-					<table cellspacing="4" cellpadding="6" border='0' align="left">
-						<tr>
-							<td width="25" height='30'><div style="background-color:#fcf8e3; width:20px;">&nbsp;</div></td>
-							<td>Altered</td>
-						</tr>
-					</table>
-				</div>
-					<table width="100%" align="center" border="0" class="table table-bordered table-stripedx table-hover" style="font-size: 12px;">
+					<?php if(empty($confirmed)){ ?>
+					<div align="left">
+						<table cellspacing="4" cellpadding="6" border='0' align="left">
+							<tr>
+								<td width="25" height='30'><div style="background-color:#fcf8e3; width:20px;">&nbsp;</div></td>
+								<td>Altered</td>
+							</tr>
+						</table>
+					</div>
+					<?php } ?>
+					<table id="tblist" width="100%" align="center" border="0" class="table table-borderedx table-hover" style="font-size: 12px;">
 						<thead>
 							<tr style="background-color:#f5f5f5">
 								<td rowspan="2" style="padding-left:10px; font-weight: bold;">DATE</td>
@@ -358,11 +349,12 @@ else{
 							$totalTardy+=$dly['tardy'];
 							$totalDayAbsent+=$dly['dayAbsent'];
 						?>
-							<tr <?php echo $dly['bgColor'];?>>
+							<tr id="rw<?php echo $rID;?>" <?php echo $dly['bgColor'];?>>
 								<td height="5" style="padding-left:10px;">
 									<div style="display: flex; justify-content: space-between; align-items: center;">
 										<span><?php echo $dly['dailyName'];?></span>
-										<a id="vw<?php echo $rID?>" class="thickbox btn btn-mini btn-<?php echo ($attendance_ready==1) ? 'info':'warning'; ?>" style="cursor: pointer;" title="Attendance Manage" data-rel="tooltip" onclick="showThis(this.id,'attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>','Attendance Manage Time In/Out'<?php echo ($attendance_ready==1) ? ",'1'" : '' ?>)"><?php if($attendance_ready==1){echo '<i class="halflings-icon search white"></i>';}else{echo '<i class="icon-edit icon-white"></i> Edit';} ?></a>
+										<a id="vw<?php echo $rID?>" class="thickbox btn btn-mini btn-<?php echo ($attendance_ready==1) ? 'info':'warning'; ?>" style="cursor: pointer;display:none;" title="Attendance Manage" data-rel="tooltip" onclick="showThis(this.id,'attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>','Attendance Manage Time In/Out'<?php echo ($attendance_ready==1) ? ",'1'" : '' ?>)"><?php if($attendance_ready==1){echo '<i class="halflings-icon search white"></i>';}else{echo '<i class="icon-edit icon-white"></i> Edit';} ?></a>
+										<a class="btn btn-mini btn-<?php echo ($attendance_ready==1) ? 'info':'warning'; ?>" style="cursor: pointer;" title="Attendance Manage" data-rel="tooltip" href="attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>&rw=<?php echo $rowStart?>"><?php if($attendance_ready==1){echo '<i class="halflings-icon search white"></i>';}else{echo '<i class="icon-edit icon-white"></i> Edit';} ?></a>
 									</div>
 								</td>
 								<td style="text-align: center !important;"><?php echo $dly['amin'];?></td>
@@ -395,7 +387,7 @@ else{
 			</form>
 		</div>
 	</div><!--/span-->
-</div><!--/row-->
+</div><!--/row--><?php echo $_SESSION['notif_indi_idd']; ?>
 <!-- body content: end here-->
 
 <!-- start: JavaScript-->
@@ -450,6 +442,18 @@ $.notify("<?php echo $_SESSION['notif_success'] ?>", {className: "success",autoH
 $.notify("<?php echo $_SESSION['notif_warning'] ?>", {className: "error",autoHideDelay: 3500,globalPosition: 'bottom right'});
 </script>
 <?php unset($_SESSION['notif_warning']);} ?>
+
+<?php if(isset($_SESSION['notif_indi_idd'])){ ?>
+<script src="../js/jcentr.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('#rw<?php echo $_SESSION['notif_indi_idd'] ?>').centerView();
+	$('#rw<?php echo $_SESSION['notif_indi_idd'] ?>').css('border','3px solid green');
+	$("#rw<?php echo $_SESSION['notif_indi_idd'] ?>").animate({borderColor:"#87EAC1"}, 4000);
+	window.setTimeout(function(){$('#rw<?php echo $_SESSION['notif_indi_idd'] ?>').css('border','1px solid black');}, 5000);
+});
+</script>
+<?php unset($_SESSION['notif_indi_idd']);} ?>
 <!-- end: JavaScript-->
 </body>
 </html>

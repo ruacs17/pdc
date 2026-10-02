@@ -131,6 +131,7 @@ while( $rEmps = $db->fetch_array($qEmps)):
 		$position .= $rPos['pos_name'];
 		$countPos++;
 	endwhile;
+	$hasLeave=$hasHoliday=0;
 	$has_attendance = $db->getValue('employee','has_attendance',array('emp_id'=>$emp_id));
 	if( $has_attendance == 0 ){
 		$dates = functions::date_diff($date_start,$date_end);
@@ -178,11 +179,18 @@ while( $rEmps = $db->fetch_array($qEmps)):
 				$totalTardy -= $rA['am_absent_min'];
 			if($rA['pm_absent'])
 				$totalTardy -= $rA['pm_absent_min'];
+			if($rA['is_holiday']==2)
+				$hasLeave=1;
+			if($rA['is_holiday']==1)
+				$hasHoliday=1;
+			if($rA['is_holiday']==3){
+				$hasLeave=$hasHoliday=1;
+			}
 			endwhile;
 	}
-	$bgColor = ($rEmps['att_ready']==1) ? '' : 'bgcolor="#FBD490"';
+	$bgColor = ($rEmps['att_ready']==1) ? '' : 'bgcolor="#fcf8e3"';
 	$empAbsentHours = $empUnderDutyHours + $empLateDutyHours;
-	$arrPayrollList[$emp_id] = array('emp_id'=>$emp_id,'emp_no'=>$emp_no,'name'=>$name,'position'=>$position,'regular_hours'=>$empRegDutyHours,'overtime_hours'=>$empOTDutyHours,'undertime_hours'=>$empUnderDutyHours,'late_hours'=>$empLateDutyHours,'totalTardy'=>$totalTardy,'absentHours'=>$empAbsentHours,'totalDayPresent'=>$totalDayPresent,'totalDayAbsent'=>$totalDayAbsent,'totalDayRequired'=>$totalDayRequired,'bgColor'=>$bgColor);
+	$arrPayrollList[$emp_id] = array('emp_id'=>$emp_id,'emp_no'=>$emp_no,'name'=>$name,'position'=>$position,'regular_hours'=>$empRegDutyHours,'overtime_hours'=>$empOTDutyHours,'undertime_hours'=>$empUnderDutyHours,'late_hours'=>$empLateDutyHours,'totalTardy'=>$totalTardy,'absentHours'=>$empAbsentHours,'totalDayPresent'=>$totalDayPresent,'totalDayAbsent'=>$totalDayAbsent,'totalDayRequired'=>$totalDayRequired,'bgColor'=>$bgColor,'hasLeave'=>$hasLeave,'hasHoliday'=>$hasHoliday);
 endwhile;
 ?>
 <!DOCTYPE html>
@@ -377,7 +385,7 @@ endwhile;
 						</tr>
 						<tr>
 							<td height="30px">Attendance Type</td>
-							<td><strong><?php echo strtoupper($worker_type);?></strong></td>
+							<td><strong><?php echo strtoupper($worker_type); if($worker_type=='admin'){echo ' <i>(Office Personnel)</i>';}?></strong></td>
 						</tr>
 						<tr>
 							<td height="30px">Confirm Status</td>
@@ -388,9 +396,18 @@ endwhile;
 					</table>
 				</div>
 				<br>
-				
 				<!-- WRAPPER APPLIED HERE -->
 				<div class="table-wrapper">
+					<?php if(empty($confirmed)){ ?>
+					<div align="left">
+						<table cellspacing="4" cellpadding="6" border='0' align="left">
+							<tr>
+								<td width="25" height='30'><div style="background-color:#fcf8e3; width:20px;">&nbsp;</div></td>
+								<td>Unverified</td>
+							</tr>
+						</table>
+					</div>
+					<?php } ?>
 					<table id="tblist" width="100%" border="0" class="table table-hover" style="font-size:12px;">
 						<thead>
 							<tr>
@@ -421,9 +438,10 @@ endwhile;
 
 								$has_travel = $db->getValue('travel_personnel tv, travel_order tro, travel_order_detail tod','count(*)',array('personnel_id'=>$pd['emp_id']),'AND travel_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'" AND tro.to_id=tod.to_id AND tv.to_id=tro.to_id ORDER BY act_time_from');
 								$has_travel = ($has_travel) ? '&nbsp;&nbsp;<i class="icon-truck icon-info" title="Has Travel Order" style="cursor:pointer;"></i>' : '';
-								$has_leave = $db->getValue('leave_file lf,leave_file_detail lfd','count(lfd.lfd_id)',array('lf.emp_id'=>$pd['emp_id']),'AND lf.lf_id=lfd.lf_id AND lfd.lfd_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'"');
-								#echo $db->last_query;
-								$has_leave = ($has_leave) ? '&nbsp;&nbsp;<i class="icon-plane icon-info" title="Has Leave Application" style="cursor:pointer;"></i>' : '';
+								// $has_leave = $db->getValue('leave_file lf,leave_file_detail lfd','count(lfd.lfd_id)',array('lf.emp_id'=>$pd['emp_id']),'AND lf.lf_id=lfd.lf_id AND lfd.lfd_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'"');
+								// $has_leave = ($has_leave) ? '&nbsp;&nbsp;<i class="icon-plane icon-info" title="Has Leave Application" style="cursor:pointer;"></i>' : '';
+								$has_leave = (isset($pd['hasLeave']) && $pd['hasLeave']==1 ) ? '&nbsp;&nbsp;<i class="icon-plane icon-info" title="Has Leave Application" style="cursor:pointer;"></i>' : '';
+								$has_holiday = (isset($pd['hasHoliday']) && $pd['hasHoliday']==1 ) ? '&nbsp;&nbsp;<i class="icon-gift icon-info" title="Has Holiday" style="cursor:pointer;"></i>' : '';
 						?>
 							<tr id="rw<?php echo $memberID?>" <?php echo $pd['bgColor']?>>
 								<td height="30px" style="vertical-align: top; padding-top: 10px; padding-bottom: 10px;">
@@ -432,7 +450,7 @@ endwhile;
 											<a id="vw<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; font-weight: 600; font-size: 13px; color: #1e293b;" title="Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><?php echo $countEmp.'. '.$pd['name'];?></a>
 											<a id="vw2<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; color: #2563eb;text-decoration:none;" title="View Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><i class="icon-search" style="font-size: 14px;"></i></a>
 										</div>
-										<div><?php echo $has_travel.' '.$has_leave;?></div>
+										<div><?php echo $has_travel.' '.$has_leave.' '.$has_holiday;?></div>
 									</div>
 									<div style="padding-left: 15px; margin-top: 3px; font-size: 11.5px; color: #475569; border-left: 2px solid #cbd5e1;">
 										<div style="font-weight: 500; color: #334155;"><?php echo $pd['position'];?></div>

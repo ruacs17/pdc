@@ -47,7 +47,7 @@ $txSalHour = functions::formatMoney($rSal['es_hourly'],4);
 $txSalMin = functions::formatMoney($rSal['es_minute'],4);
 $sal_type = ($rSal['es_type']) ? $rSal['es_type'] : "";
 
-$alteredBgc='#f2e2d0';
+$alteredBgc='#fbf2e9';
 $regularDutyHours=0; $otDutyHours=0;$totalAbsent=0; $hoursPerDay=0;$empRegAmount=0;$empOTAmount=0;$empAbsentAmount=0;$totalDayAbsent=0;$totalMinAbsent=0;
 
 $arrDailyAttendance = array();
@@ -72,69 +72,56 @@ else{
 		$dailyName = functions::datearr($rA['eat_date']).'<br>('.$rA['eat_day'].')';
 		
 		$amin = ($rA['am_in']) ? functions::MilToTwelve($rA['am_in']) : '--:--';
-		$amin .= ($rA['am_in_assign']) ? ' <i>('.functions::MilToTwelve($rA['am_in_assign']).')</i>' : ' (--:--)';
+		$amin .= ($rA['am_in_assign']) ? ' <br><small class="text-muted">('.functions::MilToTwelve($rA['am_in_assign']).')</small>' : ' <br><small class="text-muted">(--:--)</small>';
 
 		$amout = ($rA['am_out']) ? functions::MilToTwelve($rA['am_out']) : '--:--';
-		$amout .= ($rA['am_out_assign']) ? ' <i>('.functions::MilToTwelve($rA['am_out_assign']).')</i>' : ' (--:--)';
+		$amout .= ($rA['am_out_assign']) ? ' <br><small class="text-muted">('.functions::MilToTwelve($rA['am_out_assign']).')</small>' : ' <br><small class="text-muted">(--:--)</small>';
 		$amDutyHrs = ($rA['am_in_assign'] && $rA['am_out_assign']) ? functions::min_diff($rA['am_in_assign'],$rA['eat_date'],$rA['am_out_assign'],$rA['eat_date']) : 0;
 
 		$pmin = ($rA['pm_in']) ? functions::MilToTwelve($rA['pm_in']) : '--:--';
-		$pmin .= ($rA['pm_in_assign']) ? ' <i>('.functions::MilToTwelve($rA['pm_in_assign']).')</i>' : ' (--:--)';
+		$pmin .= ($rA['pm_in_assign']) ? ' <br><small class="text-muted">('.functions::MilToTwelve($rA['pm_in_assign']).')</small>' : ' <br><small class="text-muted">(--:--)</small>';
 
 		$pmout = ($rA['pm_out']) ? functions::MilToTwelve($rA['pm_out']) : '--:--';
-		$pmout .= ($rA['pm_out_assign']) ? ' <i>('.functions::MilToTwelve($rA['pm_out_assign']).')</i>' : ' (--:--)';
+		$pmout .= ($rA['pm_out_assign']) ? ' <br><small class="text-muted">('.functions::MilToTwelve($rA['pm_out_assign']).')</small>' : ' <br><small class="text-muted">(--:--)</small>';
 
 		$pmDutyHrs = ($rA['pm_in_assign'] && $rA['pm_out_assign']) ? functions::min_diff($rA['pm_in_assign'],$rA['eat_date'],$rA['pm_out_assign'],$rA['eat_date']) : 0;
 		if($pay_confirm)
 			$bgColor='';
 		else
-			$bgColor = ( $db->getValue('emp_attendance_adjustment','count(*)',array('eatd_id'=>$rA['eatd_id'])) ) ? 'bgcolor="'.$alteredBgc.'"' : '';
+			$bgColor = ( $db->getValue('emp_attendance_adjustment','count(*)',array('eatd_id'=>$rA['eatd_id'])) ) ? 'class="row-altered"' : '';
 
 		$regularDutyHours += $rA['duty_min'];
 		$otDutyHours += $rA['ot_min'];
 		$totalAbsent += $rA['late_min'] + $rA['under_min'];
 
-
-		$dutyDisplay = ($rA['duty_min']) ? functions::min_to_hour($rA['duty_min']) : ''; #$dutyDisplay .= ($sal_type=='fixed') ? ' <strong>('.functions::formatMoney($rA['duty_amount']).')</strong>' : '';
-		$otDisplay = ($rA['ot_min']) ? functions::min_to_hour($rA['ot_min']) : ''; #$otDisplay .= ($sal_type=='fixed' && $otDisplay) ? ' <strong>('.functions::formatMoney($rA['ot_amount']).')</strong>' : '';
-		#$absentDisplay = ($rA['late_min'] || $rA['under_min']) ? functions::min_to_hour($rA['late_min'] + $rA['under_min']).' <strong>('.functions::formatMoney($rA['absent_amount']).')</strong>' : '';
+		$dutyDisplay = ($rA['duty_min']) ? functions::min_to_hour($rA['duty_min']) : '';
+		$otDisplay = ($rA['ot_min']) ? functions::min_to_hour($rA['ot_min']) : '';
 		
 		$absentDay=0;
 		if($rA['am_absent']){
 			$absentDay += $rA['am_absent'];
 			$absentMin += $rA['am_absent_min'];
 		}
-		elseif($rA['am_absent_min']){
-			#$absentMin += $rA['am_absent_min'];
-		}
 		if($rA['pm_absent']){
 			$absentDay += $rA['pm_absent'];
 			$absentMin += $rA['pm_absent_min'];
 		}
-		elseif($rA['pm_absent_min']){
-			#$absentMin += $rA['pm_absent_min'];
-		}
 
 		$lateUnderMins = ( empty($rA['am_absent']) && empty($rA['pm_absent']) ) ? ($rA['late_min'] + $rA['under_min']) : ($rA['late_min'] + $rA['under_min']) - ($rA['am_absent_min']+$rA['pm_absent_min']);
-		#$lateUnderMins = ($rA['late_min'] + $rA['under_min']) - ($rA['am_absent_min']+$rA['pm_absent_min']);
-		#echo '<br>'.$rA['late_min'].' '.$rA['under_min'].' '.$rA['am_absent_min'].' '.$rA['pm_absent_min'];
-		$absentDayDisplay =  ($absentDay) ? $absentDay.' (day)' : '';
+		$absentDayDisplay = ($absentDay) ? $absentDay.' (day)' : '';
 		$absentHrDisplay = ($absentMin) ? functions::min_to_hour($absentMin).' (hr)' : '';
-		$absentDisplay = $absentDayDisplay.' '.$absentHrDisplay;
+		$absentDisplay = ($absentDayDisplay || $absentHrDisplay) ? $absentDayDisplay.' = '.$absentHrDisplay : '';
 
 		$empRegAmount += $rA['duty_amount'];
 		$empOTAmount += $rA['ot_amount'];
 		$empAbsentAmount += $rA['absent_amount'];
-		// if($sal_type=='flexible'){
-		// 	$es_minute = $rA['wage_minute'];
-		// }
 
 		$otin = ($rA['ot_in']) ? functions::MilToTwelve($rA['ot_in']) : functions::MilToTwelve($db->getValue('attendance_overtime_detail','actual_start_time',array('emp_id'=>$rA['emp_id'],'actual_start_date'=>$rA['eat_date'])));
 		$otout = ($rA['ot_out']) ? functions::MilToTwelve($rA['ot_out']) : functions::MilToTwelve($db->getValue('attendance_overtime_detail','actual_end_time',array('emp_id'=>$rA['emp_id'],'actual_start_date'=>$rA['eat_date'])));
 		$arrDailyAttendance[] = array('eatd_id'=>$rA['eatd_id'],'dailyName'=>$dailyName,'amin'=>$amin,'amout'=>$amout,'pmin'=>$pmin,'pmout'=>$pmout,'otin'=>$otin,'otout'=>$otout,'dutyHours'=>$rA['duty_min'],'otHours'=>$rA['ot_min'],'late'=>$rA['late_min'],'undertime'=>$rA['under_min'],'dutyDisplay'=>$dutyDisplay,'otDisplay'=>$otDisplay,'absentDisplay'=>$absentDisplay,'bgColor'=>$bgColor,'absentDay'=>$absentDay,'absentMinutes'=>$absentMin,'lateUnderMins'=>$lateUnderMins);
-	endwhile; #echo '<br>'.$absentMin;   
+	endwhile;
 }
-// echo '<pre>';print_r($arrDailyAttendance);
+
 $hoursPerDay = 480;
 $cert_id = $db->getValue('employee','cert_id',array('emp_id'=>$emp_id));
 $fileName = $db->getValue('cert_img','cert_name',array('cert_id'=>$cert_id));
@@ -170,7 +157,6 @@ function position($emp_id){
 	<link id="base-style-responsive" href="../css/style-responsive.css" rel="stylesheet">
 	<script src="../js/inputInt.js"></script>
 	<!-- end: CSS -->
-	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
 	<!--[if lt IE 9]>
 	<link id="ie-style" href="../css/ie.css" rel="stylesheet">
 	<![endif]-->
@@ -180,204 +166,592 @@ function position($emp_id){
 	<!-- start: Favicon -->
 	<link rel="shortcut icon" href="../img/favicon.png">
 	<!-- end: Favicon -->
+
+	<style type="text/css">
+		:root {
+			--bg-canvas: #fcfaf8;
+			--panel-bg: #ffffff;
+			--border-subtle: #e7e0d8;
+			--text-primary: #2c1d11;
+			--text-muted: #78695c;
+			
+			/* Theme Colors */
+			--theme-brown-header: linear-gradient(135deg, #4a2c1d 0%, #2b180d 100%);
+			--theme-brown-primary: #7c401e;
+			--theme-brown-hover: #5c2e14;
+			--theme-brown-light: #f5ebe6;
+			--theme-brown-accent: #b45309;
+			--theme-brown-active-row: #f3e5dc;
+			--theme-green-payout: #2e6b38;
+			--theme-red-deduction: #b91c1c;
+		}
+
+		body {
+			background-color: var(--bg-canvas);
+			font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+			color: var(--text-primary);
+			margin: 0;
+			padding: 0;
+		}
+
+		.page-full-wrapper {
+			width: 100% !important;
+			max-width: 100% !important;
+			padding: 0 !important;
+			box-sizing: border-box;
+		}
+
+		.card-panel {
+			width: 100%;
+			background: var(--panel-bg);
+			border-radius: 0;
+			border: none;
+			box-shadow: none;
+			overflow: hidden;
+			box-sizing: border-box;
+		}
+
+		.card-header-custom {
+			background: var(--theme-brown-header);
+			padding: 18px 25px;
+			color: #ffffff;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.card-header-custom h2 {
+			margin: 0;
+			font-size: 18px;
+			font-weight: 700;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			color: #ffffff;
+		}
+
+		.card-body-custom {
+			padding: 25px;
+			width: 100%;
+			box-sizing: border-box;
+		}
+
+		.info-banner-grid {
+			display: flex;
+			gap: 20px;
+			background: #f7f2ed;
+			border-left: 4px solid var(--theme-brown-primary);
+			padding: 14px 20px;
+			border-radius: 8px;
+			margin-bottom: 25px;
+			font-size: 13px;
+		}
+
+		.info-banner-item {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.info-banner-item span {
+			color: var(--text-muted);
+		}
+
+		.info-banner-item strong {
+			color: var(--text-primary);
+			font-size: 14px;
+		}
+
+		.profile-card-grid {
+			display: grid;
+			grid-template-columns: 160px minmax(320px, 1fr) minmax(380px, 1fr);
+			gap: 25px;
+			background: #ffffff;
+			border: 1px solid var(--border-subtle);
+			border-radius: 12px;
+			padding: 20px 25px;
+			margin-bottom: 25px;
+			align-items: center;
+		}
+
+		.avatar-box {
+			width: 100%;
+			height: 160px;
+			border-radius: 10px;
+			overflow: hidden;
+			border: 1px solid var(--border-subtle);
+			background: #fdfaf7;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.avatar-box img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.details-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 13px;
+		}
+
+		.details-table td {
+			padding: 7px 4px;
+			vertical-align: top;
+		}
+
+		.details-table td.lbl {
+			color: var(--text-muted);
+			font-weight: 600;
+			width: 110px;
+			white-space: nowrap;
+		}
+
+		.salary-box {
+			background: #fdfaf7;
+			border-radius: 10px;
+			padding: 16px 20px;
+			border: 1px solid var(--border-subtle);
+		}
+
+		.salary-header {
+			font-size: 12px;
+			font-weight: 700;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			color: var(--theme-brown-primary);
+			margin-bottom: 12px;
+			padding-bottom: 6px;
+			border-bottom: 1px dashed var(--border-subtle);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.salary-grid {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 10px 20px;
+		}
+
+		.salary-item {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.salary-item .lbl {
+			font-size: 11px;
+			color: var(--text-muted);
+			font-weight: 600;
+			margin-bottom: 2px;
+		}
+
+		.salary-item .val {
+			font-size: 13px;
+			font-weight: 700;
+			color: var(--text-primary);
+		}
+
+		/* Total Deductions Summary Highlight */
+		.deduction-summary-box {
+			grid-column: span 2;
+			margin-top: 8px;
+			padding: 8px 12px;
+			background: #fef2f2;
+			border: 1px solid #fecaca;
+			border-radius: 6px;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+		}
+
+		.deduction-summary-box .lbl {
+			font-size: 12px;
+			font-weight: 700;
+			color: var(--theme-red-deduction);
+		}
+
+		.deduction-summary-box .val {
+			font-size: 14px;
+			font-weight: 800;
+			color: var(--theme-red-deduction);
+		}
+
+		.legend-bar {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			margin-bottom: 12px;
+			font-size: 12px;
+			color: var(--text-muted);
+		}
+
+		.legend-box-altered {
+			width: 18px;
+			height: 18px;
+			background-color: var(--theme-brown-light);
+			border: 1px solid var(--border-subtle);
+			border-radius: 4px;
+		}
+
+		.table-wrapper {
+			width: 100%;
+			border-radius: 12px;
+			overflow: hidden;
+			border: 1px solid var(--border-subtle);
+			box-sizing: border-box;
+		}
+
+		.attendance-table {
+			width: 100% !important;
+			border-collapse: separate;
+			border-spacing: 0;
+			font-size: 12px;
+			margin: 0;
+		}
+
+		.attendance-table thead tr.head-group {
+			background: #eddcd0;
+		}
+
+		.attendance-table thead tr.head-group td {
+			font-weight: 800;
+			color: var(--theme-brown-primary);
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			font-size: 11px;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--border-subtle);
+		}
+
+		.attendance-table thead tr.head-sub {
+			background: #f4ebe2;
+		}
+
+		.attendance-table thead tr.head-sub td {
+			color: var(--text-muted);
+			font-weight: 700;
+			font-size: 11px;
+			padding: 8px 10px;
+			border-bottom: 1px solid var(--border-subtle);
+		}
+
+		.attendance-table tbody tr {
+			transition: background 0.15s ease;
+		}
+
+		.attendance-table tbody tr:hover {
+			background-color: #fcf6f0 !important;
+		}
+
+		.attendance-table tbody td {
+			padding: 8px 10px;
+			border-bottom: 1px solid #f2e9e1;
+			vertical-align: middle;
+		}
+
+		.attendance-table tfoot tr {
+			font-weight: 700;
+			background: #f7f2ed;
+		}
+
+		.attendance-table tfoot td {
+			padding: 12px 10px;
+			border-top: 2px solid var(--border-subtle);
+		}
+
+		.row-altered {
+			background-color: #fbf2e9 !important;
+		}
+
+		.payout-pill {
+			display: inline-block;
+			padding: 4px 12px;
+			border-radius: 50px;
+			background-color: var(--theme-green-payout);
+			color: #ffffff;
+			font-weight: 700;
+			font-size: 12px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+		}
+
+		.payout-pill strong {
+			color: #ffffff !important;
+		}
+
+		.payout-pill.deduction-pill {
+			background-color: var(--theme-red-deduction);
+		}
+
+		.text-muted {
+			color: var(--text-muted);
+		}
+
+		.btn-action-view {
+			background: var(--theme-brown-light);
+			color: var(--theme-brown-primary) !important;
+			border-radius: 6px;
+			padding: 4px 8px;
+			border: 1px solid var(--border-subtle);
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			transition: all 0.2s;
+		}
+
+		.btn-action-view:hover {
+			background: var(--theme-brown-primary);
+			color: #ffffff !important;
+		}
+
+		.btn-action-view i {
+			margin: 0 !important;
+		}
+	</style>
 </head>
 <body>
 <!-- body content: start here-->
-<div class="row-fluid">
-	<div class="box span12">
-		<div class="box-header" data-original-title>
-			<h2><i class="halflings-icon white list"></i><span class="break"></span>ATTENDANCE PAYROLL PREVIEW</h2>
+<div class="page-full-wrapper">
+	<div class="card-panel">
+		<div class="card-header-custom">
+			<h2><i class="halflings-icon white list"></i> Attendance Payroll Preview</h2>
 		</div>
-		<div class="box-content">
+		<div class="card-body-custom">
 			<form class="form-horizontal" method="post">
-				<table border="0" width="90%" style="font-size: 12px;">
-					<tr>
-						<td width="10%" height="30px">Project</td>
-						<td><strong><?php echo $proj_name;?></strong></td>
-					</tr>
-					<tr>
-						<td height="30px">Period Covered</td>
-						<td><strong><?php echo functions::datearr($date_start).' - '.functions::datearr($date_end);?></strong></td>
-					</tr>
-				</table><br>
-				<table width="100%" border="1">
-					<tr>
-						<td valign="top" width="200"><img width="200" height="200" src="../img_emp/<?php echo $file;?>"></td>
-						<td valign="top" style="padding-top: 10px; padding-left:5px;" width="55%">
-							<table border="0" width="99%">
-								<tr>
-									<td width="10%" height="30px" valign="top"><i>ID No.</i></td>
-									<td valign="top"><strong><?php echo $emp_no;?></strong></td>
-								</tr>
-								<tr>
-									<td width="10%" height="30px" valign="top"><i>Name</i></td>
-									<td valign="top"><strong><?php echo $emp_name;?></strong></td>
-								</tr>
-								<tr>
-									<td valign="top" style="padding-top:10px;"><i>Position</i></td>
-									<td valign="top" style="padding-top:10px;"><?php echo position($emp_id); ?></td>
-								</tr>
-								<tr>
-									<td valign="top" style="padding-top:10px;"><i>Status</i></td>
-									<td valign="top" style="padding-top:10px;">
-										<?php
-										$qStat = $db->select('emp_work_status','*',array('emp_id'=>$emp_id),'AND ews_date <= "'.$date_end.'" ORDER BY ews_date DESC, ews_id DESC LIMIT 1');
-										$rStat = $db->fetch_array($qStat);
-										$wrkStat = (isset($rStat['ews_stat'])) ? $rStat['ews_stat'] : 'Undefined Status';
-										$projBased = (isset($rStat['project_based']) && $rStat['project_based']==1) ? ' <i>Project Based</i>' : '';
-										$wrkDate = (isset($rStat['ews_date'])) ? ' ('.functions::datearr($rStat['ews_date']).')' : '';
-										echo $work_status = $wrkStat.$projBased.$wrkDate;
-										?>
-									</td>
-								</tr>
-							</table>
-						</td>
-						<td valign="top" style="padding-top: 10px;">
-							<table border="0" width="90%">
-								<tr>
-									<td width="35%"><div align="right" style="padding:2px;">Salary Type:</div></td>
-									<td><div align="left" style="padding:2px;"><strong><?php if($sal_type=='flexible')echo 'Monthly';elseif($sal_type=='fixed')echo 'Daily';else{echo 'Unidentified';}?></strong></div></td>
-								</tr>
-								<?php if($sal_type=='flexible'){ ?>
-								<tr>
-									<td><div align="right" style="padding:2px;">Monthly:</div></td>
-									<td><div align="left" style="padding:2px;"><strong title="<?php echo functions::formatMoney($rSal['es_salary'],'~'); ?>"><?php echo functions::formatMoney($rSal['es_salary'])?></strong></div></td>
-								</tr>
-								<tr>
-									<td><div align="right" style="padding:2px;">Semi-Monthly:</div></td>
-									<td><div align="left" style="padding:2px;"><strong title="<?php echo ($rSal['es_salary']) ? functions::formatMoney($rSal['es_salary']/2,'~'): 0;?>"><?php echo ($rSal['es_salary']) ? functions::formatMoney($rSal['es_salary']/2,'~'): 0;?></strong></div></td>
-								</tr>
-								<tr style="display:none;">
-									<td><div align="right" style="padding:2px;">Working Days:</div></td>
-									<td><div align="left" style="padding:2px;"><strong><?php echo $rSal['working_days'] ?></strong></div></td>
-								</tr>
-								<?php }?>
-								<tr>
-									<td><div align="right" style="padding:2px;">Daily:</div></td>
-									<td><div align="left" style="padding:2px;"><strong title="<?php echo functions::formatMoney($rSal['es_daily'],'~'); ?>"><?php echo functions::formatMoney($rSal['es_daily'],'3'); ?></strong></div></td>
-								</tr>
-								<tr>
-									<td><div align="right" style="padding:2px;">Hourly:</div></td>
-									<td><div align="left" style="padding:2px;"><strong title="<?php echo functions::formatMoney($rSal['es_hourly'],'~'); ?>"><?php echo functions::formatMoney($rSal['es_hourly'],'3'); ?></strong></div></td>
-								</tr>
-								<tr>
-									<td><div align="right" style="padding:2px;">Minute:</div></td>
-									<td><div align="left" style="padding:2px;"><strong title="<?php echo functions::formatMoney($rSal['es_minute'],'~'); ?>"><?php echo functions::formatMoney($rSal['es_minute'],'3'); ?></strong></div></td>
-								</tr>
-							</table>
-						</td>
-					</tr>
-				</table><br>
-				<?php if( empty($sal_type) ){echo '<div align="center" style="color:red">Warning: <strong style="font-size: 21px">Salary not set!</strong></div>';}
-				else if($has_attendance==1){?>
-				<div align="left">
-					<table cellspacing="4" cellpadding="6" border='0' align="left">
-						<tr>
-							<td width="25" height='30'><div style="background-color:<?php echo $alteredBgc;?>; width:20px;">&nbsp;</div></td>
-							<td>Altered</td>
-						</tr>
+				
+				<!-- Top Information Banner -->
+				<div class="info-banner-grid">
+					<div class="info-banner-item">
+						<span>Project:</span>
+						<strong><?php echo $proj_name;?></strong>
+					</div>
+					<div style="border-left: 1px solid var(--border-subtle); margin: 0 10px;"></div>
+					<div class="info-banner-item">
+						<span>Period Covered:</span>
+						<strong><?php echo functions::datearr($date_start).' - '.functions::datearr($date_end);?></strong>
+					</div>
+				</div>
+
+				<?php
+				// Compute total absent and tardiness minutes & total deduction amount first
+				$calcTotalAbsentMinutes = 0;
+				$calcTotalLateUnderMins = 0;
+				foreach($arrDailyAttendance as $dlyCalc) {
+					$calcTotalAbsentMinutes += $dlyCalc['absentMinutes'];
+					$calcTotalLateUnderMins += $dlyCalc['lateUnderMins'];
+				}
+				$grandTotalDeductionMins = $calcTotalAbsentMinutes + $calcTotalLateUnderMins;
+				$grandTotalDeductionAmount = $grandTotalDeductionMins * $es_minute;
+				?>
+
+				<!-- Redesigned Employee Profile & Salary Overview Grid -->
+				<div class="profile-card-grid">
+					<div class="avatar-box">
+						<img src="../img_emp/<?php echo $file;?>" alt="Employee Photo">
+					</div>
+					<div>
+						<table class="details-table">
+							<tr>
+								<td class="lbl">ID No.</td>
+								<td><strong><?php echo $emp_no;?></strong></td>
+							</tr>
+							<tr>
+								<td class="lbl">Name</td>
+								<td><strong><?php echo $emp_name;?></strong></td>
+							</tr>
+							<tr>
+								<td class="lbl">Position</td>
+								<td><?php echo position($emp_id); ?></td>
+							</tr>
+							<tr>
+								<td class="lbl">Status</td>
+								<td>
+									<?php
+									$qStat = $db->select('emp_work_status','*',array('emp_id'=>$emp_id),'AND ews_date <= "'.$date_end.'" ORDER BY ews_date DESC, ews_id DESC LIMIT 1');
+									$rStat = $db->fetch_array($qStat);
+									$wrkStat = (isset($rStat['ews_stat'])) ? $rStat['ews_stat'] : 'Undefined Status';
+									$projBased = (isset($rStat['project_based']) && $rStat['project_based']==1) ? ' <small class="text-muted">(Project Based)</small>' : '';
+									$wrkDate = (isset($rStat['ews_date'])) ? ' ('.functions::datearr($rStat['ews_date']).')' : '';
+									echo $work_status = $wrkStat.$projBased.$wrkDate;
+									?>
+								</td>
+							</tr>
+						</table>
+					</div>
+					<div class="salary-box">
+						<div class="salary-header">
+							<span>Salary Information</span>
+							<span style="color: var(--text-primary); font-size: 11px;">
+								Type: <strong><?php if($sal_type=='flexible')echo 'Monthly';elseif($sal_type=='fixed')echo 'Daily';else{echo 'Unidentified';}?></strong>
+							</span>
+						</div>
+						<div class="salary-grid">
+							<?php if($sal_type=='flexible'){ ?>
+							<div class="salary-item">
+								<span class="lbl">Monthly</span>
+								<span class="val" title="<?php echo functions::formatMoney($rSal['es_salary'],'~'); ?>"><?php echo functions::formatMoney($rSal['es_salary']); ?></span>
+							</div>
+							<div class="salary-item">
+								<span class="lbl">Semi-Monthly</span>
+								<span class="val" title="<?php echo ($rSal['es_salary']) ? functions::formatMoney($rSal['es_salary']/2,'~'): 0;?>"><?php echo ($rSal['es_salary']) ? functions::formatMoney($rSal['es_salary']/2,'~'): 0;?></span>
+							</div>
+							<?php } ?>
+							<div class="salary-item">
+								<span class="lbl">Daily Rate</span>
+								<span class="val" title="<?php echo functions::formatMoney($rSal['es_daily'],'~'); ?>"><?php echo functions::formatMoney($rSal['es_daily'],'3'); ?></span>
+							</div>
+							<div class="salary-item">
+								<span class="lbl">Hourly Rate</span>
+								<span class="val" title="<?php echo functions::formatMoney($rSal['es_hourly'],'~'); ?>"><?php echo functions::formatMoney($rSal['es_hourly'],'3'); ?></span>
+							</div>
+							<div class="salary-item">
+								<span class="lbl">Minute Rate</span>
+								<span class="val" title="<?php echo functions::formatMoney($rSal['es_minute'],'~'); ?>"><?php echo functions::formatMoney($rSal['es_minute'],'3'); ?></span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<?php if( empty($sal_type) ){
+					echo '<div align="center" style="color:#b91c1c; padding: 20px; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca; margin-bottom: 20px;">Warning: <strong style="font-size: 18px">Salary not set!</strong></div>';
+				} else if($has_attendance==1){ ?>
+
+				<div class="legend-bar">
+					<div class="legend-box-altered"></div>
+					<span>Altered/Adjusted Attendance Record</span>
+				</div>
+
+				<div class="table-wrapper">
+					<table class="attendance-table table-hover">
+						<thead>
+							<tr class="head-group">
+								<td width="14%">DATE</td>
+								<td colspan="2" align="center">Morning</td>
+								<td colspan="2" align="center">Afternoon</td>
+								<td colspan="2" align="center">Overtime</td>
+								<td colspan="4" align="center">Total Summary</td>
+							</tr>
+							<tr class="head-sub">
+								<td>&nbsp;</td>
+								<td width="9%" align="center">In <br><small>Actual (Assigned)</small></td>
+								<td width="9%" align="center">Out <br><small>Actual (Assigned)</small></td>
+								<td width="9%" align="center">In <br><small>Actual (Assigned)</small></td>
+								<td width="9%" align="center">Out <br><small>Actual (Assigned)</small></td>
+								<td width="7%" align="center">In</td>
+								<td width="7%" align="center">Out</td>
+								<td width="10%" align="center">Duty</td>
+								<td width="9%" align="center">Overtime</td>
+								<td width="10%" align="center">Absent</td>
+								<td width="10%" align="center">Tardy / Under</td>
+							</tr>
+						</thead>
+						<tbody>
+							<?php
+							if( $db->getValue('emp_attendance_detail','sum(duty_min)',array('emp_id'=>$emp_id,'eat_id'=>$eatid),'AND eat_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'"')==0 ){
+								if($sal_type=='flexible')
+									$empAbsentAmount = ($es_salary / 2);
+							}
+							$totalLateUnderMins=$totalAbsent=0;$totalLate=0;$totalUnder=0;$countAtt=0;$totalAbsentDay=0;$totalAbsentMinutes=0;
+							foreach($arrDailyAttendance as $dly):
+								$countAtt++;
+								$totalAbsent += ($dly['late'] + $dly['undertime']);
+								$totalLate += $dly['late'];
+								$totalUnder += $dly['undertime'];
+								$rID = $dly['eatd_id'];
+								$totalAbsentDay+=$dly['absentDay'];
+								$totalAbsentMinutes+=$dly['absentMinutes'];
+								$totalLateUnderMins+=$dly['lateUnderMins'];
+							?>
+							<tr id="rw<?php echo $rID;?>" <?php echo $dly['bgColor']?>>
+								<td>
+									<div style="display: flex; align-items: center; justify-content: space-between;">
+										<?php echo $dly['dailyName'];?>
+										<a id="vw2<?php echo $countAtt?>" class="btn-action-view" style="cursor: pointer;" title="Attendance Detail View" data-rel="tooltip" href="attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>&frm=<?php echo functions::encode('attendance_adjust_selected.php')?>">
+											<i class="halflings-icon search white"></i>
+										</a>
+									</div>
+								</td>
+								<td align="center"><?php echo $dly['amin'];?></td>
+								<td align="center"><?php echo $dly['amout'];?></td>
+								<td align="center"><?php echo $dly['pmin'];?></td>
+								<td align="center"><?php echo $dly['pmout'];?></td>
+								<td align="center"><?php echo $dly['otin'];?></td>
+								<td align="center"><?php echo $dly['otout'];?></td>
+								<td align="center"><?php echo $dly['dutyDisplay'];?></td>
+								<td align="center"><?php echo $dly['otDisplay'];?></td>
+								<td align="center"><?php echo $dly['absentDisplay'];?></td>
+								<td align="center"><?php echo ($dly['lateUnderMins']>0) ? functions::min_to_hour($dly['lateUnderMins']) : '';?></td>
+							</tr>
+							<?php endforeach;?>
+						</tbody>
+						<tfoot>
+							<tr>
+								<td colspan="7" align="right" style="font-weight:700;">Total Hours &nbsp;&nbsp;</td>
+								<td align="center"><strong><?php echo ($regularDutyHours) ? functions::min_to_hour($regularDutyHours) : '';?></strong></td>
+								<td align="center"><strong><?php echo ($otDutyHours) ? functions::min_to_hour($otDutyHours) : '';?></strong></td>
+								<td align="center"><strong><?php echo ($totalAbsentMinutes) ? functions::min_to_hour($totalAbsentMinutes) : '';?></strong></td>
+								<td align="center"><strong><?php echo ($totalLateUnderMins) ? functions::min_to_hour($totalLateUnderMins) : ''; ?></strong></td>
+							</tr>
+							<tr>
+								<td colspan="7" align="right" style="font-weight:700;">Amount &nbsp;&nbsp;</td>
+								<td align="center">
+									<?php if( $sal_type=='fixed' && $regularDutyHours ){ ?>
+										<div class="payout-pill" title="<?php echo functions::formatMoney($regularDutyHours*$es_minute,'~'); ?>">
+											<strong><?php echo functions::formatMoney($regularDutyHours*$es_minute,'3'); ?></strong>
+										</div>
+									<?php } ?>
+								</td>
+								<td align="center">
+									<?php if( $otDutyHours ){ ?>
+										<div class="payout-pill" title="<?php echo functions::formatMoney($otDutyHours*$es_minute,'~'); ?>">
+											<strong><?php echo functions::formatMoney($otDutyHours*$es_minute,'3'); ?></strong>
+										</div>
+									<?php } ?>
+								</td>
+								<td align="center" class="rwAbsent">
+									<?php if( $totalAbsentMinutes ){ ?>
+										<div class="payout-pill deduction-pill" title="<?php echo functions::formatMoney(($totalAbsentMinutes*$es_minute),'~'); ?>">
+											<strong><?php echo functions::formatMoney(($totalAbsentMinutes*$es_minute),'3'); ?></strong>
+										</div>
+									<?php } ?>
+								</td>
+								<td align="center" class="rwAbsent">
+									<?php if( $totalLateUnderMins ){ ?>
+										<div class="payout-pill deduction-pill" title="<?php echo functions::formatMoney($totalLateUnderMins*$es_minute,'~'); ?>">
+											<strong><?php echo functions::formatMoney($totalLateUnderMins*$es_minute,'3'); ?></strong>
+										</div>
+									<?php } ?>
+								</td>
+							</tr>
+							<!-- Optional Summary Row across Deduction Columns -->
+							<?php if ( $totalAbsentMinutes && $totalLateUnderMins ) { ?>
+							<tr>
+								<td colspan="9" align="right" style="font-weight: 700; color: var(--theme-red-deduction);">
+									Total Combined Deductions (Absent + Tardy): &nbsp;&nbsp;
+								</td>
+								<td colspan="2" align="center">
+									<div class="payout-pill deduction-pill" style="padding: 6px 16px; font-size: 13px;">
+										<strong><?php echo functions::formatMoney($grandTotalDeductionAmount, '3'); ?></strong>
+									</div>
+								</td>
+							</tr>
+							<?php } ?>
+						</tfoot>
 					</table>
 				</div>
-				<table width="100%" align="center" class="table-hover" border="1" style="font-size: 12px;">
-					<thead>
-					<tr style="background-color:#CCC">
-						<td>DATE</td>
-						<td colspan="2"><div align="center">Morning</div></td>
-						<td colspan="2"><div align="center">Afternoon</div></td>
-						<td colspan="2"><div align="center">Overtime</div></td>
-						<td colspan="4"><div align="center">Total</div></td>
-					</tr>
-					<tr style="background-color:#CCC">
-						<td width="9%">&nbsp;</td>
-						<td width="10%"><div align="center">In<br>Actual <i>(Assigned)</i></div></td>
-						<td width="10%"><div align="center">Out<br>Actual <i>(Assigned)</i></div></td>
-						<td width="10%"><div align="center">In<br>Actual <i>(Assigned)</i></div></td>
-						<td width="10%"><div align="center">Out<br>Actual <i>(Assigned)</i></div></td>
-						<td width="7%"><div align="center">In</div></td>
-						<td width="7%"><div align="center">Out</div></td>
-						<td width="10%"><div align="center">Duty</div></td>
-						<td width="10%"><div align="center">Overtime</div></td>
-						<td width="10%"><div align="center">Absent</div></td>
-						<td width="10%"><div align="center">Tardy/Under</div></td>
-					</tr>
-					</thead>
-					<tbody>
-						<?php
-						if( $db->getValue('emp_attendance_detail','sum(duty_min)',array('emp_id'=>$emp_id,'eat_id'=>$eatid),'AND eat_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'"')==0 ){
-							if($sal_type=='flexible')
-								$empAbsentAmount = ($es_salary / 2);
-						}
-						$totalLateUnderMins=$totalAbsent=0;$totalLate=0;$totalUnder=0;$countAtt=0;$totalAbsentDay=0;$totalAbsentMinutes=0;
-						foreach($arrDailyAttendance as $dly):
-							$countAtt++;
-							$totalAbsent += ($dly['late'] + $dly['undertime']);
-							$totalLate += $dly['late'];
-							$totalUnder += $dly['undertime'];
-							$rID = $dly['eatd_id'];
-							$totalAbsentDay+=$dly['absentDay'];
-							$totalAbsentMinutes+=$dly['absentMinutes'];
-							$totalLateUnderMins+=$dly['lateUnderMins'];
-						?>
-						<tr <?php echo $dly['bgColor']?>>
-							<td style="padding:2px 5px;">
-								<div style="display: flex;">
-									<div style="flex: 1;" align="left"><a id="vw<?php echo $countAtt?>" class="thickbox" style="cursor: pointer;" title="Attendance Detail View" data-rel="tooltip" onclick="showThis(this.id,'attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>','Attendance Detail','1')"><?php echo $dly['dailyName'];?></a></div>
-									<div style="flex: 1;padding-top:7px;" align="right"><a id="vw2<?php echo $countAtt?>" class="thickbox btn btn-mini btn-info" style="cursor: pointer;" title="Attendance Detail View" data-rel="tooltip" onclick="showThis(this.id,'attendance_adjust_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($emp_id);?>&eatdid=<?php echo functions::encode($rID);?>','Attendance Detail','1')"><i class="halflings-icon search white"></i></a></div>
-								</div>
-							</td>
-							<td><div align="center"><?php echo $dly['amin'];?></div></td>
-							<td><div align="center"><?php echo $dly['amout'];?></div></td>
-							<td><div align="center"><?php echo $dly['pmin'];?></div></td>
-							<td><div align="center"><?php echo $dly['pmout'];?></div></td>
-							<td><div align="center"><?php echo $dly['otin'];?></div></td>
-							<td><div align="center"><?php echo $dly['otout'];?></div></td>
-							<td><div align="center"><?php echo $dly['dutyDisplay'];?></div></td>
-							<td><div align="center"><?php echo $dly['otDisplay'];?></div></td>
-							<td><div align="center"><?php echo $dly['absentDisplay'];?></div></td>
-							<td><div align="center"><?php echo ($dly['lateUnderMins']>0) ? functions::min_to_hour($dly['lateUnderMins']) : '';?></div></td>
-						</tr>
-						<?php endforeach;?>
-						<tr>
-							<td colspan="7" align="right">Total Hours &nbsp;&nbsp;</td>
-							<td><div align="center"><strong><?php echo ($regularDutyHours) ? functions::min_to_hour($regularDutyHours) : '';?></strong></div></td>
-							<td><div align="center"><strong><?php echo ($otDutyHours) ? functions::min_to_hour($otDutyHours) : '';?></strong></div></td>
-							<td>
-								<div align="center">
-									<strong><?php echo ($totalAbsentMinutes) ? functions::min_to_hour($totalAbsentMinutes) : '';?>
-										<?php #echo $totalAbsentMinutes;
-										// if($totalAbsentDay)
-										// 	echo ($totalAbsentDay>1) ? $totalAbsentDay.' (days)' : $totalAbsentDay.' (day)';
-										// if( $totalAbsentMinutes ){
-										// 	$hrOnly = intval($totalAbsentMinutes / 60);
-										// 	if($remMinute = ($totalAbsentMinutes % 60) ){
-										// 		$hrOnly += round($remMinute / 60,2);
-										// 	}
-										// 	echo '<br>'.$hrOnly.'(hr)';
-										// }
-										?>
-									</strong>
-								</div>
-							</td>
-							<td><div align="center"><?php echo ($totalLateUnderMins) ? functions::min_to_hour($totalLateUnderMins) : ''; ?></div></td>
-						</tr>
-						<tr>
-							<td colspan="7" align="right">Amount &nbsp;&nbsp;</td>
-							<td <?php if( $sal_type=='fixed' && $regularDutyHours)echo 'style="color:#FFF; background-color:green"'; ?>><div align="center" title="<?php echo ( $sal_type=='fixed' && $regularDutyHours) ? functions::formatMoney($regularDutyHours*$es_minute,'~') : '';?>"><strong><?php echo ( $sal_type=='fixed' && $regularDutyHours) ? functions::formatMoney($regularDutyHours*$es_minute,'3') : '';?></strong> </div></td>
-							<td <?php if( $otDutyHours)echo 'style="color:#FFF; background-color:green"'; ?>><div align="center" title="<?php echo ($otDutyHours) ? functions::formatMoney($otDutyHours*$es_minute,'~') : '';?>"><strong><?php echo ($otDutyHours) ? functions::formatMoney($otDutyHours*$es_minute,'3') : '';?></strong> </div></td>
-							<td class="rwAbsent" <?php if( $totalAbsentMinutes )echo 'style="color:#FFF; background-color:green"'; ?>><div align="center" title="<?php echo ($totalAbsentMinutes) ? functions::formatMoney(($totalAbsentMinutes*$es_minute),'~') : '';?>"><strong><?php echo ($totalAbsentMinutes) ? functions::formatMoney(($totalAbsentMinutes*$es_minute),'3') : '';?></strong></div></td>
-							<td class="rwAbsent"><div align="center" title="<?php echo ($totalLateUnderMins) ? functions::formatMoney($totalLateUnderMins*$es_minute,'~') : '' ?>"><strong><?php echo ($totalLateUnderMins) ? functions::formatMoney($totalLateUnderMins*$es_minute,'3') : '' ?></strong></div></td>
-						</tr>
-					</tbody>
-				</table>
 
 				<?php }else{?>
-					<div align="center">Attendance not applicable</div>
+					<div align="center" style="padding: 30px; color: var(--text-muted); background: #fdfaf7; border-radius: 8px; border: 1px solid var(--border-subtle);">Attendance not applicable</div>
 				<?php }?>
 			</form>
 		</div>
-	</div><!--/span-->
-</div><!--/row-->
+	</div>
+</div>
 <!-- body content: end here-->
+
 <!-- start: JavaScript-->
 <script src="../js/jquery-1.9.1.min.js"></script>
 <script src="../js/jquery-migrate-1.0.0.min.js"></script>
@@ -413,15 +787,27 @@ function position($emp_id){
 <script src="../js/thickboxa.js"></script>
 <link rel="stylesheet" type="text/css" href="../css/thickbox.css"/>
 <script src="../js/showPage.js"></script>
+
 <?php if( $absentView ){ ?>
 <script src="../js/jcentr.js"></script>
 <script type="text/javascript">
 $(document).ready(function(){
 	$('.rwAbsent').centerView();
-	$('.rwAbsent').css('border','3px solid red');
+	$('.rwAbsent').css('border','2px solid #dc2626');
 });
 </script>
 <?php } ?>
+<?php if(isset($_SESSION['notif_indi_idd'])){ ?>
+<script src="../js/jcentr.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	$('#rw<?php echo $_SESSION['notif_indi_idd'] ?>').centerView();
+	$('#rw<?php echo $_SESSION['notif_indi_idd'] ?>').css('border','3px solid green');
+	$("#rw<?php echo $_SESSION['notif_indi_idd'] ?>").animate({borderColor:"#87EAC1"}, 4000);
+	window.setTimeout(function(){$('#rw<?php echo $_SESSION['notif_indi_idd'] ?>').css('border','1px solid black');}, 5000);
+});
+</script>
+<?php unset($_SESSION['notif_indi_idd']);} ?>
 <!-- end: JavaScript-->
 </body>
 </html>

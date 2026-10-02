@@ -313,9 +313,9 @@ if($uploaded_file){
 		}
 	}
 
-	function diffComp($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',
-		$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn=0,$actualOtOut=0,&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
+	function diffComp($actualAmIn='',$assignAmIn='',$actualAmOut='',$assignAmOut='',$actualPmIn='',$assignPmIn='',$actualPmOut='',$assignPmOut='',$actualOtIn=0,$actualOtOut=0,&$late=0,&$undertime=0,&$dutyHours=0,&$otHours=0){
 		$cDate = date('Y-m-d');
+		$late=$undertime=$dutyHours=0;
 		if( $assignAmIn && $assignAmOut )//compute the required duty mins for morning
 			$dutyHours += functions::min_diff($assignAmIn,$cDate,$assignAmOut,$cDate);
 		if( $assignPmIn && $assignPmOut )//compute the required duty mins for afternoon
@@ -430,7 +430,7 @@ if($uploaded_file){
 	foreach($arrAttendanceRecord as $employee => $calDate):
 		$monAmIn='';$monAmOut='';$monPmIn='';$monPmOut='';$tueAmIn='';$tueAmOut='';$tuePmIn='';$tuePmOut='';$wedAmIn='';$wedAmOut='';$wedPmIn='';$wedPmOut='';$thuAmIn='';$thuAmOut='';$thuPmIn='';$thuPmOut='';$friAmIn='';$friAmOut='';$friPmIn='';$friPmOut='';$satAmIn='';$satAmOut='';$satPmIn='';$satPmOut='';$sunAmIn='';$sunAmOut='';$sunPmIn='';$sunPmOut='';$am_in='';$am_out='';$pm_in='';$pm_out='';
 		$emp_id = $db->getValue('employee','emp_id',array('emp_no'=>$employee));
-#if($emp_id==217){
+
 		//Get Employee Filed Leave
 		$arrEmpLeaves=array();
 		if($dateRangeFrom && $dateRangeTo){
@@ -669,7 +669,7 @@ if($uploaded_file){
 								if($rHol['hol_year']=='all' || $rHol['hol_year']==$holYr){
 									if($rHol['hol_type']=='Regular Holiday'){//Monthly wager and daily wager can avail this holiday
 										//check if there is an adjustment already of this kind of holiday
-										if( $db->getValue('emp_attendance_adjustment','count(*)',array('emp_id'=>$emp_id,'eta_date'=>$cDate,'remarks'=>$arrHoliday[$cDate]))==0 ){
+										if( $db->getValue('emp_attendance_adjustment','count(*)',array('emp_id'=>$emp_id,'eta_date'=>$cDate,'remarks'=>$rHol['hol_type']))==0 ){
 											//if there is non, then add record
 											//insert the original attendance record
 											$newAddetaID = $db->insert('emp_attendance_adjustment',array('eatd_id'=>$eatd_id,'emp_id'=>$emp_id,'eta_date'=>$cDate,'eta_day'=>$dayName,
@@ -685,12 +685,12 @@ if($uploaded_file){
 										$is_holiday=1;
 										diffComp($am_in_assign,$am_in_assign,$am_out_assign,$am_out_assign,$pm_in_assign,$pm_in_assign,$pm_out_assign,$pm_out_assign,$ot_in,$ot_out,$late,$undertime,$dutyHours,$otHours);
 										$arrUpdateAtt=array('am_in'=>NULL,'am_in_assign'=>$am_in_assign,'am_out'=>NULL,'am_out_assign'=>$am_out_assign,'pm_in'=>NULL,'pm_in_assign'=>$pm_in_assign,'pm_out'=>NULL,'pm_out_assign'=>$pm_out_assign,'ot_in'=>$ot_in,'ot_out'=>$ot_out,'duty_min'=>$dutyHours,'ot_min'=>$otHours,'late_min'=>$late,'under_min'=>$undertime,'is_holiday'=>$is_holiday);
-										$db->update('emp_attendance_detail',$arrUpdateAtt,array('emp_id'=>$emp_id,'eat_id'=>$eatid,'eat_date'=>$cDate));
+										$db->update('emp_attendance_detail',$arrUpdateAtt,array('emp_id'=>$emp_id,'eatd_id'=>$eatd_id,'eat_date'=>$cDate));
 									}
 									else if($rHol['hol_type']=='Special Non-Working Holiday'){
 										if($sal_type=='flexible'){//Only monthly wager can avail the paid special holiday
 											//check if there is an adjustment already of this kind of holiday
-											if( $db->getValue('emp_attendance_adjustment','count(*)',array('emp_id'=>$emp_id,'eta_date'=>$cDate,'remarks'=>$arrHoliday[$cDate]))==0 ){
+											if( $db->getValue('emp_attendance_adjustment','count(*)',array('emp_id'=>$emp_id,'eta_date'=>$cDate,'remarks'=>$rHol['hol_type']))==0 ){
 												//if there is non, then add record
 												//insert the original attendance record
 												$newAddetaID = $db->insert('emp_attendance_adjustment',array('eatd_id'=>$eatd_id,'emp_id'=>$emp_id,'eta_date'=>$cDate,'eta_day'=>$dayName,
@@ -706,7 +706,7 @@ if($uploaded_file){
 											$is_holiday=1;
 											diffComp($am_in_assign,$am_in_assign,$am_out_assign,$am_out_assign,$pm_in_assign,$pm_in_assign,$pm_out_assign,$pm_out_assign,$ot_in,$ot_out,$late,$undertime,$dutyHours,$otHours);
 											$arrUpdateAtt=array('am_in'=>NULL,'am_in_assign'=>$am_in_assign,'am_out'=>NULL,'am_out_assign'=>$am_out_assign,'pm_in'=>NULL,'pm_in_assign'=>$pm_in_assign,'pm_out'=>NULL,'pm_out_assign'=>$pm_out_assign,'ot_in'=>$ot_in,'ot_out'=>$ot_out,'duty_min'=>$dutyHours,'ot_min'=>$otHours,'late_min'=>$late,'under_min'=>$undertime,'is_holiday'=>$is_holiday);
-											$db->update('emp_attendance_detail',$arrUpdateAtt,array('emp_id'=>$emp_id,'eat_id'=>$eatid,'eat_date'=>$cDate));
+											$db->update('emp_attendance_detail',$arrUpdateAtt,array('emp_id'=>$emp_id,'eatd_id'=>$eatd_id,'eat_date'=>$cDate));
 										}//End: Only monthly wager can avail the paid special holiday
 									}
 								}
@@ -813,7 +813,7 @@ if($uploaded_file){
 				if( isset($ra['eatd_id']) ){
 					absentDay($ra['am_in'],$ra['am_in_assign'],$ra['am_out'],$ra['am_out_assign'],$ra['pm_in'],$ra['pm_in_assign'],$ra['pm_out'],$ra['pm_out_assign'],$am_absent,$pm_absent,$am_absent_min,$pm_absent_min);
 					$db->update('emp_attendance_detail',array('am_absent'=>$am_absent,'pm_absent'=>$pm_absent,'am_absent_min'=>$am_absent_min,'pm_absent_min'=>$pm_absent_min),array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id));
-					#echo $db->last_query.'<br>';					
+					#echo $db->last_query.'<br>';
 				}
 				//End checking absent
 			}//has already attendance record
@@ -832,7 +832,6 @@ if($uploaded_file){
 				#echo '<br>Leave Check: '.$db->last_query;
 				#echo '<br>';
 				//***********LEAVE CHECK**************
-				#if( $lfd_id = $db->getValue('leave_file_detail','lfd_id',array('emp_id'=>$emp_id,'lfd_date'=>$cDate)) ){
 				if( isset($arrEmpLeaves[$cDate]) ){
 					$lfd_id = $arrEmpLeaves[$cDate];
 					$qLv = $db->select('leave_file_detail','*',array('lfd_id'=>$lfd_id));
@@ -992,7 +991,7 @@ if($uploaded_file){
 
 										diffComp($am_in_assign,$am_in_assign,$am_out_assign,$am_out_assign,$pm_in_assign,$pm_in_assign,$pm_out_assign,$pm_out_assign,$ot_in,$ot_out,$late,$undertime,$dutyHours,$otHours);
 										$arrUpdateAtt=array('am_in'=>NULL,'am_in_assign'=>$am_in_assign,'am_out'=>NULL,'am_out_assign'=>$am_out_assign,'pm_in'=>NULL,'pm_in_assign'=>$pm_in_assign,'pm_out'=>NULL,'pm_out_assign'=>$pm_out_assign,'ot_in'=>$ot_in,'ot_out'=>$ot_out,'duty_min'=>$dutyHours,'ot_min'=>$otHours,'late_min'=>$late,'under_min'=>$undertime,'is_holiday'=>$is_holiday);
-										$db->update('emp_attendance_detail',$arrUpdateAtt,array('emp_id'=>$emp_id,'eat_id'=>$eatd_id,'eat_date'=>$cDate));
+										$db->update('emp_attendance_detail',$arrUpdateAtt,array('emp_id'=>$emp_id,'eatd_id'=>$eatd_id,'eat_date'=>$cDate));
 									}
 									else if($rHol['hol_type']=='Special Non-Working Holiday'){
 										if($sal_type=='flexible'){//Only monthly wager can avail the paid special holiday
@@ -1018,7 +1017,7 @@ if($uploaded_file){
 
 											diffComp($am_in_assign,$am_in_assign,$am_out_assign,$am_out_assign,$pm_in_assign,$pm_in_assign,$pm_out_assign,$pm_out_assign,$ot_in,$ot_out,$late,$undertime,$dutyHours,$otHours);
 											$arrUpdateAtt=array('am_in'=>NULL,'am_in_assign'=>$am_in_assign,'am_out'=>NULL,'am_out_assign'=>$am_out_assign,'pm_in'=>NULL,'pm_in_assign'=>$pm_in_assign,'pm_out'=>NULL,'pm_out_assign'=>$pm_out_assign,'ot_in'=>$ot_in,'ot_out'=>$ot_out,'duty_min'=>$dutyHours,'ot_min'=>$otHours,'late_min'=>$late,'under_min'=>$undertime,'is_holiday'=>$is_holiday);
-											$db->update('emp_attendance_detail',$arrUpdateAtt,array('emp_id'=>$emp_id,'eat_id'=>$eatd_id,'eat_date'=>$cDate));
+											$db->update('emp_attendance_detail',$arrUpdateAtt,array('emp_id'=>$emp_id,'eatd_id'=>$eatd_id,'eat_date'=>$cDate));
 										}//End: Only monthly wager can avail the paid special holiday
 									}
 								}
@@ -1026,18 +1025,20 @@ if($uploaded_file){
 						}//End: If allowed to have the holiday credit
 					}//End: If regular or Probationary
 				}//End: Check if there is a holiday
+				//***********END: HOLIDAY CHECK**************
 
 				//Checking for absent
 				$am_absent=0;$pm_absent=0;$am_absent_min=0;$pm_absent_min=0;
 				$q_absent = $db->select('emp_attendance_detail','*',array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id,'is_holiday'=>NULL));
 				$ra = $db->fetch_array($q_absent);
-				absentDay($ra['am_in'],$ra['am_in_assign'],$ra['am_out'],$ra['am_out_assign'],$ra['pm_in'],$ra['pm_in_assign'],$ra['pm_out'],$ra['pm_out_assign'],$am_absent,$pm_absent,$am_absent_min,$pm_absent_min);
-				$db->update('emp_attendance_detail',array('am_absent'=>$am_absent,'pm_absent'=>$pm_absent,'am_absent_min'=>$am_absent_min,'pm_absent_min'=>$pm_absent_min),array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id));
-				#echo '<br>Last Update: '.$db->last_query.'<br>';
+				if( isset($ra['eatd_id']) ){
+					absentDay($ra['am_in'],$ra['am_in_assign'],$ra['am_out'],$ra['am_out_assign'],$ra['pm_in'],$ra['pm_in_assign'],$ra['pm_out'],$ra['pm_out_assign'],$am_absent,$pm_absent,$am_absent_min,$pm_absent_min);
+					$db->update('emp_attendance_detail',array('am_absent'=>$am_absent,'pm_absent'=>$pm_absent,'am_absent_min'=>$am_absent_min,'pm_absent_min'=>$pm_absent_min),array('emp_id'=>$emp_id,'eat_date'=>$cDate,'eatd_id'=>$eatd_id));
+					#echo '<br>Last Update: '.$db->last_query.'<br>';
+				}
 				//End checking absent
 			}
 		endforeach;
-#}//if($emp_id==217)
 	endforeach;
 	functions::sendTo('attendance_summary_view.php?eatid='.functions::encode($eatid));
 	die();

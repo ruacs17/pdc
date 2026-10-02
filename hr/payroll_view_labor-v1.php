@@ -261,74 +261,20 @@ if( isset($_REQUEST['c']) ){
 	<!-- start: Favicon -->
 	<link rel="shortcut icon" href="../img/favicon.png">
 	<style type="text/css">
-		:root {
-			--primary-color: #6b4423;
-			--primary-hover: #523318;
-			--primary-light: #f5efe6;
-			--accent-color: #8c5a2b;
-			--background-light: #faf7f2;
-			--card-bg: #ffffff;
-			--text-main: #2c221e;
-			--text-muted: #7a6e65;
-			--border-color: #e6ded6;
-		}
-
-		html, body {
-			margin: 0 !important;
-			padding: 0 !important;
-			width: 100% !important;
-			min-height: 100% !important;
-			background-color: var(--background-light) !important;
-			color: var(--text-main);
-			font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-		}
-
-		.row-fluid {
-			width: 100% !important;
-			max-width: 100% !important;
-			margin: 0 !important;
-			padding: 0 !important;
-		}
-
-		.box {
-			background: var(--card-bg);
-			border: none !important;
-			border-radius: 0 !important;
-			box-shadow: none !important;
-			margin-bottom: 0 !important;
-			overflow: hidden;
-			width: 100% !important;
-		}
-
-		/* Custom Earthy Brown Card Header Design */
-		.card-header-custom {
-			background: linear-gradient(135deg, #5c3a1e 0%, #7d522a 100%) !important;
-			color: #ffffff !important;
-			padding: 20px 24px;
-			border-bottom: none !important;
-			border-radius: 0 !important;
-			display: flex;
-			align-items: center;
-			justify-content: space-between;
-		}
-
-		.card-header-custom h2 {
-			color: #ffffff !important;
-			margin: 0 !important;
-			font-size: 18px !important;
-			font-weight: 600 !important;
-			display: flex;
-			align-items: center;
-			gap: 10px;
-		}
-
-		.padright{padding-right: 5px;}
-		.padleft{padding-left: 5px;}
+	.padright{padding-right: 5px;}
+	.padleft{padding-left: 5px;}
 	</style>
+<style type="text/css">
+/*.table-wrapper thead tr:nth-child(1) th { background: #DDD;position: sticky; top: 0px; }
+.table-wrapper thead tr:nth-child(2) th { background: #DDD;position: sticky; top: 20px;}
+.table-wrapper thead tr:nth-child(3) th { background: #DDD;position: sticky; top: 40px; }
+.table-wrapper thead tr:nth-child(4) th { background: #DDD;position: sticky; top: 60px; }*/
+</style>
 	<style type="text/css">
 		.table-wrapper td, th {
 			border:  1px solid;
 			padding: 2px;
+			/*min-width: 100px;*/
 			background: white;
 			box-sizing: border-box;
 			text-align: left;
@@ -352,7 +298,7 @@ if( isset($_REQUEST['c']) ){
 		.table-wrapper thead tr:nth-child(3) th { top: 60px; } 
 		.table-wrapper thead tr:nth-child(4) th { top: 92px; } 
 		.table-wrapper tbody {overflow: scroll;}
-		/* MAKE LEFT COLUMN FIXED */
+		/* MAKE LEFT COLUMN FIXEZ */
 		.table-wrapper tr > :first-child {
 			min-width: 200px;
 			position: -webkit-sticky;
@@ -369,7 +315,7 @@ if( isset($_REQUEST['c']) ){
 <div id="spinner"></div>
 <div class="row-fluid">
 	<div class="box span12">
-		<div class="card-header-custom">
+		<div class="box-header" data-original-title>
 			<h2><i class="halflings-icon white th"></i><span class="break"></span>PAYROLL PREVIEW (LABOR)</h2>
 		</div>
 		<div class="box-content">

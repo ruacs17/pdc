@@ -508,5 +508,4 @@ else{
 	functions::sendTo('attendance_summary_view.php?eatid='.functions::encode($eatid));
 	die();
 }
-
 ?>

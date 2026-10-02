@@ -9,14 +9,14 @@ $db = new Database();
 $name = $db->getValue('users','concat(lname,", ",fname," ",mname)',array('username'=>$username));
 #$logs = new Logs();
 #$logs->save('visit');
-   
+$fromPayrollView = (isset($_REQUEST['frm']) && !empty($_REQUEST['frm']) ) ? functions::decode($_REQUEST['frm']) : 0; 
 $tmAmIn = (isset($_REQUEST['tmAmIn']) && !empty($_REQUEST['tmAmIn']) ) ? functions::decode($_REQUEST['tmAmIn']) : '';
 $tmAmOut = (isset($_REQUEST['tmAmOut']) && !empty($_REQUEST['tmAmOut']) ) ? functions::decode($_REQUEST['tmAmOut']) : '';
 $tmPmIn = (isset($_REQUEST['tmPmIn']) && !empty($_REQUEST['tmPmIn']) ) ? functions::decode($_REQUEST['tmPmIn']) : '';
 $tmPmOut = (isset($_REQUEST['tmPmOut']) && !empty($_REQUEST['tmPmOut']) ) ? functions::decode($_REQUEST['tmPmOut']) : '';
-
+$rowStart = (isset($_REQUEST['rw']) && !empty($_REQUEST['rw']) ) ? $_REQUEST['rw'] : 0; 
 $eatid = (isset($_REQUEST['eatid']) && !empty($_REQUEST['eatid']) ) ? functions::decode($_REQUEST['eatid']) : 0;
-$eatdid = (isset($_REQUEST['eatdid']) && !empty($_REQUEST['eatdid']) ) ? functions::decode($_REQUEST['eatdid']) : 0;
+$_SESSION['notif_indi_idd'] = $eatdid = (isset($_REQUEST['eatdid']) && !empty($_REQUEST['eatdid']) ) ? functions::decode($_REQUEST['eatdid']) : 0;
 $qEatID = $db->select('emp_attendance','*',array('eat_id'=>$eatid));
 $rEatID = $db->fetch_array($qEatID);
 $p_id = $rEatID['proj_id'];
@@ -343,7 +343,7 @@ if( isset($_POST['btnSave']) ){
 			if($dayName=="Saturday"){
 				diffComp($logins['amin'],$satAmIn,$logins['amout'],$satAmOut,$logins['pmin'],$satPmIn,$logins['pmout'],$satPmOut,$logins['otin'],$logins['otout'],$late,$undertime,$dutyHours,$otHours);
 				$am_in_assign = (isset($satAmIn) && !empty($satAmIn)) ? $satAmIn : NULL;
-				$am_out_assign = (isset($satAmOut) && !empty($satAmOut)) ? $satAmOut : NULL;
+				$am_out_assign = (isset($satAmOut) && !empty($satOut)) ? $satOut : NULL;
 				$pm_in_assign = (isset($satPmIn) && !empty($satPmIn)) ? $satPmIn : NULL;
 				$pm_out_assign = (isset($satPmOut) && !empty($satPmOut)) ? $satPmOut : NULL;
 			}
@@ -378,7 +378,8 @@ if( isset($_POST['btnSave']) ){
 		endforeach;
 	endforeach;
 	$_SESSION['notif_success']='Attendance modification saved!';
-	functions::sendTo(functions::pageName().'?eatid='.functions::encode($eatid).'&empid='.functions::encode($emp_id).'&eatdid='.functions::encode($eatdid));
+	#functions::sendTo(functions::pageName().'?eatid='.functions::encode($eatid).'&empid='.functions::encode($emp_id).'&eatdid='.functions::encode($eatdid));
+	functions::sendTo('attendance_view_selected.php?eatid='.functions::encode($eatid).'&empid='.functions::encode($emp_id).'&eatdid='.functions::encode($eatdid).'&rw='.$rowStart);
 	die();
 }
 $totalRow = 0;
@@ -404,17 +405,18 @@ $arrPayrollList = array();
 	<script src="../js/inputInt.js"></script>
 	<link rel="stylesheet" href="../css/timepicker.css">
 	<!-- end: CSS -->
-	<!-- Modern Professional Custom Overrides -->
+	<!-- Warm Earthy/Brown Custom Overrides -->
 	<style>
 		:root {
-			--primary-color: #4f46e5;
-			--primary-hover: #4338ca;
-			--success-color: #10b981;
-			--background-light: #f8fafc;
+			--primary-color: #6b4423;
+			--primary-hover: #523318;
+			--primary-light: #f5efe6;
+			--accent-color: #8c5a2b;
+			--background-light: #faf7f2;
 			--card-bg: #ffffff;
-			--text-main: #1e293b;
-			--text-muted: #64748b;
-			--border-color: #e2e8f0;
+			--text-main: #2c221e;
+			--text-muted: #7a6e65;
+			--border-color: #e6ded6;
 		}
 
 		html, body {
@@ -444,15 +446,19 @@ $arrPayrollList = array();
 			width: 100% !important;
 		}
 
-		.box-header {
-			background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%) !important;
+		/* Custom Earthy Brown Card Header Design */
+		.card-header-custom {
+			background: linear-gradient(135deg, #5c3a1e 0%, #7d522a 100%) !important;
 			color: #ffffff !important;
 			padding: 20px 24px;
 			border-bottom: none !important;
 			border-radius: 0 !important;
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
 		}
 
-		.box-header h2 {
+		.card-header-custom h2 {
 			font-size: 16px;
 			font-weight: 600;
 			letter-spacing: 0.5px;
@@ -460,9 +466,10 @@ $arrPayrollList = array();
 			display: flex;
 			align-items: center;
 			gap: 8px;
+			color: #ffffff;
 		}
 
-		.box-header h2 i {
+		.card-header-custom h2 i {
 			color: #ffffff;
 		}
 
@@ -471,17 +478,17 @@ $arrPayrollList = array();
 			background-color: var(--card-bg);
 		}
 
-		/* Modern Employee Info Card Redesign */
+		/* Employee Info Card Redesign - Warm Tone */
 		.employee-info-card {
 			display: grid;
 			grid-template-columns: 2fr 1.5fr 1.5fr;
 			gap: 16px;
-			background: #f8fafc;
+			background: #fdfbf7;
 			border: 1px solid var(--border-color);
 			border-radius: 10px;
 			padding: 16px 20px;
 			margin-bottom: 24px;
-			box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.02);
+			box-shadow: 0 1px 3px 0 rgba(44, 34, 30, 0.03);
 		}
 
 		.employee-info-item {
@@ -507,17 +514,17 @@ $arrPayrollList = array();
 		.employee-status-badge {
 			display: inline-flex;
 			align-items: center;
-			background-color: #ecfdf5;
-			color: #047857;
+			background-color: #f3ece1;
+			color: #5c3a1e;
 			padding: 2px 10px;
 			border-radius: 9999px;
 			font-size: 12px;
 			font-weight: 600;
 			width: fit-content;
-			border: 1px solid #a7f3d0;
+			border: 1px solid #dfd2c1;
 		}
 
-		/* Modern Table Enhancements */
+		/* Modern Table Enhancements - Warm Earthy Theme */
 		.table {
 			width: 100% !important;
 			border-collapse: separate !important;
@@ -531,7 +538,7 @@ $arrPayrollList = array();
 		}
 
 		.table th {
-			background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9) !important;
+			background: linear-gradient(180deg, #f7f2eb 0%, #efe7dc) !important;
 			color: var(--text-main) !important;
 			font-weight: 600 !important;
 			text-transform: uppercase !important;
@@ -565,11 +572,11 @@ $arrPayrollList = array();
 		}
 
 		.table-hover tbody tr:hover td {
-			background-color: #f8fafc !important;
+			background-color: #f9f5f0 !important;
 		}
 
 		.table-striped tbody tr:nth-child(odd) td {
-			background-color: #fafbfc !important;
+			background-color: #faf6f0 !important;
 		}
 
 		.btn-primary {
@@ -580,7 +587,7 @@ $arrPayrollList = array();
 			padding: 10px 24px !important;
 			font-weight: 600 !important;
 			letter-spacing: 0.5px;
-			box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+			box-shadow: 0 2px 4px rgba(107, 68, 35, 0.25);
 			transition: background-color 0.2s, transform 0.1s;
 		}
 
@@ -594,7 +601,7 @@ $arrPayrollList = array();
 
 		.badge-time-link {
 			display: inline-block;
-			background-color: #f1f5f9;
+			background-color: #f3ece4;
 			color: var(--primary-color);
 			padding: 2px 6px;
 			border-radius: 4px;
@@ -606,15 +613,15 @@ $arrPayrollList = array();
 		}
 
 		.badge-time-link:hover {
-			background-color: #e2e8f0;
+			background-color: #e5d8c8;
 			text-decoration: none;
 			color: var(--primary-hover);
 		}
 
-		/* Modern Time Log Pill Styles */
+		/* Warm Brown Time Log Pills */
 		.time-log-pill {
 			display: inline-block;
-			background-color: #f1f5f9;
+			background-color: #f5efe6;
 			color: var(--text-main);
 			padding: 3px 8px;
 			border-radius: 4px;
@@ -627,10 +634,10 @@ $arrPayrollList = array();
 		}
 
 		.time-log-pill:hover {
-			background-color: #e2e8f0;
+			background-color: #e8dccf;
 			color: var(--primary-color);
 			text-decoration: none;
-			border-color: #cbd5e1;
+			border-color: #d1c1b0;
 		}
 
 		.time-log-pill.active {
@@ -650,16 +657,16 @@ $arrPayrollList = array();
 			text-align: center;
 		}
 
-		/* Enhanced Modern Modal Dialog Styles */
+		/* Enhanced Modern Modal Dialog Styles - Earthy Theme */
 		#confirmModal {
 			border-radius: 12px;
 			border: none;
-			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+			box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 			overflow: hidden;
 		}
 
 		#confirmModal .modal-header {
-			background: linear-gradient(135deg, #4f46e5 0%, #6366f1 100%);
+			background: linear-gradient(135deg, #5c3a1e 0%, #7d522a 100%);
 			color: #ffffff;
 			padding: 16px 20px;
 			border-bottom: none;
@@ -699,7 +706,7 @@ $arrPayrollList = array();
 		}
 
 		#confirmModal .modal-footer {
-			background-color: #f8fafc;
+			background-color: #faf7f2;
 			padding: 14px 20px;
 			border-top: 1px solid var(--border-color);
 			display: flex;
@@ -721,7 +728,7 @@ $arrPayrollList = array();
 		}
 
 		#confirmModal .modal-footer .btn-secondary:hover {
-			background: #f1f5f9;
+			background: #f3ece4;
 			color: var(--text-main);
 		}
 	</style>
@@ -739,7 +746,7 @@ $arrPayrollList = array();
 <!-- body content: start here-->
 <div class="row-fluid">
 	<div class="box span12">
-		<div class="box-header" data-original-title>
+		<div class="card-header-custom" data-original-title>
 			<h2><i class="halflings-icon white edit"></i><span class="break"></span>ATTENDANCE ADJUSTMENT</h2>
 		</div>
 		<div class="box-content">
@@ -903,10 +910,10 @@ $arrPayrollList = array();
 							<td style="padding: 12px 8px;">
 								<div align="left">
 									<?php if($attendance_ready==0 && $att_confirm==0){?>
-									<input id="selAmIn" type="text" name="selAmIn">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in_default)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><i>(<?php echo $am_in_assign;?>)</i></a>
+									<input id="selAmIn" type="text" name="selAmIn">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in_default)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>&rw=<?php echo $rowStart?>"><i>(<?php echo $am_in_assign;?>)</i></a>
 									<div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Time log Detected:</div>
 									<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
-										<a class="time-log-pill <?php echo ($am_in == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode('--:--')?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>">--:--</a>
+										<a class="time-log-pill <?php echo ($am_in == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode('--:--')?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>&rw=&rw=<?php echo $rowStart?>">--:--</a>
 										<?php
 											$found=0;
 											foreach( $arrAttR as $ar):
@@ -918,7 +925,7 @@ $arrPayrollList = array();
 													$isActive = ($am_in == $tmpTime && !$found);
 													if($isActive) { $found=1; }
 												?>
-												<a class="time-log-pill <?php echo $isActive ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($tmpTime)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><?php echo functions::MilToTwelve($ar);?></a>
+												<a class="time-log-pill <?php echo $isActive ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($tmpTime)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>&rw=<?php echo $rowStart?>"><?php echo functions::MilToTwelve($ar);?></a>
 												<?php
 												}
 											endforeach;
@@ -934,10 +941,10 @@ $arrPayrollList = array();
 							<td style="padding: 12px 8px;">
 								<div align="left">
 									<?php if($attendance_ready==0 && $att_confirm==0){?>
-									<input id="selAmOut" type="text" name="selAmOut">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out_default)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><i>(<?php echo $am_out_assign;?>)</i></a>
+									<input id="selAmOut" type="text" name="selAmOut">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out_default)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>&rw=<?php echo $rowStart?>"><i>(<?php echo $am_out_assign;?>)</i></a>
 									<div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Time log Detected:</div>
 									<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
-										<a class="time-log-pill <?php echo ($am_out == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode('--:--')?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>">--:--</a>
+										<a class="time-log-pill <?php echo ($am_out == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode('--:--')?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>&rw=<?php echo $rowStart?>">--:--</a>
 										<?php
 											$found=0;
 											foreach( $arrAttR as $ar):
@@ -949,7 +956,7 @@ $arrPayrollList = array();
 													$isActive = ($am_out == $tmpTime && !$found);
 													if($isActive) { $found=1; }
 												?>
-												<a class="time-log-pill <?php echo $isActive ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($tmpTime)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><?php echo functions::MilToTwelve($ar);?></a>
+												<a class="time-log-pill <?php echo $isActive ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($tmpTime)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($pm_out)?>&rw=<?php echo $rowStart?>"><?php echo functions::MilToTwelve($ar);?></a>
 												<?php
 												}
 											endforeach;
@@ -965,10 +972,10 @@ $arrPayrollList = array();
 							<td style="padding: 12px 8px;">
 								<div align="left">
 									<?php if($attendance_ready==0 && $att_confirm==0){ ?>
-									<input id="selPmIn" type="text" name="selPmIn">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in_default)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><i>(<?php echo $pm_in_assign;?>)</i></a>
+									<input id="selPmIn" type="text" name="selPmIn">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in_default)?>&tmPmOut=<?php echo functions::encode($pm_out)?>&rw=<?php echo $rowStart?>"><i>(<?php echo $pm_in_assign;?>)</i></a>
 									<div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Time log Detected:</div>
 									<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
-										<a class="time-log-pill <?php echo ($pm_in == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode('--:--')?>&tmPmOut=<?php echo functions::encode($pm_out)?>">--:--</a>
+										<a class="time-log-pill <?php echo ($pm_in == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode('--:--')?>&tmPmOut=<?php echo functions::encode($pm_out)?>&rw=<?php echo $rowStart?>">--:--</a>
 										<?php
 											$found=0;
 											foreach( $arrAttR as $ar):
@@ -980,7 +987,7 @@ $arrPayrollList = array();
 													$isActive = ($pm_in == $tmpTime && !$found);
 													if($isActive) { $found=1; }
 												?>
-												<a class="time-log-pill <?php echo $isActive ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($tmpTime)?>&tmPmOut=<?php echo functions::encode($pm_out)?>"><?php echo functions::MilToTwelve($ar);?></a>
+												<a class="time-log-pill <?php echo $isActive ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($tmpTime)?>&tmPmOut=<?php echo functions::encode($pm_out)?>&rw=<?php echo $rowStart?>"><?php echo functions::MilToTwelve($ar);?></a>
 												<?php
 												}
 											endforeach;
@@ -996,10 +1003,10 @@ $arrPayrollList = array();
 							<td style="padding: 12px 8px;">
 								<div align="left">
 									<?php if($attendance_ready==0 && $att_confirm==0){?>
-									<input id="selPmOut" type="text" name="selPmOut">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&empid=<?php echo functions::encode($emp_id)?>&tmPmOut=<?php echo functions::encode($pm_out_default)?>"><i>(<?php echo $pm_out_assign;?>)</i></a>
+									<input id="selPmOut" type="text" name="selPmOut">&nbsp;&nbsp;&nbsp;<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&empid=<?php echo functions::encode($emp_id)?>&tmPmOut=<?php echo functions::encode($pm_out_default)?>&rw=<?php echo $rowStart?>"><i>(<?php echo $pm_out_assign;?>)</i></a>
 									<div style="font-size: 11px; font-weight: 600; color: var(--text-muted); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px;">Time log Detected:</div>
 									<div style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px;">
-										<a class="time-log-pill <?php echo ($pm_out == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&empid=<?php echo functions::encode($emp_id)?>&tmPmOut=<?php echo functions::encode('--:--')?>">--:--</a>
+										<a class="time-log-pill <?php echo ($pm_out == '--:--') ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&empid=<?php echo functions::encode($emp_id)?>&tmPmOut=<?php echo functions::encode('--:--')?>&rw=<?php echo $rowStart?>">--:--</a>
 										<?php
 											$found=0;
 											foreach( $arrAttR as $ar):
@@ -1011,7 +1018,7 @@ $arrPayrollList = array();
 													$isActive = ($pm_out == $tmpTime && !$found);
 													if($isActive) { $found=1; }
 												?>
-												<a class="time-log-pill <?php echo $isActive ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($tmpTime)?>"><?php echo functions::MilToTwelve($ar);?></a>
+												<a class="time-log-pill <?php echo $isActive ? 'active' : ''; ?>" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($am_in)?>&tmAmOut=<?php echo functions::encode($am_out)?>&tmPmIn=<?php echo functions::encode($pm_in)?>&tmPmOut=<?php echo functions::encode($tmpTime)?>&rw=<?php echo $rowStart?>"><?php echo functions::MilToTwelve($ar);?></a>
 												<?php
 												}
 											endforeach;
@@ -1034,12 +1041,18 @@ $arrPayrollList = array();
 				<div align="center" style="padding-top: 40px;">Reason: <textarea name="txRemarks" id="txRemarks" style="width:400px;"></textarea></div>
 				<div align="center" style="padding-top: 20px;">
 					<button type="button" id="btnSaveTrigger" class="btn btn-small btn-primary"> SAVE CHANGES </button>
+					<a class="btn btn-sm btn-primary" style="background-color: orange !important;" href="attendance_view_selected.php?eatid=<?php echo functions::encode($eatid)?>&empid=<?php echo functions::encode($emp_id)?>&rw=<?php echo $rowStart;?>">Back</a>
 					<input type="hidden" name="btnSave" value="1">
 				</div>
 				<?php
 						}
 						else{
-							echo '<div align="center" style="padding-top: 40px;">Attendance confirmed, Cannot be modified!</div>';
+						?>
+							<div align="center" style="padding-top: 40px;">
+								Attendance confirmed, Cannot be modified!
+								<div style="padding-top: 40px;"><a class="btn btn-sm btn-primary" style="background-color: orange !important;" href="<?php echo ($fromPayrollView) ? 'payroll_view_selected.php' : 'attendance_view_selected.php';?>?eatid=<?php echo functions::encode($eatid)?>&empid=<?php echo functions::encode($emp_id)?>eatdid=<?php echo functions::encode($eatdid)?>&&rw=<?php echo $rowStart?>">Go Back</a></div>
+							</div>
+						<?php
 						}
 					}
 				$qAttMod = $db->select('emp_attendance_adjustment','*',array('eatd_id'=>$eatdid),'ORDER BY change_date, change_time');
