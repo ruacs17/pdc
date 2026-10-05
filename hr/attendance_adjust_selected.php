@@ -1050,7 +1050,7 @@ $arrPayrollList = array();
 						?>
 							<div align="center" style="padding-top: 40px;">
 								Attendance confirmed, Cannot be modified!
-								<div style="padding-top: 40px;"><a class="btn btn-sm btn-primary" style="background-color: orange !important;" href="<?php echo ($fromPayrollView) ? 'payroll_view_selected.php' : 'attendance_view_selected.php';?>?eatid=<?php echo functions::encode($eatid)?>&empid=<?php echo functions::encode($emp_id)?>eatdid=<?php echo functions::encode($eatdid)?>&&rw=<?php echo $rowStart?>">Go Back</a></div>
+								<div style="padding-top: 40px;"><a class="btn btn-sm btn-primary" style="background-color: orange !important;" href="<?php echo ($fromPayrollView) ? 'payroll_view_selected.php' : 'attendance_view_selected.php';?>?eatid=<?php echo functions::encode($eatid)?>&empid=<?php echo functions::encode($emp_id)?>&eatdid=<?php echo functions::encode($eatdid)?>&&rw=<?php echo $rowStart?>">Go Back</a></div>
 							</div>
 						<?php
 						}

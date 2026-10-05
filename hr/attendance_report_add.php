@@ -18,12 +18,12 @@ $qEatID = $db->select('emp_attendance','*',array('eat_id'=>$eatid));
 $rEatID = $db->fetch_array($qEatID);
 $p_id = $rEatID['proj_id'];
 $proj_name = $db->getValue('project','proj_name',array('proj_id'=>$p_id));
-
-$attendance_ready = $rEatID['attendance_ready'];
+$eat_id = $rEatID['eat_id'] ?? NULL;
+$attendance_ready = $rEatID['attendance_ready'] ?? NULL;
 $date_start = ($rEatID['date_start']) ? $rEatID['date_start'] : "";
 $date_end = ($rEatID['date_end']) ? $rEatID['date_end'] : "";
 $eas_id = ($rEatID['eas_id']) ? $rEatID['eas_id'] : $eas_id;
-$worker_type = $rEatID['payroll_type'];
+$worker_type = $rEatID['payroll_type'] ?? NULL;
 $eas_name = $db->getValue('emp_assignment','eas_name',array('eas_id'=>$eas_id));
 $eas_proj_id = $db->getValue('emp_assignment','proj_id',array('eas_id'=>$eas_id));
 ?>

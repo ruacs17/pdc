@@ -387,7 +387,7 @@ else{
 			</form>
 		</div>
 	</div><!--/span-->
-</div><!--/row--><?php echo $_SESSION['notif_indi_idd']; ?>
+</div><!--/row-->
 <!-- body content: end here-->
 
 <!-- start: JavaScript-->

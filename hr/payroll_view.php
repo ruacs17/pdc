@@ -235,6 +235,7 @@ else{
 				}
 			}
 			if($sal_type=='fixed'){
+				#$empGrossPay = $empRegularAmount + $empAddons + $empOTAmount + $empAbsentAmount;
 				$empGrossPay = $empRegularAmount + $empAddons + $empOTAmount + $empAbsentAmount;
 			}
 			else if($sal_type=='flexible'){

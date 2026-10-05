@@ -333,7 +333,7 @@ function position($emp_id){
 
 		.salary-grid {
 			display: grid;
-			grid-template-columns: repeat(2, 1fr);
+			grid-template-columns: repeat(4, 1fr);
 			gap: 10px 20px;
 		}
 
@@ -346,7 +346,7 @@ function position($emp_id){
 			font-size: 11px;
 			color: var(--text-muted);
 			font-weight: 600;
-			margin-bottom: 2px;
+			margin-bottom: 5px;
 		}
 
 		.salary-item .val {

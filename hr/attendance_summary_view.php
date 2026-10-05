@@ -17,28 +17,31 @@ if($eatid)
 	$_SESSION['notif_id']=$eatid;
 $qEatID = $db->select('emp_attendance','*',array('eat_id'=>$eatid));
 $rEatID = $db->fetch_array($qEatID);
-$p_id = $rEatID['proj_id'];
+$eat_id = $rEatID['eat_id'] ?? $eatid;
+$p_id = $rEatID['proj_id'] ?? 0;
 $proj_name = $db->getValue('project','proj_name',array('proj_id'=>$p_id));
-$confirmed = $rEatID['confirmed'];
-$attendance_ready = $rEatID['attendance_ready'];
-$date_start = $rEatID['date_start'];
-$date_end = $rEatID['date_end'];
-$worker_type = $rEatID['payroll_type'];
-$eas_name = $rEatID['note'];
-$payroll_no = $rEatID['payroll_no'];
-$att_year = $rEatID['att_year'];
+$confirmed = $rEatID['confirmed'] ?? 0;
+$attendance_ready = $rEatID['attendance_ready'] ?? 0;
+$date_start = $rEatID['date_start'] ?? '';
+$date_end = $rEatID['date_end'] ?? '';
+$worker_type = $rEatID['payroll_type'] ?? '';
+$eas_name = $rEatID['note'] ?? '';
+$payroll_no = $rEatID['payroll_no'] ?? '';
+$att_year = $rEatID['att_year'] ?? '';
 
-$prepared_by=$db->getValue('employee','CONCAT(fname," ",left(mname,1),". ",lname)',array('emp_id'=>$rEatID['prepared_by']));
-$prepared_position = position($rEatID['prepared_by']);
+$attendance_detail = $db->getValue('emp_attendance_detail','count(eat_id)',array('eat_id'=>$eatid));
 
-$checked_by=$db->getValue('employee','CONCAT(fname," ",left(mname,1),". ",lname)',array('emp_id'=>$rEatID['checked_by']));
-$checked_position = position($rEatID['checked_by']);
+$prepared_by=$db->getValue('employee','CONCAT(fname," ",left(mname,1),". ",lname)',array('emp_id'=>$rEatID['prepared_by'] ?? 0));
+$prepared_position = position($rEatID['prepared_by'] ?? 0);
 
-$received_by=$db->getValue('employee','CONCAT(fname," ",left(mname,1),". ",lname)',array('emp_id'=>$rEatID['received_by']));
-$received_position = position($rEatID['received_by']);
+$checked_by=$db->getValue('employee','CONCAT(fname," ",left(mname,1),". ",lname)',array('emp_id'=>$rEatID['checked_by'] ?? 0));
+$checked_position = position($rEatID['checked_by'] ?? 0);
 
-$approved_by=$db->getValue('employee','CONCAT(fname," ",left(mname,1),". ",lname)',array('emp_id'=>$rEatID['approved_by']));
-$approved_position = position($rEatID['approved_by']);
+$received_by=$db->getValue('employee','CONCAT(fname," ",left(mname,1),". ",lname)',array('emp_id'=>$rEatID['received_by'] ?? 0));
+$received_position = position($rEatID['received_by'] ?? 0);
+
+$approved_by=$db->getValue('employee','CONCAT(fname," ",left(mname,1),". ",lname)',array('emp_id'=>$rEatID['approved_by'] ?? 0));
+$approved_position = position($rEatID['approved_by'] ?? 0);
 
 function position($emp_id){
 	global $db;
@@ -173,7 +176,6 @@ while( $rEmps = $db->fetch_array($qEmps)):
 			}
 			$totalDayPresent+=$dayPresent;
 
-
 			$totalTardy += $tardy = $rA['late_min']+$rA['under_min'];
 			if($rA['am_absent'])
 				$totalTardy -= $rA['am_absent_min'];
@@ -186,7 +188,7 @@ while( $rEmps = $db->fetch_array($qEmps)):
 			if($rA['is_holiday']==3){
 				$hasLeave=$hasHoliday=1;
 			}
-			endwhile;
+		endwhile;
 	}
 	$bgColor = ($rEmps['att_ready']==1) ? '' : 'bgcolor="#fcf8e3"';
 	$empAbsentHours = $empUnderDutyHours + $empLateDutyHours;
@@ -196,338 +198,625 @@ endwhile;
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<!-- start: Meta -->
 	<meta charset="utf-8">
 	<title>Employee Attendance Summary</title>
-	<!-- end: Meta -->
-	<!-- start: Mobile Specific -->
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<!-- end: Mobile Specific -->
-	<!-- start: CSS -->
 	<link id="bootstrap-style" href="../css/bootstrap.min.css" rel="stylesheet">
 	<link href="../css/bootstrap-responsive.min.css" rel="stylesheet">
 	<link id="base-style" href="../css/style.css" rel="stylesheet">
 	<link id="base-style-responsive" href="../css/style-responsive.css" rel="stylesheet">
-	<link id="base-style" href="../css/loader.css" rel="stylesheet">
+	<link id="base-style-loader" href="../css/loader.css" rel="stylesheet">
 	<script src="../js/inputInt.js"></script>
-	<!-- end: CSS -->
-	<!-- The HTML5 shim, for IE6-8 support of HTML5 elements -->
+	
 	<!--[if lt IE 9]>
 	<link id="ie-style" href="../css/ie.css" rel="stylesheet">
 	<![endif]-->
 	<!--[if IE 9]>
 	<link id="ie9style" href="../css/ie9.css" rel="stylesheet">
 	<![endif]-->
-	<!-- start: Favicon -->
 	<link rel="shortcut icon" href="../img/favicon.png">
-	<!-- end: Favicon -->
-	<style>
-	/* Style the header */
-	.header {
-		background: #CCC;
-	}
-	/* The sticky class is added to the header with JS when it reaches its scroll position */
-	.sticky {
-		position: fixed;
-		top: 0;
-		width: 97%
-	}
-	.hideit{
-		display:none;
-	}
-	.brdrNone{
-		border:none;
-	}
-	</style>
-<style type="text/css">
-/* Modernized Enhanced Table Container Styling */
-.table-wrapper {
-	background: #ffffff;
-	border-radius: 8px;
-	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-	border: 1px solid #e2e8f0;
-	overflow-x: auto;
-	margin-top: 10px;
-}
-.table-wrapper table {
-	margin-bottom: 0 !important;
-	border-collapse: separate !important;
-	border-spacing: 0;
-}
-.table-wrapper th {
-	background: #f8fafc !important;
-	color: #475569;
-	font-weight: 700;
-	text-transform: uppercase;
-	font-size: 11px;
-	letter-spacing: 0.8px;
-	position: sticky;
-	top: 0;
-	z-index: 10;
-	border-bottom: 2px solid #e2e8f0 !important;
-	border-top: none !important;
-	padding: 14px 12px !important;
-}
-.table-wrapper td {
-	padding: 12px !important;
-	vertical-align: middle !important;
-	color: #334155;
-	border-top: 1px solid #f1f5f9 !important;
-}
-/* Smooth modern hover highlight for rows without inline backgrounds */
-.table-hover tbody tr:not([style*="background"]):hover > td {
-	background-color: #f0f4f8 !important;
-	color: #0f172a;
-}
-/* Clean up link appearance inside the data rows */
-.table-wrapper td a {
-	color: #2563eb;
-	text-decoration: none;
-}
-.table-wrapper td a:hover {
-	text-decoration: underline;
-}
 
-/* Enhanced Signature Block Styling */
-.signature-card {
-	background: #ffffff;
-	border: 1px solid #e2e8f0;
-	border-radius: 8px;
-	box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.03);
-	padding: 24px 20px;
-	margin-top: 35px;
-}
-.signature-table td {
-	vertical-align: top;
-	padding: 0 15px;
-}
-.sig-role {
-	font-size: 11px;
-	text-transform: uppercase;
-	letter-spacing: 0.8px;
-	color: #64748b;
-	font-weight: 700;
-	margin-bottom: 45px;
-}
-.sig-container {
-	display: inline-block;
-	max-width: 200px;
-	width: 100%;
-}
-.sig-line {
-	border-top: 1px solid #94a3b8;
-	padding-top: 6px;
-	font-size: 13px;
-	color: #1e293b;
-	margin-bottom: 4px;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-.sig-pos {
-	font-size: 11px;
-	color: #64748b;
-	font-style: italic;
-}
-.info-panel {
-	background: #f8fafc;
-	border: 1px solid #e2e8f0;
-	border-radius: 8px;
-	padding: 18px 24px;
-	margin-bottom: 20px;
-}
-.info-panel table td {
-	padding: 6px 10px;
-	color: #334155;
-	font-size: 13px;
-}
-</style>
+	<style type="text/css">
+		/* Custom Earthy Brown Card Header */
+		div.card-header-custom {
+			background-color: #4A3B32 !important;
+			color: #F7F5F0 !important;
+			padding: 14px 20px !important;
+			border-top-left-radius: 6px !important;
+			border-top-right-radius: 6px !important;
+			margin-bottom: 0 !important;
+			border-bottom: 3px solid #8C6D58 !important;
+		}
+		div.card-header-custom h2 {
+			color: #F7F5F0 !important;
+			margin: 0 !important;
+			font-size: 16px !important;
+			font-weight: 600 !important;
+			letter-spacing: 0.5px !important;
+			line-height: 1.2 !important;
+		}
+
+		/* Main Flex Grid: Left Content, Right Sticky Wizard */
+		.page-layout-grid {
+			display: flex !important;
+			justify-content: space-between !important;
+			align-items: flex-start !important;
+			padding: 20px 0 !important;
+			gap: 30px !important;
+		}
+		
+		/* Expanded Form & Summary Content Area */
+		.main-content-area {
+			flex: 1 !important;
+			max-width: 1400px !important;
+			min-width: 0 !important;
+		}
+
+		/* Sticky Sidebar Area Pinned to Far Right */
+		.sidebar-wizard-area {
+			width: 220px !important;
+			flex-shrink: 0 !important;
+			position: sticky !important;
+			top: 20px !important;
+			margin-left: auto !important;
+		}
+
+		/* Vertical Process Wizard Navigation */
+		.process-wizard-vertical {
+			display: flex !important;
+			flex-direction: column !important;
+			margin: 0 !important;
+			padding: 20px 15px !important;
+			list-style: none !important;
+			background: #FAF8F5 !important;
+			border: 1px solid #E6E1DA !important;
+			border-radius: 8px !important;
+			box-shadow: 0 2px 8px rgba(74, 59, 50, 0.05) !important;
+		}
+		.wizard-title {
+			font-size: 11px !important;
+			text-transform: uppercase !important;
+			letter-spacing: 0.8px !important;
+			font-weight: 800 !important;
+			color: #8C6D58 !important;
+			margin-bottom: 15px !important;
+			padding-bottom: 8px !important;
+			border-bottom: 2px solid #E0DCD5 !important;
+			text-align: center !important;
+		}
+		.process-step {
+			position: relative !important;
+			padding-bottom: 25px !important;
+		}
+		.process-step:last-child {
+			padding-bottom: 0 !important;
+		}
+
+		/* Vertical Connecting Line */
+		.process-step:not(:last-child)::after {
+			content: '' !important;
+			position: absolute !important;
+			left: 20px !important;
+			top: 20px !important;
+			bottom: -25px !important;
+			width: 3px !important;
+			background-color: #E6E1DA !important;
+			z-index: 1 !important;
+			transition: background-color 0.3s ease !important;
+		}
+		.process-step.active:not(:last-child)::after,
+		.process-step.complete:not(:last-child)::after {
+			background-color: #8C6D58 !important;
+		}
+
+		.process-step a {
+			display: flex !important;
+			align-items: center !important;
+			gap: 12px !important;
+			text-decoration: none !important;
+			position: relative !important;
+			z-index: 2 !important;
+			transition: all 0.25s ease-in-out !important;
+		}
+		
+		/* Step Badge Icon */
+		.step-icon {
+			width: 40px !important;
+			height: 40px !important;
+			border-radius: 50% !important;
+			background-color: #FFFFFF !important;
+			color: #A3968A !important;
+			display: flex !important;
+			align-items: center !important;
+			justify-content: center !important;
+			font-weight: 600 !important;
+			font-size: 15px !important;
+			border: 2px solid #E6E1DA !important;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.03) !important;
+			transition: all 0.25s ease-in-out !important;
+			flex-shrink: 0 !important;
+		}
+
+		.step-label {
+			font-size: 13px !important;
+			font-weight: 600 !important;
+			color: #8C7E72 !important;
+			transition: all 0.25s ease-in-out !important;
+			line-height: 1.2 !important;
+		}
+
+		/* Active Step Styling */
+		.process-step.active .step-icon {
+			background-color: #4A3B32 !important;
+			color: #FFFFFF !important;
+			font-size: 16px !important;
+			border: 3px solid #8C6D58 !important;
+			transform: scale(1.12) !important;
+			box-shadow: 0 0 0 4px rgba(140, 109, 88, 0.25), 0 4px 10px rgba(74, 59, 50, 0.3) !important;
+			animation: pulse-ring 2.5s infinite !important;
+		}
+		@keyframes pulse-ring {
+			0% { box-shadow: 0 0 0 0px rgba(140, 109, 88, 0.4), 0 4px 10px rgba(74, 59, 50, 0.3); }
+			70% { box-shadow: 0 0 0 7px rgba(140, 109, 88, 0), 0 4px 10px rgba(74, 59, 50, 0.3); }
+			100% { box-shadow: 0 0 0 0px rgba(140, 109, 88, 0), 0 4px 10px rgba(74, 59, 50, 0.3); }
+		}
+
+		.process-step.active .step-label {
+			color: #4A3B32 !important;
+			font-weight: 800 !important;
+			font-size: 13px !important;
+		}
+
+		.process-step.complete .step-icon {
+			background-color: #FAF8F5 !important;
+			color: #8C6D58 !important;
+			border-color: #8C6D58 !important;
+		}
+		.process-step.complete .step-label {
+			color: #8C6D58 !important;
+		}
+
+		/* Single Consolidated Summary Card */
+		.single-summary-card {
+			background: #FFFFFF !important;
+			border: 1px solid #E6E1DA !important;
+			border-left: 5px solid #8C6D58 !important;
+			border-radius: 8px !important;
+			padding: 22px 26px !important;
+			margin-bottom: 20px !important;
+			box-shadow: 0 2px 8px rgba(74, 59, 50, 0.04) !important;
+		}
+
+		.summary-grid-layout {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 20px 28px;
+		}
+
+		.summary-field {
+			display: flex;
+			flex-direction: column;
+		}
+
+		.summary-field.full-width {
+			grid-column: 1 / -1;
+		}
+
+		.summary-label-text {
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: 0.7px;
+			font-weight: 700;
+			color: #8C6D58;
+			margin-bottom: 6px;
+		}
+
+		.summary-value-text {
+			font-size: 14px;
+			font-weight: 600;
+			color: #3A2F28;
+			line-height: 1.5;
+			word-break: break-word;
+			overflow-wrap: break-word;
+		}
+
+		.summary-divider {
+			grid-column: 1 / -1;
+			border-bottom: 1px dashed #E6E1DA;
+			margin: 2px 0;
+		}
+
+		/* Badges */
+		.badge-earthy {
+			display: inline-block;
+			padding: 3px 8px;
+			font-size: 11px;
+			font-weight: 700;
+			line-height: 1.2;
+			color: #4A3B32;
+			background-color: #EFECE6;
+			border: 1px solid #D8D2C7;
+			border-radius: 4px;
+			text-transform: uppercase;
+		}
+
+		.badge-status-confirmed {
+			background-color: #E2F0D9;
+			color: #2E6B38;
+			border: 1px solid #B8DCAB;
+		}
+
+		.badge-status-unconfirmed {
+			background-color: #FFF2CC;
+			color: #8A6D3B;
+			border: 1px solid #FFE599;
+		}
+
+		/* Table Styling */
+		.table-wrapper {
+			background: #ffffff !important;
+			border-radius: 6px !important;
+			box-shadow: 0 2px 6px rgba(74, 59, 50, 0.05) !important;
+			border: 1px solid #E6E1DA !important;
+			overflow-x: auto !important;
+			margin-top: 10px !important;
+		}
+		.table-wrapper table {
+			margin-bottom: 0 !important;
+			border-collapse: separate !important;
+			border-spacing: 0 !important;
+		}
+		.table-wrapper th {
+			background: #F4F0EA !important;
+			color: #4A3B32 !important;
+			font-weight: 700 !important;
+			text-transform: uppercase !important;
+			font-size: 11px !important;
+			letter-spacing: 0.8px !important;
+			position: sticky !important;
+			top: 0 !important;
+			z-index: 10 !important;
+			border-bottom: 2px solid #E0DCD5 !important;
+			border-top: none !important;
+			padding: 12px 10px !important;
+		}
+		.table-wrapper td {
+			padding: 10px !important;
+			vertical-align: middle !important;
+			color: #4A3B32 !important;
+			border-top: 1px solid #EFECE6 !important;
+		}
+		.table-hover tbody tr:not([style*="background"]):hover > td {
+			background-color: #F7F5F0 !important;
+			color: #4A3B32 !important;
+		}
+		.table-wrapper td a {
+			color: #8C6D58 !important;
+			text-decoration: none !important;
+		}
+
+		/* Signature Card */
+		.signature-card {
+			background: #FAF8F5 !important;
+			border: 1px solid #E6E1DA !important;
+			border-radius: 6px !important;
+			box-shadow: 0 2px 6px rgba(74, 59, 50, 0.03) !important;
+			padding: 24px 20px !important;
+			margin-top: 25px !important;
+		}
+		.signature-table td {
+			vertical-align: top !important;
+			padding: 0 15px !important;
+		}
+		.sig-role {
+			font-size: 11px !important;
+			text-transform: uppercase !important;
+			letter-spacing: 0.8px !important;
+			color: #8C6D58 !important;
+			font-weight: 700 !important;
+			margin-bottom: 45px !important;
+		}
+		.sig-container {
+			display: inline-block !important;
+			max-width: 200px !important;
+			width: 100% !important;
+		}
+		.sig-line {
+			border-top: 1px solid #8C6D58 !important;
+			padding-top: 6px !important;
+			font-size: 13px !important;
+			color: #4A3B32 !important;
+			margin-bottom: 4px !important;
+			white-space: nowrap !important;
+			overflow: hidden !important;
+			text-overflow: ellipsis !important;
+		}
+		.sig-pos {
+			font-size: 11px !important;
+			color: #7A6B60 !important;
+			font-style: italic !important;
+		}
+
+		.header { background: #CCC; }
+		.sticky { position: fixed; top: 0; width: 97%; }
+		.hideit { display: none; }
+
+		@media (max-width: 992px) {
+			.page-layout-grid {
+				flex-direction: column-reverse !important;
+				gap: 25px !important;
+			}
+			.main-content-area { max-width: 100% !important; }
+			.sidebar-wizard-area {
+				width: 100% !important;
+				position: static !important;
+				margin-left: 0 !important;
+			}
+			.process-wizard-vertical {
+				flex-direction: row !important;
+				justify-content: space-between !important;
+			}
+			.process-step { padding-bottom: 0 !important; flex: 1 !important; }
+			.process-step:not(:last-child)::after { display: none !important; }
+			.summary-grid-layout { grid-template-columns: 1fr; }
+		}
+	</style>
 </head>
 <body>
-<!-- body content: start here-->
 <div id="spinner"></div>
 <div class="row-fluid">
 	<div class="box span12">
-		<div class="box-header" data-original-title>
-			<h2><i class="halflings-icon white th"></i><span class="break"></span>ATTENDANCE SUMMARY PREVIEW</h2>
+		<div class="card-header-custom">
+			<h2>ATTENDANCE SUMMARY PREVIEW</h2>
 		</div>
 		<div class="box-content">
-			<form class="form-horizontal" method="post">
-				<?php if($attendance_ready==0){?>
-				<div align="right" style="padding-bottom:10px;">
-					<a id="icnReupload" href="attendance_report_add_attlog_option.php?eatid=<?php echo functions::encode($eatid)?>&frm=1" class="btn btn-success" title="Upload Updated Att. Log"><i class="icon-upload-alt white upload-alt"></i></a>&nbsp;
-					<a id="icnRefresh" href="?eatid=<?php echo functions::encode($eatid)?>&pr=t" class="btn btn-info" title="Re calculate attendance"><i class="halflings-icon white refresh"></i></a>&nbsp;
-					<a id="icnSignatory" class="btn btn-info thickbox" title="Manage Signatory" data-rel="tooltip" onclick="showThis(this.id,'attendance_report_signatory.php?eatid=<?php echo functions::encode($eatid);?>','Attendance Detail')"><i class="halflings-icon white user"></i></a>&nbsp;
-					<a id="edtRpt" class="btn btn-warning" title="Manage Report" data-rel="tooltip" href="attendance_report_add_charge.php?eatid=<?php echo functions::encode($eatid);?>&frm=1"><i class="halflings-icon white edit"></i></a>&nbsp;
-				</div>
-				<?php }?>
-				<div class="info-panel">
-					<table border="0" width="100%">
-						<tr>
-							<td width="18%" height="30px">Project / Department</td>
-							<td><strong><?php echo $proj_name;?></strong></td>
-						</tr>
-						<?php if($eas_name){?>
-						<tr>
-							<td height="30px">Description</td>
-							<td><strong><?php echo $eas_name; echo ($worker_type) ? ' ('.$worker_type.')' : '';?></strong></td>
-						</tr>
-						<?php }?>
-						<?php if($attendance_ready){?>
-						<tr>
-							<td height="30px">Payroll No.</td>
-							<td><strong><?php echo $payroll_no;?></strong></td>
-						</tr>
-						<?php }?>
-						<tr>
-							<td height="30px">Period Covered</td>
-							<td><strong><?php echo functions::datearr($date_start).' - '.functions::datearr($date_end);?></strong></td>
-						</tr>
-						<tr>
-							<td height="30px">Attendance Type</td>
-							<td><strong><?php echo strtoupper($worker_type); if($worker_type=='admin'){echo ' <i>(Office Personnel)</i>';}?></strong></td>
-						</tr>
-						<tr>
-							<td height="30px">Confirm Status</td>
-							<td>
-								<label class="checkbox inline"><input type="checkbox" name="chkConf" id="chkConf" value="1" onClick="stat(this.value)" <?php if($attendance_ready)echo 'checked';?> <?php if($confirmed){echo 'disabled';}elseif( $db->getValue('emp_attendance_personnel','count(*)',array('att_ready'=>0,'eat_id'=>$eatid)) ){echo 'disabled';}?>> <?php echo ($attendance_ready) ? 'Confirmed' : 'Unconfirmed';?> <?php if($confirmed){echo '&nbsp;&nbsp;&nbsp;<i>(Payroll Confirmed)</i>';} ?></label>
-							</td>
-						</tr>
-					</table>
-				</div>
-				<br>
-				<!-- WRAPPER APPLIED HERE -->
-				<div class="table-wrapper">
-					<?php if(empty($confirmed)){ ?>
-					<div align="left">
-						<table cellspacing="4" cellpadding="6" border='0' align="left">
-							<tr>
-								<td width="25" height='30'><div style="background-color:#fcf8e3; width:20px;">&nbsp;</div></td>
-								<td>Unverified</td>
-							</tr>
-						</table>
-					</div>
-					<?php } ?>
-					<table id="tblist" width="100%" border="0" class="table table-hover" style="font-size:12px;">
-						<thead>
-							<tr>
-								<th width="28%">NAME / POSITION</th>
-								<th width="10%"><div align="right">Rendered Days</div></th>
-								<th width="10%"><div align="right">Absent Days</div></th>
-								<th width="10%"><div align="right">Required Days</div></th>
-								<th width="10%"><div align="center">Overtime<br>Hours</div></th>
-								<th width="11%"><div align="center">Total Duty<br>(HOURS)</div></th>
-								<th width="11%"><div align="center">Total Tardy/Under<br>(HOURS)</div></th>
-								<th width="11%"><div align="center"><?php if($attendance_ready==0){?><a href="#" onClick="statAll('1')">Verify All</a>&nbsp;|&nbsp;<a href="#" onClick="statAll('2')">Unverify All</a><?php }else{echo 'Verified';} ?></div></th>
-							</tr>
-						</thead>
-						<tbody>
-						<?php
-						$countEmp=0;$totalDutyHours=0;
-						foreach($arrMember as $memberID => $statReady):
-							$countEmp++;
+			
+			<div class="page-layout-grid">
 
-							$pd = isset($arrPayrollList[$memberID]) ? $arrPayrollList[$memberID] : 0;
-							$totalDutyHours = ($pd['overtime_hours'] + $pd['regular_hours']);
-							if($pd){
-								$hrsPrDay = 480;
-								$qStat = $db->select('emp_work_status','*',array('emp_id'=>$memberID),'ORDER BY ews_date DESC LIMIT 1');
-								$rStat = $db->fetch_array($qStat);
-								$wrkStat = (isset($rStat['ews_stat'])) ? $rStat['ews_stat'] : 'Undefined Status';
-								$projBased = (isset($rStat['project_based']) && $rStat['project_based']==1) ? 'Project Based' : '';
-
-								$has_travel = $db->getValue('travel_personnel tv, travel_order tro, travel_order_detail tod','count(*)',array('personnel_id'=>$pd['emp_id']),'AND travel_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'" AND tro.to_id=tod.to_id AND tv.to_id=tro.to_id ORDER BY act_time_from');
-								$has_travel = ($has_travel) ? '&nbsp;&nbsp;<i class="icon-truck icon-info" title="Has Travel Order" style="cursor:pointer;"></i>' : '';
-								// $has_leave = $db->getValue('leave_file lf,leave_file_detail lfd','count(lfd.lfd_id)',array('lf.emp_id'=>$pd['emp_id']),'AND lf.lf_id=lfd.lf_id AND lfd.lfd_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'"');
-								// $has_leave = ($has_leave) ? '&nbsp;&nbsp;<i class="icon-plane icon-info" title="Has Leave Application" style="cursor:pointer;"></i>' : '';
-								$has_leave = (isset($pd['hasLeave']) && $pd['hasLeave']==1 ) ? '&nbsp;&nbsp;<i class="icon-plane icon-info" title="Has Leave Application" style="cursor:pointer;"></i>' : '';
-								$has_holiday = (isset($pd['hasHoliday']) && $pd['hasHoliday']==1 ) ? '&nbsp;&nbsp;<i class="icon-gift icon-info" title="Has Holiday" style="cursor:pointer;"></i>' : '';
-						?>
-							<tr id="rw<?php echo $memberID?>" <?php echo $pd['bgColor']?>>
-								<td height="30px" style="vertical-align: top; padding-top: 10px; padding-bottom: 10px;">
-									<div style="display: flex; align-items: center; justify-content: space-between;">
-										<div style="display: flex; align-items: center; gap: 8px;">
-											<a id="vw<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; font-weight: 600; font-size: 13px; color: #1e293b;" title="Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><?php echo $countEmp.'. '.$pd['name'];?></a>
-											<a id="vw2<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; color: #2563eb;text-decoration:none;" title="View Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><i class="icon-search" style="font-size: 14px;"></i></a>
-										</div>
-										<div><?php echo $has_travel.' '.$has_leave.' '.$has_holiday;?></div>
+				<!-- Main Content Form Area -->
+				<div class="main-content-area">
+					<form class="form-horizontal" method="post">
+						<?php if($attendance_ready==0){?>
+						<div align="right" style="padding-bottom:10px;">
+							<a id="icnReupload" href="attendance_report_add_attlog_option.php?eatid=<?php echo functions::encode($eatid)?>&frm=1" class="btn btn-success" title="Upload Updated Att. Log"><i class="icon-upload-alt white upload-alt"></i></a>&nbsp;
+							<a id="icnRefresh" href="?eatid=<?php echo functions::encode($eatid)?>&pr=t" class="btn btn-info" title="Re calculate attendance"><i class="halflings-icon white refresh"></i></a>&nbsp;
+							<a id="icnSignatory" class="btn btn-info thickbox" title="Manage Signatory" data-rel="tooltip" onclick="showThis(this.id,'attendance_report_signatory.php?eatid=<?php echo functions::encode($eatid);?>','Attendance Detail')"><i class="halflings-icon white user"></i></a>&nbsp;
+							<a id="edtRpt" class="btn btn-warning" title="Manage Report" data-rel="tooltip" href="attendance_report_add_charge.php?eatid=<?php echo functions::encode($eatid);?>&frm=1"><i class="halflings-icon white edit"></i></a>&nbsp;
+						</div>
+						<?php }?>
+						
+						<!-- Consolidated Summary Card (No Icons) -->
+						<div class="single-summary-card">
+							<div class="summary-grid-layout">
+								
+								<!-- Project / Department (Full Width for Long Text) -->
+								<div class="summary-field full-width">
+									<div class="summary-label-text">Project / Department</div>
+									<div class="summary-value-text" style="font-size: 16px; font-weight: 700; color: #4A3B32;">
+										<?php echo htmlspecialchars($proj_name); ?>
 									</div>
-									<div style="padding-left: 15px; margin-top: 3px; font-size: 11.5px; color: #475569; border-left: 2px solid #cbd5e1;">
-										<div style="font-weight: 500; color: #334155;"><?php echo $pd['position'];?></div>
-										<div style="margin-top: 1px;">
-											<span class="label" style="background-color: #e2e8f0; color: #475569; font-size: 10px; padding: 1px 6px; font-weight: normal;"><?php echo $wrkStat; ?></span>
-											<?php if($projBased){ ?>
-												<span class="label" style="background-color: #dbeafe; color: #1e40af; font-size: 10px; padding: 1px 6px; font-weight: normal; margin-left: 4px;"><?php echo $projBased; ?></span>
-											<?php } ?>
+								</div>
+
+								<!-- Description (Full Width if present) -->
+								<?php if($eas_name){ ?>
+								<div class="summary-field full-width">
+									<div class="summary-label-text">Description</div>
+									<div class="summary-value-text">
+										<?php echo htmlspecialchars($eas_name); echo ($worker_type) ? ' ('.htmlspecialchars($worker_type).')' : ''; ?>
+									</div>
+								</div>
+								<?php } ?>
+
+								<div class="summary-divider"></div>
+
+								<!-- Period Covered -->
+								<div class="summary-field">
+									<div class="summary-label-text">Period Covered</div>
+									<div class="summary-value-text">
+										<?php echo functions::datearr($date_start).' &mdash; '.functions::datearr($date_end); ?>
+									</div>
+								</div>
+
+								<!-- Attendance Type -->
+								<div class="summary-field">
+									<div class="summary-label-text">Attendance Type</div>
+									<div class="summary-value-text" style="display: flex; align-items: center; gap: 8px;">
+										<span class="badge-earthy"><?php echo strtoupper($worker_type); ?></span>
+										<?php if($worker_type=='admin'){ echo '<span style="font-size: 12px; color: #7A6B60; font-style: italic;">(Office Personnel)</span>'; } ?>
+									</div>
+								</div>
+
+								<!-- Payroll No. (If Confirmed/Ready) -->
+								<?php if($attendance_ready){ ?>
+								<div class="summary-field">
+									<div class="summary-label-text">Payroll No.</div>
+									<div class="summary-value-text">
+										<?php echo htmlspecialchars($payroll_no); ?>
+									</div>
+								</div>
+								<?php } ?>
+
+								<!-- Confirmation Status -->
+								<div class="summary-field <?php echo (!$attendance_ready) ? '' : ''; ?>">
+									<div class="summary-label-text">Confirmation Status</div>
+									<div class="summary-value-text">
+										<div style="display: flex; align-items: center; gap: 10px;">
+											<label class="checkbox inline" style="padding-left: 0; margin-bottom: 0; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px;">
+												<input type="checkbox" name="chkConf" id="chkConf" value="1" style="margin-top: 0;" onClick="stat(this.value)" <?php if($attendance_ready) echo 'checked'; ?> <?php if($confirmed){ echo 'disabled'; } elseif( $db->getValue('emp_attendance_personnel','count(*)',array('att_ready'=>0,'eat_id'=>$eatid)) ){ echo 'disabled'; } ?>>
+												<span class="badge-earthy <?php echo ($attendance_ready) ? 'badge-status-confirmed' : 'badge-status-unconfirmed'; ?>">
+													<?php echo ($attendance_ready) ? 'Confirmed' : 'Unconfirmed'; ?>
+												</span>
+											</label>
+											<?php if($confirmed){ echo '<span style="font-size: 12px; color: #7A6B60; font-style: italic;">(Payroll Confirmed)</span>'; } ?>
 										</div>
 									</div>
-								</td>
-								<td><div align="right"><?php echo ($pd['totalDayPresent'] > 1) ? $pd['totalDayPresent'].' days' : $pd['totalDayPresent'].' day';?></div></td>
-								<td><div align="right"><?php echo ($pd['totalDayAbsent'] > 1) ? $pd['totalDayAbsent'].' days' : $pd['totalDayAbsent'].' day';?></div></td>
-								<td><div align="right"><?php echo ($pd['totalDayRequired'] > 1) ? $pd['totalDayRequired'].' days' : $pd['totalDayRequired'].' day';?></div></td>
-								<td><div align="center"><?php echo ($pd['overtime_hours']) ? functions::min_to_hour($pd['overtime_hours']) : '';?></div></td>
-								<td><div align="center"><?php echo ($totalDutyHours) ? functions::min_to_hour($totalDutyHours) : '';?></div></td>
-								<td><div align="center"><?php echo ($pd['totalTardy']) ? functions::min_to_hour($pd['totalTardy']) : '';?></div></td>
-								<td><div align="center"><input type="checkbox" class="chkDel" name="chkDel[<?php echo $memberID; ?>]" id="chkDel[<?php echo $memberID; ?>]" value="<?php echo functions::encode($memberID); ?>" <?php if($attendance_ready){echo 'disabled';}?> onClick="statIndi(this.value)" <?php echo ($statReady) ? 'checked':''; ?>></div></td>
-							</tr>
-						<?php }else{?>
-							<tr>
-								<td height="30px" style="vertical-align: top;"><?php echo $countEmp.'. '.$db->getValue('employee','concat(lname,", ",fname)',array('emp_id'=>$memberID));?></td>
-								<td><div align="right">-------</div></td>
-								<td><div align="right">-------</div></td>
-								<td><div align="right">-------</div></td>
-								<td><div align="right">-------</div></td>
-								<td><div align="right">-------</div></td>
-								<td><div align="right">-------</div></td>
-								<td><div align="right">-------</div></td>
-							</tr>
-						<?php }
-						endforeach;?>
-						</tbody>
-					</table>
+								</div>
+
+							</div>
+						</div>
+						
+						<div class="table-wrapper">
+							<?php if(empty($confirmed)){ ?>
+							<div align="left" style="padding: 10px 10px 0 10px;">
+								<table cellspacing="4" cellpadding="6" border='0' align="left">
+									<tr>
+										<td width="25" height='30'><div style="background-color:#fcf8e3; width:20px; border:1px solid #E0DCD5;">&nbsp;</div></td>
+										<td>Unverified</td>
+									</tr>
+								</table>
+							</div>
+							<?php } ?>
+							<table id="tblist" width="100%" border="0" class="table table-hover" style="font-size:12px;">
+								<thead>
+									<tr>
+										<th width="28%">NAME / POSITION</th>
+										<th width="10%"><div align="right">Rendered Days</div></th>
+										<th width="10%"><div align="right">Absent Days</div></th>
+										<th width="10%"><div align="right">Required Days</div></th>
+										<th width="10%"><div align="center">Overtime<br>Hours</div></th>
+										<th width="11%"><div align="center">Total Duty<br>(HOURS)</div></th>
+										<th width="11%"><div align="center">Total Tardy/Under<br>(HOURS)</div></th>
+										<th width="11%"><div align="center"><?php if($attendance_ready==0){?><a href="#" onClick="statAll('1')">Verify All</a>&nbsp;|&nbsp;<a href="#" onClick="statAll('2')">Unverify All</a><?php }else{echo 'Verified';} ?></div></th>
+									</tr>
+								</thead>
+								<tbody>
+								<?php
+								$countEmp=0;$totalDutyHours=0;
+								foreach($arrMember as $memberID => $statReady):
+									$countEmp++;
+
+									$pd = isset($arrPayrollList[$memberID]) ? $arrPayrollList[$memberID] : 0;
+									$totalDutyHours = ($pd['overtime_hours'] + $pd['regular_hours']);
+									if($pd){
+										$hrsPrDay = 480;
+										$qStat = $db->select('emp_work_status','*',array('emp_id'=>$memberID),'ORDER BY ews_date DESC LIMIT 1');
+										$rStat = $db->fetch_array($qStat);
+										$wrkStat = (isset($rStat['ews_stat'])) ? $rStat['ews_stat'] : 'Undefined Status';
+										$projBased = (isset($rStat['project_based']) && $rStat['project_based']==1) ? 'Project Based' : '';
+
+										$has_travel = $db->getValue('travel_personnel tv, travel_order tro, travel_order_detail tod','count(*)',array('personnel_id'=>$pd['emp_id']),'AND travel_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'" AND tro.to_id=tod.to_id AND tv.to_id=tro.to_id ORDER BY act_time_from');
+										$has_travel = ($has_travel) ? '&nbsp;&nbsp;<i class="icon-truck icon-info" title="Has Travel Order" style="cursor:pointer;"></i>' : '';
+										$has_leave = (isset($pd['hasLeave']) && $pd['hasLeave']==1 ) ? '&nbsp;&nbsp;<i class="icon-plane icon-info" title="Has Leave Application" style="cursor:pointer;"></i>' : '';
+										$has_holiday = (isset($pd['hasHoliday']) && $pd['hasHoliday']==1 ) ? '&nbsp;&nbsp;<i class="icon-gift icon-info" title="Has Holiday" style="cursor:pointer;"></i>' : '';
+								?>
+									<tr id="rw<?php echo $memberID?>" <?php echo $pd['bgColor']?>>
+										<td height="30px" style="vertical-align: top; padding-top: 10px; padding-bottom: 10px;">
+											<div style="display: flex; align-items: center; justify-content: space-between;">
+												<div style="display: flex; align-items: center; gap: 8px;">
+													<a id="vw<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; font-weight: 600; font-size: 13px; color: #4A3B32;" title="Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><?php echo $countEmp.'. '.$pd['name'];?></a>
+													<a id="vw2<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; color: #8C6D58; text-decoration:none;" title="View Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><i class="icon-search" style="font-size: 14px;"></i></a>
+												</div>
+												<div><?php echo $has_travel.' '.$has_leave.' '.$has_holiday;?></div>
+											</div>
+											<div style="padding-left: 15px; margin-top: 3px; font-size: 11.5px; color: #7A6B60; border-left: 2px solid #C8C2B9;">
+												<div style="font-weight: 500; color: #594C42;"><?php echo $pd['position'];?></div>
+												<div style="margin-top: 1px;">
+													<span class="label" style="background-color: #E6E1DA; color: #4A3B32; font-size: 10px; padding: 1px 6px; font-weight: normal;"><?php echo $wrkStat; ?></span>
+													<?php if($projBased){ ?>
+														<span class="label" style="background-color: #8C6D58; color: #FFFFFF; font-size: 10px; padding: 1px 6px; font-weight: normal; margin-left: 4px;"><?php echo $projBased; ?></span>
+													<?php } ?>
+												</div>
+											</div>
+										</td>
+										<td><div align="right"><?php echo ($pd['totalDayPresent'] > 1) ? $pd['totalDayPresent'].' days' : $pd['totalDayPresent'].' day';?></div></td>
+										<td><div align="right"><?php echo ($pd['totalDayAbsent'] > 1) ? $pd['totalDayAbsent'].' days' : $pd['totalDayAbsent'].' day';?></div></td>
+										<td><div align="right"><?php echo ($pd['totalDayRequired'] > 1) ? $pd['totalDayRequired'].' days' : $pd['totalDayRequired'].' day';?></div></td>
+										<td><div align="center"><?php echo ($pd['overtime_hours']) ? functions::min_to_hour($pd['overtime_hours']) : '';?></div></td>
+										<td><div align="center"><?php echo ($totalDutyHours) ? functions::min_to_hour($totalDutyHours) : '';?></div></td>
+										<td><div align="center"><?php echo ($pd['totalTardy']) ? functions::min_to_hour($pd['totalTardy']) : '';?></div></td>
+										<td><div align="center"><input type="checkbox" class="chkDel" name="chkDel[<?php echo $memberID; ?>]" id="chkDel[<?php echo $memberID; ?>]" value="<?php echo functions::encode($memberID); ?>" <?php if($attendance_ready){echo 'disabled';}?> onClick="statIndi(this.value)" <?php echo ($statReady) ? 'checked':''; ?>></div></td>
+									</tr>
+								<?php }else{?>
+									<tr>
+										<td height="30px" style="vertical-align: top;"><?php echo $countEmp.'. '.$db->getValue('employee','concat(lname,", ",fname)',array('emp_id'=>$memberID));?></td>
+										<td><div align="right">-------</div></td>
+										<td><div align="right">-------</div></td>
+										<td><div align="right">-------</div></td>
+										<td><div align="right">-------</div></td>
+										<td><div align="right">-------</div></td>
+										<td><div align="right">-------</div></td>
+										<td><div align="right">-------</div></td>
+									</tr>
+								<?php }
+								endforeach;?>
+								</tbody>
+							</table>
+						</div>
+						
+						<div class="signature-card">
+							<table border="0" width="100%" class="signature-table">
+								<tr>
+									<td align="center" width="25%">
+										<div class="sig-role">Prepared By</div>
+										<div class="sig-container">
+											<div class="sig-line"><strong><?php echo $prepared_by?></strong></div>
+											<div class="sig-pos"><?php echo $prepared_position?></div>
+										</div>
+									</td>
+									<td align="center" width="25%">
+										<div class="sig-role">Checked By</div>
+										<div class="sig-container">
+											<div class="sig-line"><strong><?php echo $checked_by?></strong></div>
+											<div class="sig-pos"><?php echo $checked_position?></div>
+										</div>
+									</td>
+									<td align="center" width="25%">
+										<div class="sig-role">Received By</div>
+										<div class="sig-container">
+											<div class="sig-line"><strong><?php echo $received_by?></strong></div>
+											<div class="sig-pos"><?php echo $received_position?></div>
+										</div>
+									</td>
+									<td align="center" width="25%">
+										<div class="sig-role">Approved By</div>
+										<div class="sig-container">
+											<div class="sig-line"><strong><?php echo $approved_by?></strong></div>
+											<div class="sig-pos"><?php echo $approved_position?></div>
+										</div>
+									</td>
+								</tr>
+							</table>
+						</div>
+					</form>
 				</div>
-				
-				<br>
-				<div class="signature-card">
-					<table border="0" width="100%" class="signature-table">
-						<tr>
-							<td align="center" width="25%">
-								<div class="sig-role">Prepared By</div>
-								<div class="sig-container">
-									<div class="sig-line"><strong><?php echo $prepared_by?></strong></div>
-									<div class="sig-pos"><?php echo $prepared_position?></div>
-								</div>
-							</td>
-							<td align="center" width="25%">
-								<div class="sig-role">Checked By</div>
-								<div class="sig-container">
-									<div class="sig-line"><strong><?php echo $checked_by?></strong></div>
-									<div class="sig-pos"><?php echo $checked_position?></div>
-								</div>
-							</td>
-							<td align="center" width="25%">
-								<div class="sig-role">Received By</div>
-								<div class="sig-container">
-									<div class="sig-line"><strong><?php echo $received_by?></strong></div>
-									<div class="sig-pos"><?php echo $received_position?></div>
-								</div>
-							</td>
-							<td align="center" width="25%">
-								<div class="sig-role">Approved By</div>
-								<div class="sig-container">
-									<div class="sig-line"><strong><?php echo $approved_by?></strong></div>
-									<div class="sig-pos"><?php echo $approved_position?></div>
-								</div>
-							</td>
-						</tr>
-					</table>
+
+				<!-- Right Vertical Process Wizard Sidebar -->
+				<div class="sidebar-wizard-area">
+					<ul class="process-wizard-vertical">
+						<div class="wizard-title">Process Steps</div>
+						<li class="process-step complete">
+							<a href="<?php echo ($eatid) ? 'attendance_report_add.php?eatid='.functions::encode($eatid).'&frm=1' : '#'; ?>">
+								<span class="step-icon">1</span>
+								<span class="step-label">Manage Details</span>
+							</a>
+						</li>
+						<li class="process-step complete">
+							<a href="<?php echo ($eatid) ? 'attendance_report_add_personnel.php?eatid='.functions::encode($eatid) : '#'; ?>">
+								<span class="step-icon">2</span>
+								<span class="step-label">Manage Personnel</span>
+							</a>
+						</li>
+						<li class="process-step complete">
+							<a href="<?php echo ($eatid) ? 'attendance_report_add_attlog_option.php?eatid='.functions::encode($eatid) : '#'; ?>">
+								<span class="step-icon">3</span>
+								<span class="step-label">Upload Att. Log</span>
+							</a>
+						</li>
+						<li class="process-step active">
+							<a href="javascript:void(0)">
+								<span class="step-icon">4</span>
+								<span class="step-label">Summary</span>
+							</a>
+						</li>
+					</ul>
 				</div>
-			</form>
+
+			</div>
 		</div>
-	</div><!--/span-->
-</div><!--/row-->
-<!-- body content: end here-->
-<!-- start: JavaScript-->
+	</div>
+</div>
+
+<!-- JavaScript dependencies -->
 <script src="../js/jquery-1.9.1.min.js"></script>
 <script src="../js/jquery-migrate-1.0.0.min.js"></script>
 <script src="../js/jquery-ui-1.10.0.custom.min.js"></script>
@@ -566,7 +855,7 @@ endwhile;
 <script>
 function stat(v){
 	<?php if($attendance_ready==0){?>
-		if(confirm('Do you want to confirmed this attendance?')){
+		if(confirm('Do you want to confirm this attendance?')){
 			document.getElementById("spinner").style.display = "block";
 			window.location="<?php echo functions::pageName()?>?eatid=<?php echo functions::encode($eatid);?>&c="+v;	
 		}
@@ -574,7 +863,7 @@ function stat(v){
 			document.getElementById("chkConf").checked = false;
 		}
 	<?php }else{?>
-		if(confirm('Do you want to unconfirmed this attendance?')){
+		if(confirm('Do you want to unconfirm this attendance?')){
 			document.getElementById("spinner").style.display = "block";
 			window.location="<?php echo functions::pageName()?>?eatid=<?php echo functions::encode($eatid);?>&c="+v;	
 		}
@@ -593,28 +882,32 @@ function statAll(v){
 	else
 		return false;
 }
-// When the user scrolls the page, execute myFunction
+
 window.onscroll = function() {myFunction()};
-window.onload = function(){header.classList.add("hideit");};
+window.onload = function(){
+	var header = document.getElementById("myHeader");
+	if(header){ header.classList.add("hideit"); }
+};
 
-// Get the header
 var header = document.getElementById("myHeader");
+var sticky = 270;
 
-// Get the offset position of the navbar
-var sticky = header.offsetTop;
-sticky = 270
-// Add the sticky class to the header when you reach its scroll position. Remove "sticky" when you leave the scroll position
 function myFunction() {
-	if (window.pageYOffset > sticky) {
-		header.classList.add("sticky");
-		header.classList.remove("hideit");
-	}else{
-		header.classList.remove("sticky");
-		header.classList.add("hideit");
+	if(header){
+		if (window.pageYOffset > sticky) {
+			header.classList.add("sticky");
+			header.classList.remove("hideit");
+		}else{
+			header.classList.remove("sticky");
+			header.classList.add("hideit");
+		}
 	}
 }
 </script>
-<script>document.getElementById("spinner").style.display = "none";</script>
+<script>
+var sp = document.getElementById("spinner");
+if(sp){ sp.style.display = "none"; }
+</script>
 <?php if(isset($_SESSION['notif_success'])){?>
 <script src="../js/notify.min.js"></script>
 <script type="text/javascript">
@@ -638,6 +931,5 @@ $(document).ready(function(){
 });
 </script>
 <?php unset($_SESSION['notif_indi_id']);} ?>
-<!-- end: JavaScript-->
 </body>
 </html>
