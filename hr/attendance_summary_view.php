@@ -248,7 +248,7 @@ endwhile;
 		/* Expanded Form & Summary Content Area */
 		.main-content-area {
 			flex: 1 !important;
-			max-width: 1400px !important;
+			<?php if($attendance_ready==0){echo "max-width: 1400px !important;";} ?>
 			min-width: 0 !important;
 		}
 
@@ -376,6 +376,23 @@ endwhile;
 			color: #8C6D58 !important;
 		}
 
+		.process-step:not(.active):not(.disabled):hover .step-icon {
+			background-color: #4A3B32 !important;
+			color: #FFFFFF !important;
+			border-color: #4A3B32 !important;
+			transform: scale(1.08) !important;
+			box-shadow: 0 4px 10px rgba(74, 59, 50, 0.2) !important;
+		}
+		.process-step:not(.active):not(.disabled):hover .step-label {
+			color: #4A3B32 !important;
+			font-weight: 700 !important;
+		}
+
+		.process-step.disabled a {
+			cursor: not-allowed !important;
+			opacity: 0.45 !important;
+		}
+
 		/* Single Consolidated Summary Card */
 		.single-summary-card {
 			background: #FFFFFF !important;
@@ -389,7 +406,7 @@ endwhile;
 
 		.summary-grid-layout {
 			display: grid;
-			grid-template-columns: repeat(2, 1fr);
+			grid-template-columns: repeat(4, 1fr);
 			gap: 20px 28px;
 		}
 
@@ -566,24 +583,16 @@ endwhile;
 <div id="spinner"></div>
 <div class="row-fluid">
 	<div class="box span12">
-		<div class="card-header-custom">
+		<div class="card-header-custom" style="display:none;">
 			<h2>ATTENDANCE SUMMARY PREVIEW</h2>
 		</div>
 		<div class="box-content">
-			
 			<div class="page-layout-grid">
 
 				<!-- Main Content Form Area -->
 				<div class="main-content-area">
 					<form class="form-horizontal" method="post">
-						<?php if($attendance_ready==0){?>
-						<div align="right" style="padding-bottom:10px;">
-							<a id="icnReupload" href="attendance_report_add_attlog_option.php?eatid=<?php echo functions::encode($eatid)?>&frm=1" class="btn btn-success" title="Upload Updated Att. Log"><i class="icon-upload-alt white upload-alt"></i></a>&nbsp;
-							<a id="icnRefresh" href="?eatid=<?php echo functions::encode($eatid)?>&pr=t" class="btn btn-info" title="Re calculate attendance"><i class="halflings-icon white refresh"></i></a>&nbsp;
-							<a id="icnSignatory" class="btn btn-info thickbox" title="Manage Signatory" data-rel="tooltip" onclick="showThis(this.id,'attendance_report_signatory.php?eatid=<?php echo functions::encode($eatid);?>','Attendance Detail')"><i class="halflings-icon white user"></i></a>&nbsp;
-							<a id="edtRpt" class="btn btn-warning" title="Manage Report" data-rel="tooltip" href="attendance_report_add_charge.php?eatid=<?php echo functions::encode($eatid);?>&frm=1"><i class="halflings-icon white edit"></i></a>&nbsp;
-						</div>
-						<?php }?>
+
 						
 						<!-- Consolidated Summary Card (No Icons) -->
 						<div class="single-summary-card">
@@ -591,6 +600,14 @@ endwhile;
 								
 								<!-- Project / Department (Full Width for Long Text) -->
 								<div class="summary-field full-width">
+									<?php if($attendance_ready==0){?>
+									<div align="right" style="padding-bottom:10px;">
+										<a id="icnReupload" style="display:none;" href="attendance_report_add_attlog_option.php?eatid=<?php echo functions::encode($eatid)?>&frm=1" class="btn btn-success" title="Upload Updated Att. Log"><i class="icon-upload-alt white upload-alt"></i></a>&nbsp;
+										<a id="icnRefresh" href="?eatid=<?php echo functions::encode($eatid)?>&pr=t" class="btn btn-warning" title="Re calculate attendance"><i class="halflings-icon white refresh"></i></a>&nbsp;
+										<a id="icnSignatory" class="btn btn-info thickbox" title="Manage Signatory" data-rel="tooltip" onclick="showThis(this.id,'attendance_report_signatory.php?eatid=<?php echo functions::encode($eatid);?>','Attendance Detail')"><i class="halflings-icon white user"></i></a>&nbsp;
+										<a id="edtRpt" style="display:none;" class="btn btn-warning" title="Manage Report" data-rel="tooltip" href="attendance_report_add_charge.php?eatid=<?php echo functions::encode($eatid);?>&frm=1"><i class="halflings-icon white edit"></i></a>&nbsp;
+									</div>
+									<?php }?>
 									<div class="summary-label-text">Project / Department</div>
 									<div class="summary-value-text" style="font-size: 16px; font-weight: 700; color: #4A3B32;">
 										<?php echo htmlspecialchars($proj_name); ?>
@@ -777,15 +794,16 @@ endwhile;
 								</tr>
 							</table>
 						</div>
+						
 					</form>
 				</div>
-
+				<?php if($attendance_ready==0){ ?>
 				<!-- Right Vertical Process Wizard Sidebar -->
 				<div class="sidebar-wizard-area">
 					<ul class="process-wizard-vertical">
 						<div class="wizard-title">Process Steps</div>
 						<li class="process-step complete">
-							<a href="<?php echo ($eatid) ? 'attendance_report_add.php?eatid='.functions::encode($eatid).'&frm=1' : '#'; ?>">
+							<a href="<?php echo ($eatid) ? 'attendance_report_add_charge.php?eatid='.functions::encode($eatid).'&frm=1' : '#'; ?>">
 								<span class="step-icon">1</span>
 								<span class="step-label">Manage Details</span>
 							</a>
@@ -810,7 +828,7 @@ endwhile;
 						</li>
 					</ul>
 				</div>
-
+				<?php } ?>
 			</div>
 		</div>
 	</div>

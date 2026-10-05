@@ -36,6 +36,7 @@ $selDayTo = ( isset($date_end_arr[2]) ) ? $date_end_arr[2] : '';
 $selYrTo = ( isset($date_end_arr[0]) ) ? $date_end_arr[0] : '';
 
 $attendance_detail = $db->getValue('emp_attendance_detail','count(eat_id)',array('eat_id'=>$eatid));
+$count_personnel = $db->getValue('emp_attendance_personnel','count(*)',array('eat_id'=>$eatid));
 if($eatid==0){
 	$selYrFrom=date('Y');
 	$selYrTo=date('Y');
@@ -384,8 +385,8 @@ if( isset($_POST['btnCreate']) ){
 		.wide-dropdown, 
 		#selProjAssignment_chzn,
 		.chzn-container {
-			width: 100% !important;
-			max-width: 650px !important;
+			width: 750px !important;
+			max-width: 750px !important;
 		}
 		div.form-input-col input[type="text"], 
 		div.form-input-col select,
@@ -495,7 +496,7 @@ if( isset($_POST['btnCreate']) ){
 			.wide-dropdown, 
 			#selProjAssignment_chzn,
 			.chzn-container {
-				width: 100% !important;
+				width: 555px; !important;
 			}
 		}
 	</style>
@@ -511,7 +512,7 @@ if( isset($_POST['btnCreate']) ){
 <body>
 <div class="row-fluid">
 	<div class="box span12">
-		<div class="card-header-custom">
+		<div class="card-header-custom" style="display:none;">
 			<h2><i class="halflings-icon white edit"></i><span class="break"></span>ATTENDANCE REPORT MANAGEMENT</h2>
 		</div>
 		<div class="box-content">
@@ -610,7 +611,7 @@ if( isset($_POST['btnCreate']) ){
 								<span class="step-label">Manage Personnel</span>
 							</a>
 						</li>
-						<li class="process-step <?php echo ($eat_id) ? 'complete' : 'disabled'; ?>">
+						<li class="process-step <?php echo ($count_personnel) ? 'complete' : 'disabled'; ?>">
 							<a href="<?php echo ($eat_id) ? 'attendance_report_add_attlog_option.php?eatid='.functions::encode($eat_id) : '#'; ?>">
 								<span class="step-icon">3</span>
 								<span class="step-label">Upload Att. Log</span>

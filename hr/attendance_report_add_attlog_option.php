@@ -21,7 +21,7 @@ $worker_type = $rEatID['payroll_type'] ?? NULL;
 $note = $rEatID['note'] ?? NULL;
 
 $attendance_detail = $db->getValue('emp_attendance_detail','count(eat_id)',array('eat_id'=>$eatid));
-echo $db->last_query;
+
 $frmSummary = (isset($_REQUEST['frm']) && !empty($_REQUEST['frm']) ) ? $_REQUEST['frm'] : 0;
 $personnel = $db->getValue('emp_attendance_personnel','count(eat_id)',array('eat_id'=>$eatid));
 ?>
@@ -463,7 +463,7 @@ $personnel = $db->getValue('emp_attendance_personnel','count(eat_id)',array('eat
 <div id="spinner"></div>
 <div class="row-fluid">
 	<div class="box span12">
-		<div class="card-header-custom">
+		<div class="card-header-custom" style="display:none;">
 			<h2><i class="halflings-icon white edit"></i><span class="break"></span>ATTENDANCE UPLOAD MANAGEMENT</h2>
 		</div>
 		<div class="box-content">

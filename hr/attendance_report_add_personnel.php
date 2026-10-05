@@ -418,7 +418,7 @@ if( isset($_POST['btnAdd']) ){
 			border: 1px solid #4A3B32 !important;
 			background-image: none !important;
 			text-shadow: none !important;
-			padding: 6px 14px;
+			padding: 3px 14px;
 		}
 		.btn-earthy-primary:hover {
 			background-color: #4A3B32 !important;
@@ -541,7 +541,7 @@ if( isset($_POST['btnAdd']) ){
 <div id="spinner"></div>
 <div class="row-fluid">
 	<div class="box span12">
-		<div class="card-header-custom">
+		<div class="card-header-custom" style="display:none;">
 			<h2><i class="halflings-icon white user"></i><span class="break"></span>ATTENDANCE REPORT MANAGEMENT</h2>
 		</div>
 		<div class="box-content">
