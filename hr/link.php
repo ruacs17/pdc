@@ -14,8 +14,7 @@
                             <ul>
                                 <li><a class="submenu" href="employee.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-list"></i><span class="hidden-tablet"> List</span></a></li>
                                 <li><a class="submenu" href="201_reference.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-book"></i><span class="hidden-tablet"> 201 Manage</span></a></li>
-                                <li><a class="submenu" href="assignment.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-group"></i><span class="hidden-tablet"> Attendance Group</span></a></li>
-                                <li><a class="submenu" href="project-assign.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-building"></i><span class="hidden-tablet"> Project Assignment</span></a></li>
+                                <li><a class="submenu" href="project-assign.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-building"></i><span class="hidden-tablet"> Proj. Assign</span></a></li>
                             </ul>
                         </li>
                         <li><a href="holiday.php"><i class="icon-leaf"></i><span class="hidden-tablet"> Holiday</span></a></li>
@@ -28,7 +27,13 @@
                         </li>
                         <li><a href="overtime.php"><i class="icon-calendar"></i><span class="hidden-tablet"> Overtime</span></a></li>
                         <li><a href="travel.php"><i class="icon-truck"></i><span class="hidden-tablet"> Travel</span></a></li>
-                        <li><a href="attendance.php"><i class="icon-calendar"></i><span class="hidden-tablet"> Attendance</span></a></li>
+                        <li>
+                            <a class="dropmenu" href="#"><i class="icon-calendar"></i><span class="hidden-tablet"> Attendance</span>&nbsp;<span class="icon-sort-down white">  </span></a>
+                            <ul>
+                                <li><a class="submenu" href="attendance.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-list"></i><span class="hidden-tablet"> List</span></a></li>
+                                <li><a class="submenu" href="assignment.php">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<i class="icon-group"></i><span class="hidden-tablet"> Grouping</span></a></li>
+                            </ul>
+                        </li>                        
                         <li>
                             <a class="dropmenu" href="#"><i class="icon-money"></i><span class="hidden-tablet"> Payroll</span>&nbsp;<span class="icon-sort-down white">  </span></a>
                             <ul>

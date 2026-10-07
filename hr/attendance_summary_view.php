@@ -248,13 +248,13 @@ endwhile;
 		/* Expanded Form & Summary Content Area */
 		.main-content-area {
 			flex: 1 !important;
-			<?php if($attendance_ready==0){echo "max-width: 1400px !important;";} ?>
+			<?php if($attendance_ready==0){echo "max-width: 80% !important;";} ?>
 			min-width: 0 !important;
 		}
 
 		/* Sticky Sidebar Area Pinned to Far Right */
 		.sidebar-wizard-area {
-			width: 220px !important;
+			width: 250px !important;
 			flex-shrink: 0 !important;
 			position: sticky !important;
 			top: 20px !important;
@@ -591,21 +591,15 @@ endwhile;
 
 				<!-- Main Content Form Area -->
 				<div class="main-content-area">
-					<form class="form-horizontal" method="post">
-
-						
+					<form class="form-horizontal" method="post">					
 						<!-- Consolidated Summary Card (No Icons) -->
 						<div class="single-summary-card">
-							<div class="summary-grid-layout">
-								
+							<div class="summary-grid-layout">							
 								<!-- Project / Department (Full Width for Long Text) -->
 								<div class="summary-field full-width">
 									<?php if($attendance_ready==0){?>
-									<div align="right" style="padding-bottom:10px;">
-										<a id="icnReupload" style="display:none;" href="attendance_report_add_attlog_option.php?eatid=<?php echo functions::encode($eatid)?>&frm=1" class="btn btn-success" title="Upload Updated Att. Log"><i class="icon-upload-alt white upload-alt"></i></a>&nbsp;
-										<a id="icnRefresh" href="?eatid=<?php echo functions::encode($eatid)?>&pr=t" class="btn btn-warning" title="Re calculate attendance"><i class="halflings-icon white refresh"></i></a>&nbsp;
-										<a id="icnSignatory" class="btn btn-info thickbox" title="Manage Signatory" data-rel="tooltip" onclick="showThis(this.id,'attendance_report_signatory.php?eatid=<?php echo functions::encode($eatid);?>','Attendance Detail')"><i class="halflings-icon white user"></i></a>&nbsp;
-										<a id="edtRpt" style="display:none;" class="btn btn-warning" title="Manage Report" data-rel="tooltip" href="attendance_report_add_charge.php?eatid=<?php echo functions::encode($eatid);?>&frm=1"><i class="halflings-icon white edit"></i></a>&nbsp;
+									<div align="right">
+										<a id="icnRefresh" href="?eatid=<?php echo functions::encode($eatid)?>&pr=t" class="btn btn-warning" title="Re calculate attendance" onClick="return askRecalc();"><i class="halflings-icon white refresh"></i></a>&nbsp;
 									</div>
 									<?php }?>
 									<div class="summary-label-text">Project / Department</div>
@@ -613,7 +607,6 @@ endwhile;
 										<?php echo htmlspecialchars($proj_name); ?>
 									</div>
 								</div>
-
 								<!-- Description (Full Width if present) -->
 								<?php if($eas_name){ ?>
 								<div class="summary-field full-width">
@@ -623,9 +616,7 @@ endwhile;
 									</div>
 								</div>
 								<?php } ?>
-
 								<div class="summary-divider"></div>
-
 								<!-- Period Covered -->
 								<div class="summary-field">
 									<div class="summary-label-text">Period Covered</div>
@@ -633,7 +624,6 @@ endwhile;
 										<?php echo functions::datearr($date_start).' &mdash; '.functions::datearr($date_end); ?>
 									</div>
 								</div>
-
 								<!-- Attendance Type -->
 								<div class="summary-field">
 									<div class="summary-label-text">Attendance Type</div>
@@ -642,7 +632,6 @@ endwhile;
 										<?php if($worker_type=='admin'){ echo '<span style="font-size: 12px; color: #7A6B60; font-style: italic;">(Office Personnel)</span>'; } ?>
 									</div>
 								</div>
-
 								<!-- Payroll No. (If Confirmed/Ready) -->
 								<?php if($attendance_ready){ ?>
 								<div class="summary-field">
@@ -652,7 +641,6 @@ endwhile;
 									</div>
 								</div>
 								<?php } ?>
-
 								<!-- Confirmation Status -->
 								<div class="summary-field <?php echo (!$attendance_ready) ? '' : ''; ?>">
 									<div class="summary-label-text">Confirmation Status</div>
@@ -668,10 +656,8 @@ endwhile;
 										</div>
 									</div>
 								</div>
-
 							</div>
 						</div>
-						
 						<div class="table-wrapper">
 							<?php if(empty($confirmed)){ ?>
 							<div align="left" style="padding: 10px 10px 0 10px;">
@@ -721,7 +707,7 @@ endwhile;
 											<div style="display: flex; align-items: center; justify-content: space-between;">
 												<div style="display: flex; align-items: center; gap: 8px;">
 													<a id="vw<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; font-weight: 600; font-size: 13px; color: #4A3B32;" title="Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><?php echo $countEmp.'. '.$pd['name'];?></a>
-													<a id="vw2<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; color: #8C6D58; text-decoration:none;" title="View Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><i class="icon-search" style="font-size: 14px;"></i></a>
+													<a id="vw2<?php echo $countEmp?>" class="thickbox" style="cursor: pointer; color: #8C6D58; text-decoration:none;" title="View Attendance Detail" data-rel="tooltip" onclick="showThis(this.id,'attendance_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>&rw=<?php echo ($countEmp-1) ?>','Personnel Attendance Detail'<?php echo ($attendance_ready) ? ",'1'" : ''; ?>)"><i class="icon-edit" style="font-size: 14px;"></i></a>
 												</div>
 												<div><?php echo $has_travel.' '.$has_leave.' '.$has_holiday;?></div>
 											</div>
@@ -759,8 +745,12 @@ endwhile;
 								</tbody>
 							</table>
 						</div>
-						
 						<div class="signature-card">
+							<?php if($attendance_ready==0){?>
+							<div align="right" style="padding-bottom:10px;">
+								<a id="icnSignatory" class="btn btn-info" title="Manage Signatory" data-rel="tooltip" href="attendance_report_signatory.php?eatid=<?php echo functions::encode($eatid);?>"><i class="halflings-icon white edit"></i></a>&nbsp;
+							</div>
+							<?php }?>
 							<table border="0" width="100%" class="signature-table">
 								<tr>
 									<td align="center" width="25%">
@@ -794,7 +784,6 @@ endwhile;
 								</tr>
 							</table>
 						</div>
-						
 					</form>
 				</div>
 				<?php if($attendance_ready==0){ ?>
@@ -831,6 +820,21 @@ endwhile;
 				<?php } ?>
 			</div>
 		</div>
+	</div>
+</div>
+
+<!-- Custom Earthy Modal Confirmation Box -->
+<div id="confirmModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true" style="border-radius: 8px; overflow: hidden;">
+	<div class="modal-header" style="background-color: #4A3B32; color: #F7F5F0; padding: 12px 20px; border-bottom: 3px solid #8C6D58;">
+		<button type="button" class="close" data-dismiss="modal" aria-hidden="true" style="color: #F7F5F0; opacity: 0.8;">×</button>
+		<h3 id="confirmModalLabel" style="font-size: 16px; font-weight: 600; margin: 0; color: #F7F5F0;">Confirmation</h3>
+	</div>
+	<div class="modal-body" style="padding: 20px; background-color: #FAF8F5; color: #4A3B32; font-size: 14px;">
+		<p id="confirmModalMessage" style="margin: 0; font-weight: 500;">Are you sure you want to proceed?</p>
+	</div>
+	<div class="modal-footer" style="background-color: #EFECE6; border-top: 1px solid #E6E1DA; padding: 12px 20px;">
+		<button class="btn" data-dismiss="modal" aria-hidden="true" style="border-radius: 4px;">Cancel</button>
+		<button id="btnConfirmSubmit" class="btn btn-primary" style="background-color: #8C6D58; border-color: #7A5F4C; border-radius: 4px;">Confirm</button>
 	</div>
 </div>
 
@@ -871,34 +875,71 @@ endwhile;
 <script src="../js/showPage.js"></script>
 <?php if($countEmp==0){functions::sendTo('attendance_report_add_personnel.php?eatid='.functions::encode($eatid));} ?>
 <script>
-function stat(v){
+// Helper function to invoke modern Bootstrap Modal instead of native browser confirm()
+function showConfirmModal(message, title) {
+	return new Promise(function(resolve) {
+		$('#confirmModalLabel').text(title || 'Confirmation');
+		$('#confirmModalMessage').html(message);
+		
+		// Remove previous click handlers before binding a new one
+		$('#btnConfirmSubmit').off('click').on('click', function() {
+			$('#confirmModal').modal('hide');
+			resolve(true);
+		});
+
+		$('#confirmModal').off('hidden.bs.modal').on('hidden.bs.modal', function() {
+			resolve(false);
+		});
+
+		$('#confirmModal').modal('show');
+	});
+}
+
+function askRecalc() {
+	showConfirmModal('Do you want to recalculate the attendance record?', 'Recalculate Attendance').then(function(confirmed) {
+		if (confirmed) {
+			window.location = "?eatid=<?php echo functions::encode($eatid)?>&pr=t";
+		}
+	});
+	return false;
+}
+
+function stat(v) {
 	<?php if($attendance_ready==0){?>
-		if(confirm('Do you want to confirm this attendance?')){
-			document.getElementById("spinner").style.display = "block";
-			window.location="<?php echo functions::pageName()?>?eatid=<?php echo functions::encode($eatid);?>&c="+v;	
-		}
-		else{
-			document.getElementById("chkConf").checked = false;
-		}
+		showConfirmModal('Do you want to confirm this attendance?', 'Confirm Attendance').then(function(confirmed) {
+			if (confirmed) {
+				document.getElementById("spinner").style.display = "block";
+				window.location = "<?php echo functions::pageName()?>?eatid=<?php echo functions::encode($eatid);?>&c=" + v;	
+			} else {
+				document.getElementById("chkConf").checked = false;
+			}
+		});
 	<?php }else{?>
-		if(confirm('Do you want to unconfirm this attendance?')){
-			document.getElementById("spinner").style.display = "block";
-			window.location="<?php echo functions::pageName()?>?eatid=<?php echo functions::encode($eatid);?>&c="+v;	
-		}
-		else{
-			document.getElementById("chkConf").checked = true;
-		}
+		showConfirmModal('Do you want to unconfirm this attendance?', 'Unconfirm Attendance').then(function(confirmed) {
+			if (confirmed) {
+				document.getElementById("spinner").style.display = "block";
+				window.location = "<?php echo functions::pageName()?>?eatid=<?php echo functions::encode($eatid);?>&c=" + v;	
+			} else {
+				document.getElementById("chkConf").checked = true;
+			}
+		});
 	<?php } ?>
 }
-function statIndi(v){
-	window.location="<?php echo functions::pageName()?>?eatid=<?php echo functions::encode($eatid);?>&cempid="+v;
+
+function statIndi(v) {
+	window.location = "<?php echo functions::pageName()?>?eatid=<?php echo functions::encode($eatid);?>&cempid=" + v;
 }
-function statAll(v){
-	var msg = (v==1) ? 'Do you want to verify all attendance?' : 'Do you want to unverify all attendance?';
-	if(confirm(msg))
-		window.location="<?php echo functions::pageName()?>?eatid=<?php echo functions::encode($eatid);?>&statall="+v;
-	else
-		return false;
+
+function statAll(v) {
+	var msg = (v == 1) ? 'Do you want to verify all attendance?' : 'Do you want to unverify all attendance?';
+	var title = (v == 1) ? 'Verify All Attendance' : 'Unverify All Attendance';
+
+	showConfirmModal(msg, title).then(function(confirmed) {
+		if (confirmed) {
+			window.location = "<?php echo functions::pageName()?>?eatid=<?php echo functions::encode($eatid);?>&statall=" + v;
+		}
+	});
+	return false;
 }
 
 window.onscroll = function() {myFunction()};

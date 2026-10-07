@@ -81,7 +81,7 @@ $personnel = $db->getValue('emp_attendance_personnel','count(eat_id)',array('eat
 
 		/* Sidebar anchored to Far Right */
 		.sidebar-wizard-area {
-			width: 220px;
+			width: 250px;
 			flex-shrink: 0;
 			position: sticky;
 			top: 20px;

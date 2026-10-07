@@ -142,11 +142,82 @@ if( isset($_POST['btnAdd']) ){
 
 		/* Sidebar anchored to Far Right */
 		.sidebar-wizard-area {
-			width: 220px;
+			width: 250px;
 			flex-shrink: 0;
 			position: sticky;
 			top: 20px;
 			margin-left: auto;
+		}
+
+		/* --- Earthy Native Dropdown Styling --- */
+		.select-earthy {
+			width: 580px !important;
+			max-width: 580px !important;
+			height: 38px !important;
+			padding: 6px 12px !important;
+			background-color: #FAF8F5 !important;
+			border: 1px solid #D0C9C0 !important;
+			border-radius: 5px !important;
+			color: #3A2F28 !important;
+			font-size: 13.5px !important;
+			box-sizing: border-box !important;
+			transition: all 0.2s ease-in-out !important;
+		}
+		.select-earthy:focus {
+			background-color: #FFFFFF !important;
+			border-color: #8C6D58 !important;
+			outline: none !important;
+			box-shadow: 0 0 0 3px rgba(140, 109, 88, 0.18) !important;
+		}
+
+		/* --- Earthy Chosen Dropdown Overrides --- */
+		.chzn-container {
+			font-size: 13.5px !important;
+		}
+		.chzn-container-single .chzn-single {
+			height: 36px !important;
+			line-height: 36px !important;
+			background: #FAF8F5 !important;
+			border: 1px solid #D0C9C0 !important;
+			border-radius: 5px !important;
+			color: #3A2F28 !important;
+			box-shadow: none !important;
+			padding-left: 12px !important;
+		}
+		.chzn-container-single .chzn-single div b {
+			background-position: 0 8px !important;
+		}
+		.chzn-container-active .chzn-single,
+		.chzn-container-single .chzn-single-with-drop {
+			border-color: #8C6D58 !important;
+			background-color: #FFFFFF !important;
+			box-shadow: 0 0 0 3px rgba(140, 109, 88, 0.18) !important;
+		}
+		.chzn-drop {
+			background: #FFFFFF !important;
+			border: 1px solid #8C6D58 !important;
+			border-radius: 0 0 5px 5px !important;
+			box-shadow: 0 4px 12px rgba(74, 59, 50, 0.15) !important;
+		}
+		.chzn-search input[type="text"] {
+			background-color: #FAF8F5 !important;
+			border: 1px solid #D0C9C0 !important;
+			border-radius: 4px !important;
+			color: #3A2F28 !important;
+			padding: 6px !important;
+		}
+		.chzn-search input[type="text"]:focus {
+			border-color: #8C6D58 !important;
+			outline: none !important;
+		}
+		.chzn-results .highlighted {
+			background-color: #8C6D58 !important;
+			background-image: none !important;
+			color: #FFFFFF !important;
+		}
+		.chzn-results li {
+			padding: 8px 10px !important;
+			line-height: 1.3 !important;
 		}
 
 		/* Vertical Process Wizard Navigation */
@@ -404,7 +475,7 @@ if( isset($_POST['btnAdd']) ){
 		}
 		.controls-inline-row .chzn-container {
 			flex: 1;
-			min-width: 400px !important;
+			min-width: 320px !important;
 		}
 		.controls-inline-row .btn {
 			white-space: nowrap;
@@ -606,7 +677,7 @@ if( isset($_POST['btnAdd']) ){
 						<form class="form-horizontal" id="showform" name="showform" method="post">
 							<!-- Side-by-Side Controls Bar (selEmp, btnAdd, imprt, lnkUpld) -->
 							<div class="controls-inline-row">
-								<select name="selEmp" id="selEmp" data-rel="chosen" style="width: 400px;">
+								<select name="selEmp" id="selEmp" data-rel="chosen" class="select-earthy">
 									<option value="">-- Select Employee --</option>
 									<?php $qEU = $db->select('employee','*',array(),'ORDER BY lname');
 									while($rEU = $db->fetch_array($qEU)):

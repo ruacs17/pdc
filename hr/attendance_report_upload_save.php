@@ -192,33 +192,7 @@ if($uploaded_file){
 			endforeach;
 		endforeach;
 	}
-	#echo '<pre>';print_r($arrAttendanceRecord);echo '</pre>';
-	// $arrHoliday=array();
-	// if($dateRangeFrom && $dateRangeTo){
-	// 	$frmYr = (substr($dateRangeFrom,0,4)) ? substr($dateRangeFrom,0,4) : date('Y');
-	// 	$toYr = (substr($dateRangeTo,0,4)) ? substr($dateRangeTo,0,4) : date('Y');
-	// 	$qHoliday = $db->query('SELECT * FROM holiday WHERE hol_year!="all" AND concat(hol_year,"-",hol_month,"-",hol_day) BETWEEN "'.$dateRangeFrom.'" AND "'.$dateRangeTo.'"');
-	// 	#$qHoliday = $db->select('holiday','*',array(),'WHERE hol_year!="all" AND concat(hol_year,"-",hol_month,"-",hol_day) BETWEEN "'.$dateRangeFrom.'" AND "'.$dateRangeTo.'"');
-	// 	while($rHol = $db->fetch_array($qHoliday)):
-	// 		$arrHoliday[$frmYr.'-'.$rHol['hol_month'].'-'.$rHol['hol_day']]=$rHol['hol_name'];
-	// 	endwhile;
 
-	// 	$qHolidayAllYear = $db->select('holiday','*',array(),'WHERE hol_year="all"');
-	// 	if($frmYr != $toYr){
-	// 	while($rHolAY = $db->fetch_array($qHolidayAllYear)):
-	// 		$arrHoliday[$frmYr.'-'.$rHolAY['hol_month'].'-'.$rHolAY['hol_day']]=$rHolAY['hol_name'];
-	// 		$arrHoliday[$toYr.'-'.$rHolAY['hol_month'].'-'.$rHolAY['hol_day']]=$rHolAY['hol_name'];
-	// 	endwhile;
-	// 	}
-	// 	else{
-	// 	while($rHolAY = $db->fetch_array($qHolidayAllYear)):
-	// 		$arrHoliday[$frmYr.'-'.$rHolAY['hol_month'].'-'.$rHolAY['hol_day']]=$rHolAY['hol_name'];
-	// 	endwhile;
-	// 	}
-	// }
-	#echo '<pre>';print_r($arrHoliday);echo '</pre>';
-	#echo '<pre>';print_r($arrAttendanceRecord);echo '</pre>';
-	#die();
 	function dayName($date=''){
 		#$date = '2014-02-25';
 		if($date)
@@ -714,11 +688,6 @@ if($uploaded_file){
 						}//End: If allowed to have the holiday credit
 					}//End: If regular or Probationary
 				}//End: Check if there is a holiday
-
-				// $arrUpdateAtt=array('am_in'=>$am_in,'am_in_assign'=>$am_in_assign,'am_out'=>$am_out,'am_out_assign'=>$am_out_assign,'pm_in'=>$pm_in,'pm_in_assign'=>$pm_in_assign,'pm_out'=>$pm_out,'pm_out_assign'=>$pm_out_assign,'ot_in'=>$ot_in,'ot_out'=>$ot_out,'duty_min'=>$dutyHours,'ot_min'=>$otHours,'late_min'=>$late,'under_min'=>$undertime,'is_holiday'=>$is_holiday);
-				// $db->update('emp_attendance_detail',$arrUpdateAtt,array('emp_id'=>$emp_id,'eat_id'=>$eatid,'eat_date'=>$cDate));
-				#echo '<br>upd: '.$db->last_query;
-				#echo '<br>';
 
 				//***********LEAVE CHECK**************
 				//Check if there is a leave file

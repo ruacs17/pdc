@@ -810,10 +810,7 @@ $arrPayrollList = array();
 					</tbody>
 				</table><br><br>
 				<?php }//End num_rows ?>
-				<div style="padding:10px 0px 10px 0px; display:none;">
-					Record from File:
-					<?php
-					$attRecord='';
+				<?php
 					$arrAttR=array();
 					$att_record = $db->getValue('emp_attendance_detail','att_record',array('eatd_id'=>$eatdid,'eat_id'=>$eatid));
 					if($att_record){
@@ -821,41 +818,13 @@ $arrPayrollList = array();
 						$countTR = count($arrTR);
 						$temp=2;
 						foreach( $arrTR as $ar):
-							if($ar)
-								$arrAttR[]=$ar;
-							$attRecord.='<b>'.$ar.'</b>';
-							if($countTR > $temp)
-								$attRecord.=' | ';
-							$temp++;
+							if($ar){
+								#$arrAttR[]=$ar;
+								$arrAttR[]=substr($ar,0,5);
+							}
 						endforeach;
 					}
-					#echo $attRecord;
-					?>
-					<div align="left">
-						<table border="0">
-							<tr>
-								<?php foreach( $arrAttR as $ar):  ?>
-								<td style="padding:10px 15px 10px 0px;"><strong><?php echo functions::MilToTwelve($ar) ?></strong></td>
-								<?php endforeach; ?>
-							</tr>
-							<tr>
-								<?php
-									foreach( $arrAttR as $ar):
-										$tmpTime = $ar.':00';
-										if(functions::valid_time($tmpTime)){
-								?>
-								<td>
-									<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmIn=<?php echo functions::encode($tmpTime)?>">am in</a><br>
-									<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmAmOut=<?php echo functions::encode($tmpTime)?>">am out</a><br>
-									<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmPmIn=<?php echo functions::encode($tmpTime)?>">pm in</a><br>
-									<a class="badge-time-link" href="?eatid=<?php echo functions::encode($eatid)?>&eatdid=<?php echo functions::encode($eatdid)?>&empid=<?php echo functions::encode($emp_id)?>&tmPmOut=<?php echo functions::encode($tmpTime)?>">pm out</a>
-								</td>
-								<?php 	}
-								endforeach; ?>
-							</tr>
-						</table>
-					</div>
-				</div>
+				?>
 				<table width="100%" align="center" border="1" class="table table-bordered" style="font-size: 12px;">
 					<thead>
 						<tr>
@@ -873,7 +842,6 @@ $arrPayrollList = array();
 					<tbody>
 						<?php
 						$qEmpAtt = $db->select('emp_attendance_detail','*',array('eatd_id'=>$eatdid,'eat_id'=>$eatid));
-						#echo $db->last_query;
 						$dateAttendance='';
 						$countRecord=0;
 						while($dly = $db->fetch_array($qEmpAtt)):

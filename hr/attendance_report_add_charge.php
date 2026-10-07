@@ -202,7 +202,7 @@ if( isset($_POST['btnCreate']) ){
 
 		/* Sticky Sidebar Area Pinned to Far Right */
 		.sidebar-wizard-area {
-			width: 220px !important;
+			width: 250px !important;
 			flex-shrink: 0 !important;
 			position: sticky !important;
 			top: 20px !important;
@@ -383,7 +383,6 @@ if( isset($_POST['btnCreate']) ){
 			min-height: 40px !important; 
 		}
 		.wide-dropdown, 
-		#selProjAssignment_chzn,
 		.chzn-container {
 			width: 750px !important;
 			max-width: 750px !important;
@@ -460,6 +459,28 @@ if( isset($_POST['btnCreate']) ){
 			padding: 12px 20px !important;
 		}
 
+		/* --- Earthy Native Dropdown Styling --- */
+		.select-earthy {
+			width: 750px !important;
+			height: 38px !important;
+			padding: 6px 12px !important;
+			background-color: #FAF8F5 !important;
+			border: 1px solid #D0C9C0 !important;
+			border-radius: 5px !important;
+			color: #3A2F28 !important;
+			font-size: 13.5px !important;
+			box-sizing: border-box !important;
+			transition: all 0.2s ease-in-out !important;
+		}
+		.select-earthy:focus {
+			background-color: #FFFFFF !important;
+			border-color: #8C6D58 !important;
+			outline: none !important;
+			box-shadow: 0 0 0 3px rgba(140, 109, 88, 0.18) !important;
+		}
+
+		/* --- Earthy Chosen Dropdown Overrides --- */
+
 		/* Mobile & Tablet Responsive Adjustments */
 		@media (max-width: 992px) {
 			.page-layout-grid {
@@ -494,9 +515,9 @@ if( isset($_POST['btnCreate']) ){
 				margin-bottom: 5px !important;
 			}
 			.wide-dropdown, 
-			#selProjAssignment_chzn,
+			#selProjAssignment,
 			.chzn-container {
-				width: 555px; !important;
+				width: 700px; !important;
 			}
 		}
 	</style>
@@ -535,7 +556,7 @@ if( isset($_POST['btnCreate']) ){
 							<div class="form-row">
 								<div class="form-label-col">Project / Department <span class="text-error">*</span></div>
 								<div class="form-input-col">
-									<select name="selProjAssignment" id="selProjAssignment" class="wide-dropdown" data-rel="chosen" required>
+									<select name="selProjAssignment" id="selProjAssignment" class="select-earthy" data-rel="chosen" required>
 										<option value="">-- Select Project / Department --</option>
 										<?php 
 										$qProj = $db->select('project','*',array(),'ORDER BY proj_name');
@@ -566,7 +587,7 @@ if( isset($_POST['btnCreate']) ){
 							<div class="form-row">
 								<div class="form-label-col">Worker Type <span class="text-error">*</span></div>
 								<div class="form-input-col">
-									<select name="selPayType" id="selPayType" style="width: 250px;" required>
+									<select name="selPayType" id="selPayType" style="width: 180px;" required>
 										<option value="">-- Select Worker Type --</option>
 										<option value="admin" <?php if($worker_type=='admin') echo 'selected="selected"';?>>Office Personnel</option>
 										<option value="labor" <?php if($worker_type=='labor') echo 'selected="selected"';?>>Labor Group</option>

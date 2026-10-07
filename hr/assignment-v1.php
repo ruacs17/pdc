@@ -40,10 +40,6 @@ if($projID)
 		--theme-brown-light: #f5ebe6;
 		--theme-brown-accent: #b45309;
 		--theme-brown-active-row: #f3e5dc;
-
-		/* Accent Color for Add Group Button (Emerald Green) */
-		--btn-green-bg: #10b981;
-		--btn-green-hover: #059669;
 	}
 
 	body {
@@ -58,6 +54,7 @@ if($projID)
 	.page-full-wrapper {
 		width: 100% !important;
 		max-width: 100% !important;
+		/*padding: 0 15px !important;*/
 		box-sizing: border-box;
 	}
 
@@ -67,6 +64,7 @@ if($projID)
 		border-radius: 16px;
 		border: 1px solid var(--border-subtle);
 		box-shadow: 0 10px 25px -5px rgba(61, 35, 20, 0.05);
+		overflow: visible;
 		box-sizing: border-box;
 		margin-bottom: 25px;
 	}
@@ -151,77 +149,25 @@ if($projID)
 		background: var(--theme-brown-hover);
 	}
 
-	/* Project Section Wrapper */
-	.project-section-wrapper {
-		margin-bottom: 25px;
-		background: #FAF8F5;
-		border: 1px solid var(--border-subtle);
-		border-radius: 12px;
-	}
-
-	.project-section-header {
-		background: #EFECE6;
-		padding: 10px 20px;
-		border-bottom: 1px solid var(--border-subtle);
-		font-size: 14px;
-		font-weight: 700;
-		color: #4A2C1D;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-		letter-spacing: 0.5px;
-	}
-
-	.project-header-title {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		text-transform: uppercase;
-	}
-
-	/* Green Add Group Button in Section Header */
-	.btn-add-group-header {
-		background: var(--btn-green-bg);
-		color: #ffffff !important;
-		font-size: 12px;
-		font-weight: 600;
-		padding: 5px 12px;
-		border-radius: 6px;
-		text-decoration: none !important;
-		display: inline-flex;
-		align-items: center;
-		gap: 6px;
-		transition: all 0.2s ease;
-		box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);
-		text-transform: none;
-		letter-spacing: normal;
-	}
-
-	.btn-add-group-header:hover {
-		background: var(--btn-green-hover);
-		color: #ffffff !important;
-		transform: translateY(-1px);
-		box-shadow: 0 4px 10px rgba(16, 185, 129, 0.35);
-	}
-
-	.project-section-body {
-		padding: 16px;
+	/* Full-Width Stacked Layout for Group Cards */
+	.groups-grid {
 		display: flex;
 		flex-direction: column;
-		gap: 12px;
+		gap: 15px;
+		width: 100%;
+		box-sizing: border-box;
 	}
 
-	/* CSS Grid for Consistent Column Alignment Across All Cards */
 	.group-card {
 		background: #ffffff;
 		border: 1px solid var(--border-subtle);
-		border-radius: 10px;
-		padding: 14px 20px;
-		box-shadow: 0 2px 6px rgba(61, 35, 20, 0.03);
+		border-radius: 12px;
+		padding: 18px 22px;
+		box-shadow: 0 4px 12px rgba(61, 35, 20, 0.03);
 		transition: all 0.2s ease;
-		display: grid;
-		grid-template-columns: minmax(200px, 1fr) 180px 140px 90px;
+		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		gap: 20px;
 		width: 100%;
 		box-sizing: border-box;
@@ -229,19 +175,21 @@ if($projID)
 
 	.group-card:hover {
 		transform: translateY(-1px);
-		box-shadow: 0 4px 12px rgba(61, 35, 20, 0.06);
+		box-shadow: 0 6px 16px rgba(61, 35, 20, 0.06);
 		border-color: #dcd0c4;
 	}
 
+	/* Expanded main info column */
 	.group-info-main {
 		display: flex;
 		flex-direction: column;
-		gap: 4px;
+		gap: 6px;
+		flex: 3;
 		min-width: 0;
 	}
 
 	.group-title {
-		font-size: 15px;
+		font-size: 16px;
 		font-weight: 700;
 		color: var(--theme-brown-primary);
 		margin: 0;
@@ -253,12 +201,27 @@ if($projID)
 		text-overflow: ellipsis;
 	}
 
+	.project-label {
+		font-size: 12px;
+		color: var(--text-muted);
+		font-weight: 600;
+		text-transform: uppercase;
+		display: flex;
+		align-items: center;
+		gap: 6px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+
 	.group-type-col {
+		flex: 0 0 160px;
 		display: flex;
 		align-items: center;
 	}
 
 	.group-meta-col {
+		flex: 0 0 120px;
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -274,7 +237,6 @@ if($projID)
 		padding: 2px 8px;
 		border-radius: 6px;
 		font-weight: 700;
-		border: 1px solid #E6D8CE;
 	}
 
 	.badge-type-admin {
@@ -286,7 +248,6 @@ if($projID)
 		font-size: 11px;
 		text-transform: uppercase;
 		display: inline-block;
-		border: 1px solid #E6D8CE;
 	}
 
 	.badge-type-labor {
@@ -298,41 +259,13 @@ if($projID)
 		font-size: 11px;
 		text-transform: uppercase;
 		display: inline-block;
-		border: 1px solid #E2E8F0;
 	}
 
 	.group-actions {
 		display: flex;
 		gap: 6px;
 		justify-content: flex-end;
-	}
-
-	.btn-card-action {
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		width: 32px;
-		height: 32px;
-		border-radius: 6px;
-		transition: all 0.2s ease;
-		text-decoration: none !important;
-		cursor: pointer;
-	}
-
-	.btn-card-action.btn-info-custom {
-		background: #3B82F6;
-		color: #ffffff !important;
-	}
-	.btn-card-action.btn-info-custom:hover {
-		background: #2563EB;
-	}
-
-	.btn-card-action.btn-danger-custom {
-		background: #EF4444;
-		color: #ffffff !important;
-	}
-	.btn-card-action.btn-danger-custom:hover {
-		background: #DC2626;
+		flex: 0 0 auto;
 	}
 </style>
 
@@ -340,7 +273,7 @@ if($projID)
 <div class="page-full-wrapper">
 	<div class="card-panel">
 		<div class="card-header-custom">
-			<h2><i class="halflings-icon white list-alt"></i> Group Assignment for Attendance Personnel Encoding</h2>
+			<h2><i class="halflings-icon white list-alt"></i> Group Assignment for Attendance Encoding</h2>
 			<a id="adc" href="#" class="btn-modern-add thickbox" style="cursor: pointer;text-decoration: none;" onclick="showThis(this.id,'assignment_manage.php?','Employee Assignment')">
 				<i class="halflings-icon white plus" style="margin-top:0;"></i> Add Employee Assignment
 			</a>
@@ -366,69 +299,45 @@ if($projID)
 				</div>
 			</form>
 
-			<div class="groups-container" id="tblist">
+			<div class="groups-grid" id="tblist">
 				<?php
 				if($projID)
-					$qDisp = $db->select('emp_assignment p','DISTINCT p.proj_id',array('proj_id'=>$projID),'ORDER BY proj_id');
+					$qDisp = $db->select('emp_assignment p','*',array('proj_id'=>$projID),'ORDER BY proj_id');
 				else
-					$qDisp = $db->query('SELECT DISTINCT p.proj_id FROM emp_assignment ea, project p WHERE ea.proj_id=p.proj_id ORDER BY proj_name');				
+					$qDisp = $db->query('SELECT * FROM emp_assignment ea, project p WHERE ea.proj_id=p.proj_id ORDER BY proj_name');
 				
 				while($rDisp = $db->fetch_array($qDisp)):
-					$proj_id = $rDisp['proj_id'];
-					$proj_name = $db->getValue('project','proj_name',array('proj_id'=>$proj_id));
+					$rID = $rDisp['eas_id'];
+					$member = $db->getValue('emp_assign_detail','count(*)',array('eas_id'=>$rID));
 				?>
-				<!-- Project Section Block -->
-				<div class="project-section-wrapper">
-					<div class="project-section-header">
-						<div class="project-header-title">
-							<i class="halflings-icon folder-open" style="margin-top:0;"></i> <?php echo strtoupper($proj_name); ?>
+					<div class="group-card" id="rw<?php echo $rID;?>">
+						<div class="group-info-main">
+							<div class="project-label">
+								<i class="halflings-icon briefcase" style="opacity: 0.7;"></i> 
+								<?php echo strtoupper($db->getValue('project','proj_name',array('proj_id'=>$rDisp['proj_id'])));?>
+							</div>
+							<h3 class="group-title">
+								<i class="halflings-icon user" style="color: var(--theme-brown-primary);"></i> 
+								<?php echo $rDisp['eas_name']?>
+							</h3>
 						</div>
-						<a id="adc<?php echo $proj_id;?>" href="#" class="btn-add-group-header thickbox" style="cursor: pointer;" data-rel="tooltip" title="Add New Group" onclick="showThis(this.id,'assignment_manage.php?projid=<?php echo functions::encode($proj_id)?>','Add New Group')">
-							<i class="halflings-icon white plus" style="margin-top:0;"></i> Add Group
-						</a>
-					</div>
-					<div class="project-section-body">
-						<?php
-						$qGrp = $db->select('emp_assignment p','*',array('proj_id'=>$proj_id),'ORDER BY eas_name');
-						while($rGrp = $db->fetch_array($qGrp)):
-							$eas_id = $rGrp['eas_id'];
-							$memberCount = $db->getValue('emp_assign_detail','count(*)',array('eas_id'=>$eas_id));
-						?>
-						<!-- Group Card Row -->
-						<div class="group-card" id="rw<?php echo $eas_id; ?>">
-							<div class="group-info-main">
-								<div class="group-title">
-									<i class="halflings-icon user" style="margin-top:-2px;"></i> <?php echo htmlspecialchars($rGrp['eas_name']); ?>
-								</div>
-							</div>
-
-							<div class="group-type-col">
-								<?php if($rGrp['worker_type']=='admin'){ ?>
-									<span class="badge-type-admin">Office Personnel</span>
-								<?php } else { ?>
-									<span class="badge-type-labor">Labor Group</span>
-								<?php } ?>
-							</div>
-
-							<div class="group-meta-col">
-								<span>Members:</span>
-								<span class="member-count-badge"><?php echo $memberCount;?></span>
-							</div>
-
-							<div class="group-actions">
-								<a id="vw<?php echo $eas_id?>" class="btn-card-action btn-info-custom thickbox" title="Group Detail" data-rel="tooltip" onclick="showThis(this.id,'assignment_group_select.php?easid=<?php echo functions::encode($eas_id);?>','Group Detail')">
-									<i class="halflings-icon white zoom-in" style="margin-top:0;"></i>
-								</a>
-								<?php if( $memberCount == 0){?>
-								<a id="del<?php echo $eas_id;?>" class="btn-card-action btn-danger-custom" onClick="return delt()" title="Remove this Group" data-rel="tooltip" href="?delID=<?php echo functions::encode($eas_id);?>">
-									<i class="halflings-icon white trash" style="margin-top:0;"></i>
-								</a>
-								<?php }?>
-							</div>
+						<div class="group-type-col">
+							<?php if($rDisp['worker_type']=='admin'){ ?>
+								<span class="badge-type-admin">Office Personnel</span>
+							<?php } else { ?>
+								<span class="badge-type-labor">Labor Group</span>
+							<?php } ?>
 						</div>
-						<?php endwhile; ?>
+						<div class="group-meta-col">
+							Members: <span class="member-count-badge"><?php echo $member?></span>
+						</div>
+						<div class="group-actions">
+							<a id="vw<?php echo $rID?>" class="btn btn-mini btn-info thickbox" title="Group Detail" data-rel="tooltip" onclick="showThis(this.id,'assignment_group_select.php?easid=<?php echo functions::encode($rID);?>','Group Detail')"><i class="halflings-icon white zoom-in"></i></a>
+							<?php if( $db->getValue('emp_attendance','count(*)',array('eas_id'=>$rID)) == 0){?>
+							<a id="del<?php echo $rID;?>" class="btn btn-mini btn-danger" onClick="return delt()" title="Remove this Group" data-rel="tooltip" href="?delID=<?php echo functions::encode($rID);?>"><i class="halflings-icon white trash"></i></a>
+							<?php }?>
+						</div>
 					</div>
-				</div>
 				<?php endwhile;?>
 			</div>
 		</div>

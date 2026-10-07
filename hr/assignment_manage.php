@@ -15,6 +15,8 @@ if($eas_id)
 $proj_id = $db->getValue('emp_assignment','proj_id',array('eas_id'=>$eas_id));
 $eas_name = $db->getValue('emp_assignment','eas_name',array('eas_id'=>$eas_id));
 $worker_type = $db->getValue('emp_assignment','worker_type',array('eas_id'=>$eas_id));
+if(empty($proj_id))
+	$proj_id = (isset($_REQUEST['projid']) && !empty($_REQUEST['projid']) ) ? functions::decode($_REQUEST['projid']) : 0;
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -43,6 +45,188 @@ $worker_type = $db->getValue('emp_assignment','worker_type',array('eas_id'=>$eas
 	<!-- start: Favicon -->
 	<link rel="shortcut icon" href="../img/favicon.png">
 	<!-- end: Favicon -->
+<style type="text/css">
+	:root {
+		--bg-canvas: #fcfaf8;
+		--panel-bg: #ffffff;
+		--border-subtle: #e7e0d8;
+		--text-primary: #2c1d11;
+		--text-muted: #78695c;
+		
+		/* Brown Theme Color Palette */
+		--theme-brown-header: linear-gradient(135deg, #4a2c1d 0%, #2b180d 100%);
+		--theme-brown-primary: #7c401e;
+		--theme-brown-hover: #5c2e14;
+		--theme-brown-light: #f5ebe6;
+		--theme-brown-accent: #b45309;
+	}
+
+	body {
+		background-color: var(--bg-canvas);
+		font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+		color: var(--text-primary);
+		padding: 20px;
+		margin: 0;
+	}
+
+	.form-card {
+		background: var(--panel-bg);
+		border-radius: 16px;
+		border: 1px solid var(--border-subtle);
+		box-shadow: 0 10px 25px -5px rgba(61, 35, 20, 0.05);
+		overflow: hidden;
+		max-width: 850px;
+		margin: 0 auto;
+	}
+
+	.form-card-header {
+		background: var(--theme-brown-header);
+		padding: 20px 30px;
+		color: #ffffff;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	.form-card-header h2 {
+		margin: 0;
+		font-size: 18px;
+		font-weight: 700;
+		color: #ffffff;
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		line-height: 1;
+	}
+
+	/* Custom Tab Navigation */
+	.nav-tabs-custom {
+		display: flex;
+		background: #f4ede6;
+		border-bottom: 1px solid var(--border-subtle);
+		padding: 0 20px;
+		margin: 0;
+		list-style: none;
+	}
+
+	.nav-tabs-custom li a {
+		display: block;
+		padding: 12px 20px;
+		font-size: 13px;
+		font-weight: 600;
+		color: var(--text-muted);
+		text-decoration: none;
+		border-bottom: 3px solid transparent;
+		transition: all 0.2s ease;
+	}
+
+	.nav-tabs-custom li.active a,
+	.nav-tabs-custom li a:hover {
+		color: var(--theme-brown-primary);
+		border-bottom-color: var(--theme-brown-primary);
+		background: #ffffff;
+	}
+
+	.form-card-body {
+		padding: 35px 40px;
+	}
+
+	.form-group-custom {
+		margin-bottom: 22px;
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+	}
+
+	.form-group-custom label {
+		font-size: 13px;
+		font-weight: 700;
+		color: var(--text-primary);
+		text-transform: uppercase;
+		letter-spacing: 0.5px;
+		margin: 0;
+	}
+
+	.input-control {
+		box-sizing: border-box !important;
+		padding: 8px 14px !important;
+		font-size: 14px !important;
+		line-height: 24px !important;
+		border-radius: 8px !important;
+		border: 1px solid var(--border-subtle) !important;
+		background-color: #faf8f5 !important;
+		color: var(--text-primary) !important;
+		transition: all 0.2s ease !important;
+		outline: none !important;
+		height: 42px !important;
+	}
+
+	/* Fixed Pixel Widths */
+	input.input-control[type="text"] {
+		width: 500px !important;
+	}
+
+	select.input-control {
+		width: 700px !important;
+	}
+
+	.input-control:focus {
+		border-color: var(--theme-brown-primary) !important;
+		background-color: #ffffff !important;
+		box-shadow: 0 0 0 3px rgba(124, 64, 30, 0.12) !important;
+	}
+
+	/* Fixed Pixel Width for Chosen Plugin Dropdown */
+	.chzn-container {
+		width: 700px !important;
+	}
+
+	.chzn-container-single .chzn-single {
+		height: 42px !important;
+		line-height: 40px !important;
+		border-radius: 8px !important;
+		border: 1px solid var(--border-subtle) !important;
+		background: #faf8f5 !important;
+		box-shadow: none !important;
+		color: var(--text-primary) !important;
+		padding-left: 14px !important;
+	}
+
+	.chzn-container-active .chzn-single {
+		border-color: var(--theme-brown-primary) !important;
+		box-shadow: 0 0 0 3px rgba(124, 64, 30, 0.12) !important;
+	}
+
+	.btn-save-custom {
+		background: var(--theme-brown-primary);
+		color: #ffffff !important;
+		font-weight: 700;
+		font-size: 14px;
+		padding: 10px 28px;
+		border-radius: 8px;
+		border: none;
+		cursor: pointer;
+		transition: all 0.2s ease;
+		box-shadow: 0 4px 12px rgba(124, 64, 30, 0.2);
+		display: inline-flex;
+		align-items: center;
+		gap: 8px;
+	}
+
+	.btn-save-custom:hover {
+		background: var(--theme-brown-hover);
+		transform: translateY(-1px);
+		box-shadow: 0 6px 16px rgba(124, 64, 30, 0.3);
+	}
+
+	.form-actions-custom {
+		margin-top: 30px;
+		padding-top: 20px;
+		border-top: 1px solid var(--border-subtle);
+		display: flex;
+		justify-content: flex-end;
+	}
+</style>
 <?php
 if( isset($_POST['btnSave']) ){
 	$proj_id = ( isset($_POST['selProj']) && !empty($_POST['selProj']) ) ? functions::decode($_POST['selProj']) : 0;
@@ -80,63 +264,54 @@ if( isset($_POST['btnSave']) ){
 </head>
 <body>
 <!-- body content: start here-->
-<div class="row-fluid">
-	<div class="box span12">
-		<div class="box-header" data-original-title>
-			<h2><i class="halflings-icon white edit"></i><span class="break"></span></h2>
-		</div>
-		<div class="box-content">
-			<ul class="nav tab-menu nav-tabs">
-				<?php if($eas_id){?><li><a href="assignment_group_select.php?easid=<?php echo functions::encode($eas_id)?>">Select Name</a></li><?php }?>
-				<li class="active"><a href="assignment_manage.php?easid=<?php echo functions::encode($eas_id)?>" style="opacity:.9">Manage Assignment</a></li>
-			</ul>
-		</div>
-		<div class="box-content">
-			<form class="form-horizontal" method="post" onSubmit="return ask()">
-				<div align="center" style="padding-bottom: 10px;"><h2>MANAGE GROUP ASSIGNMENT</h2></div>
-				<div align="center">
-					<table border="0">
-						<tr>
-							<td height="55" width="20%">Project / Department</td>
-							<td>
-								<div align="left">
-									<select name="selProj" id="selProj" data-rel="chosen" style="width:750px;font-size:12px;" required>
-										<option value="">--Select Project / Department--</option>
-										<?php 
-										$qProj = $db->select('project','*',array(),'ORDER BY proj_name');
-										while($rProj = $db->fetch_array($qProj)):?>
-										<option value="<?php echo functions::encode($rProj['proj_id'])?>" <?php if($proj_id==$rProj['proj_id'])echo 'selected="selected"';?>><?php echo strtoupper($rProj['proj_name']);?><?php echo ($rProj['proj_desc']) ? ' ('.$rProj['proj_desc'].')' : '';?></option>
-										<?php endwhile;?>
-									</select>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td height="55">Group Name</td>
-							<td><div align="left"><input type="text" name="txName" id="txName" value="<?php echo $eas_name?>" style="width:500px;" required></div></td>
-						</tr>
-						<tr>
-							<td height="55">Worker Type </td>
-							<td>
-								<div align="left">
-									<select name="selPayType" id="selPayType" required>
-										<option value="">--Select Worker Type--</option>
-										<option value="admin" <?php if($worker_type=='admin')echo 'selected="selected"';?>>Office Personnel</option>
-										<option value="labor" <?php if($worker_type=='labor')echo 'selected="selected"';?>>Labor Group</option>
-									</select>
-								</div>
-							</td>
-						</tr>
-						<tr>
-							<td>&nbsp;</td>
-							<td><div align="left" style="padding-top: 20px;"><input type="submit" name="btnSave" id="btnSave" value=" SAVE " class="btn btn-primary btn-small"></div></td>
-						</tr>
-					</table>
-				</div>
-			</form>
-		</div>
-	</div><!--/span-->
-</div><!--/row-->
+<div class="form-card">
+	<div class="form-card-header">
+		<h2><i class="halflings-icon white edit"></i> Manage Group Assignment</h2>
+	</div>
+
+	<ul class="nav-tabs-custom">
+		<li class="active"><a href="assignment_manage.php?easid=<?php echo functions::encode($eas_id)?>">Manage Assignment</a></li>
+		<?php if($eas_id){?>
+			<li><a href="assignment_group_select.php?easid=<?php echo functions::encode($eas_id)?>">Select Name</a></li>
+		<?php }?>
+	</ul>
+
+	<div class="form-card-body">
+		<form method="post" onSubmit="return ask()">
+			<div class="form-group-custom">
+				<label for="selProj">Project / Department</label>
+				<select name="selProj" id="selProj" data-rel="chosen" class="input-control" required>
+					<option value="">--Select Project / Department--</option>
+					<?php 
+					$qProj = $db->select('project','*',array(),'ORDER BY proj_name');
+					while($rProj = $db->fetch_array($qProj)):?>
+					<option value="<?php echo functions::encode($rProj['proj_id'])?>" <?php if($proj_id==$rProj['proj_id'])echo 'selected="selected"';?>><?php echo strtoupper($rProj['proj_name']);?><?php echo ($rProj['proj_desc']) ? ' ('.$rProj['proj_desc'].')' : '';?></option>
+					<?php endwhile;?>
+				</select>
+			</div>
+
+			<div class="form-group-custom">
+				<label for="txName">Group Name</label>
+				<input type="text" name="txName" id="txName" value="<?php echo htmlspecialchars($eas_name)?>" class="input-control" placeholder="Enter Group Name" required>
+			</div>
+
+			<div class="form-group-custom">
+				<label for="selPayType">Worker Type</label>
+				<select name="selPayType" id="selPayType" class="input-control" required>
+					<option value="">--Select Worker Type--</option>
+					<option value="admin" <?php if($worker_type=='admin')echo 'selected="selected"';?>>Office Personnel</option>
+					<option value="labor" <?php if($worker_type=='labor')echo 'selected="selected"';?>>Labor Group</option>
+				</select>
+			</div>
+
+			<div class="form-actions-custom">
+				<button type="submit" name="btnSave" id="btnSave" class="btn-save-custom">
+					<i class="halflings-icon white ok"></i> Save Assignment
+				</button>
+			</div>
+		</form>
+	</div>
+</div>
 <!-- body content: end here-->
 <!-- start: JavaScript-->
 <script src="../js/jquery-1.9.1.min.js"></script>
