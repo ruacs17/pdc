@@ -673,12 +673,16 @@ endwhile;
 								<thead>
 									<tr>
 										<th width="28%">NAME / POSITION</th>
-										<th width="10%"><div align="right">Rendered Days</div></th>
-										<th width="10%"><div align="right">Absent Days</div></th>
-										<th width="10%"><div align="right">Required Days</div></th>
-										<th width="10%"><div align="center">Overtime<br>Hours</div></th>
-										<th width="11%"><div align="center">Total Duty<br>(HOURS)</div></th>
-										<th width="11%"><div align="center">Total Tardy/Under<br>(HOURS)</div></th>
+										<?php if($worker_type=='labor'){ ?>
+										<th width="10%"><div align="center">Required<br><i>(Days)</i></div></th>
+										<th width="10%"><div align="center">Rendered<br><i>(Days)</i></div></th>
+										<?php } ?>
+										<th width="10%"><div align="center">Absent<br><i>(Days)</i></div></th>
+										<th width="10%"><div align="center">Overtime<br><i>(hh:mm:ss)</i></div></th>
+										<?php if($worker_type=='labor'){ ?>
+										<th width="11%"><div align="center">Duty<br><i>(hh:mm:ss)</i></div></th>
+										<?php } ?>
+										<th width="11%"><div align="center">Tardy/Under<br><i>(hh:mm:ss)</i></div></th>
 										<th width="11%"><div align="center"><?php if($attendance_ready==0){?><a href="#" onClick="statAll('1')">Verify All</a>&nbsp;|&nbsp;<a href="#" onClick="statAll('2')">Unverify All</a><?php }else{echo 'Verified';} ?></div></th>
 									</tr>
 								</thead>
@@ -721,11 +725,15 @@ endwhile;
 												</div>
 											</div>
 										</td>
-										<td><div align="right"><?php echo ($pd['totalDayPresent'] > 1) ? $pd['totalDayPresent'].' days' : $pd['totalDayPresent'].' day';?></div></td>
-										<td><div align="right"><?php echo ($pd['totalDayAbsent'] > 1) ? $pd['totalDayAbsent'].' days' : $pd['totalDayAbsent'].' day';?></div></td>
-										<td><div align="right"><?php echo ($pd['totalDayRequired'] > 1) ? $pd['totalDayRequired'].' days' : $pd['totalDayRequired'].' day';?></div></td>
+										<?php if($worker_type=='labor'){ ?>
+										<td><div align="center"><?php echo $pd['totalDayRequired'];?></div></td>
+										<td><div align="center"><?php echo $pd['totalDayPresent'];?></div></td>
+										<?php } ?>
+										<td><div align="center"><?php echo ($pd['totalDayAbsent'] > 1) ? $pd['totalDayAbsent'] : '';?></div></td>
 										<td><div align="center"><?php echo ($pd['overtime_hours']) ? functions::min_to_hour($pd['overtime_hours']) : '';?></div></td>
+										<?php if($worker_type=='labor'){ ?>
 										<td><div align="center"><?php echo ($totalDutyHours) ? functions::min_to_hour($totalDutyHours) : '';?></div></td>
+										<?php } ?>
 										<td><div align="center"><?php echo ($pd['totalTardy']) ? functions::min_to_hour($pd['totalTardy']) : '';?></div></td>
 										<td><div align="center"><input type="checkbox" class="chkDel" name="chkDel[<?php echo $memberID; ?>]" id="chkDel[<?php echo $memberID; ?>]" value="<?php echo functions::encode($memberID); ?>" <?php if($attendance_ready){echo 'disabled';}?> onClick="statIndi(this.value)" <?php echo ($statReady) ? 'checked':''; ?>></div></td>
 									</tr>
@@ -734,9 +742,11 @@ endwhile;
 										<td height="30px" style="vertical-align: top;"><?php echo $countEmp.'. '.$db->getValue('employee','concat(lname,", ",fname)',array('emp_id'=>$memberID));?></td>
 										<td><div align="right">-------</div></td>
 										<td><div align="right">-------</div></td>
+										<?php if($worker_type=='labor'){ ?>
 										<td><div align="right">-------</div></td>
 										<td><div align="right">-------</div></td>
 										<td><div align="right">-------</div></td>
+										<?php } ?>
 										<td><div align="right">-------</div></td>
 										<td><div align="right">-------</div></td>
 									</tr>
