@@ -1,5 +1,6 @@
 <?php require_once('templ_up.php');?>
 <?php
+$allowSupplierManage = isset($_SESSION['allowSupplierManage']) ? $_SESSION['allowSupplierManage'] : 0;
 $p_id=(isset($_REQUEST['pid']) && !empty($_REQUEST['pid']) ) ? functions::decode($_REQUEST['pid']) : 0;
 $startrow=( isset($_REQUEST['startrow']) && !empty($_REQUEST['startrow']) ) ? $_REQUEST['startrow'] : 0;
 $rowdisplay=20;
@@ -49,7 +50,9 @@ if(count($arrDisp))
 	functions::sortMultiArray($arrDisp,$orderBy,$sort_AscDesc);
 ?>
 <!-- body content: start here-->
+<?php if($allowSupplierManage){ ?>
 <div align="right"><a id="adc" href="#" class="btn btn-info btn-small btn-setting thickbox" onclick="showThis(this.id,'supplier_add.php?','Supplier Detail')">Add New Supplier / Payee</a></div><br>
+<?php } ?>
 <div class="row-fluid">
 	<div class="box span12">
 		<div class="box-header" data-original-title>

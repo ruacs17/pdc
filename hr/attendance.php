@@ -328,7 +328,7 @@ if($projID)
 		<p class="custom-modal-text">Are you sure you want to remove this attendance record? This action cannot be undone.</p>
 		<div class="custom-modal-actions">
 			<button type="button" class="btn-modal-cancel" id="btnCancelModal">Cancel</button>
-			<a href="#" class="btn-modal-confirm" id="btnConfirmDelete">Delete</a>
+			<button type="button" class="btn-modal-confirm" id="btnConfirmDelete">Delete</button>
 		</div>
 	</div>
 </div>
@@ -341,11 +341,18 @@ $(document).ready(function(){
 	var deleteTargetUrl = "";
 
 	// Open modal on delete button click
-	$('.btn-delete-trigger').on('click', function(e){
+	$(document).on('click', '.btn-delete-trigger', function(e){
 		e.preventDefault();
 		deleteTargetUrl = $(this).attr('href');
-		$('#btnConfirmDelete').attr('href', deleteTargetUrl);
 		$('#deleteConfirmModal').addClass('active');
+	});
+
+	// Trigger navigation on Delete Confirm button click
+	$('#btnConfirmDelete').on('click', function(e){
+		e.preventDefault();
+		if (deleteTargetUrl !== "") {
+			window.location.href = deleteTargetUrl;
+		}
 	});
 
 	// Close modal on Cancel

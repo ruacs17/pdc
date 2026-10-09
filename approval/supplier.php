@@ -1,5 +1,6 @@
 <?php require_once('templ_up.php');?>
 <?php
+$allowSupplierManage = isset($_SESSION['allowSupplierManage']) ? $_SESSION['allowSupplierManage'] : 0;
 $p_id=(isset($_REQUEST['pid']) && !empty($_REQUEST['pid']) ) ? functions::decode($_REQUEST['pid']) : 0;
 $startrow=( isset($_REQUEST['startrow']) && !empty($_REQUEST['startrow']) ) ? $_REQUEST['startrow'] : 0;
 $rowdisplay=20;
@@ -53,11 +54,13 @@ if(count($arrDisp))
 	<div class="box span12">
 		<div class="box-header" data-original-title style="display: flex; justify-content: space-between; align-items: center; padding: 10px 15px;">
 			<h2><i class="halflings-icon white list-alt"></i><span class="break"></span>Supplier / Payee Directory</h2>
+			<?php if($allowSupplierManage){ ?>
 			<div>
 				<a id="adc" href="#" class="btn btn-success btn-small btn-setting thickbox" onclick="showThis(this.id,'supplier_add.php?','Supplier Detail')">
 					<i class="halflings-icon white plus"></i> Add New Supplier
 				</a>
 			</div>
+			<?php } ?>
 		</div>
 		<div class="box-content">
 			<!-- Search / Filter Form Toolbar -->
@@ -154,12 +157,13 @@ if(count($arrDisp))
 								<p style="margin: 0;"><strong>Contact Numbers:</strong><br><?php echo $itm['contactPhoneNo']; ?></p>
 							<?php endif; ?>
 						</div>
-
+						<?php if($allowSupplierManage){ ?>
 						<!-- Right Section: Actions with Spacing -->
 						<div style="flex: 0 0 90px; text-align: right; display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
 							<a id="vw<?php echo $itm['supplierID']?>" class="btn btn-mini btn-success thickbox" title="View Supplier Details" data-rel="tooltip" onclick="showThis(this.id,'supplier_view.php?sid=<?php echo functions::encode($itm['supplierID']);?>','Supplier Detail','1')"><i class="halflings-icon white zoom-in"></i></a>
 							<a id="edit<?php echo $itm['supplierID']?>" class="btn btn-mini btn-info thickbox" title="Modify Supplier" data-rel="tooltip" onclick="showThis(this.id,'supplier_edit.php?sid=<?php echo functions::encode($itm['supplierID']);?>','Supplier Detail')"><i class="halflings-icon white pencil"></i></a>
 						</div>
+						<?php } ?>
 
 					</div>
 				<?php endforeach;?>
