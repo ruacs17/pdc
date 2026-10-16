@@ -168,8 +168,8 @@ if( $db->getValue('emp_payroll_detail','count(*)',array('eat_id'=>$eatid)) && $c
 	endwhile;
 }
 else{
-	$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','eas_id.emp_id,eas_id.pay_ready',array('eat_id'=>$eatid,'emp.emp_id'=>293),'AND eas_id.emp_id=emp.emp_id GROUP BY eas_id.emp_id,eas_id.pay_ready ORDER BY lname,fname');
-	#$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','eas_id.emp_id,eas_id.pay_ready',array('eat_id'=>$eatid),'AND eas_id.emp_id=emp.emp_id GROUP BY eas_id.emp_id,eas_id.pay_ready ORDER BY lname,fname');
+	#$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','eas_id.emp_id,eas_id.pay_ready',array('eat_id'=>$eatid,'emp.emp_id'=>293),'AND eas_id.emp_id=emp.emp_id GROUP BY eas_id.emp_id,eas_id.pay_ready ORDER BY lname,fname');
+	$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','eas_id.emp_id,eas_id.pay_ready',array('eat_id'=>$eatid),'AND eas_id.emp_id=emp.emp_id GROUP BY eas_id.emp_id,eas_id.pay_ready ORDER BY lname,fname');
 	while( $rEmps = $db->fetch_array($qEmps)):
 		$philhealth_contribution=0;$pagibig_contribution=0;$sss_contribution=0;$other_deduction=0;$empRegularAmount=0;$empOTAmount=0;$empUndertimeAmount=0;$empLateAmount=0;$empAbsentAmount=0;$empTotalDeduction=0;$empGrossPay=0;$empNetPay=0;$empAddons=0;
 
@@ -417,7 +417,7 @@ if( isset($_REQUEST['c']) ){
 		.table-wrapper tr > :first-child {
 			min-width: 250px;
 			position: -webkit-sticky;
-			position: sticky; 
+			/*position: sticky; */
 			background: hsl(180, 50%, 70%);
 			left: 0; 
 			box-shadow: 0 1px 0 1px black;
@@ -515,10 +515,10 @@ if( isset($_REQUEST['c']) ){
 									$deduction_page = ($salary_type=='flexible') ? 'payroll_deduction_manage_total.php' : 'payroll_deduction_manage_labor.php';
 							?>
 							<tr id="rw<?php echo $memberID?>" <?php echo $pd['bgColor']?>>
-								<td height="30px" class="padleft"><a id="vw<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Payroll Detail" data-rel="tooltip" onclick="showThis(this.id,'payroll_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>','Attendance Detail','1')"><?php echo $countEmp.'. '.$pd['name'];?></a></td>
+								<td height="30px" class="padleft"><a id="vw<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Payroll Detail" data-rel="tooltip" onclick="showThis(this.id,'payroll_view_selected.php?eatid=<?php echo functions::encode($eatid);?>&empid=<?php echo functions::encode($pd['emp_id']);?>','Attendance Detail','1')"><?php echo $countEmp.'. '.$pd['name'];?></a> <?php if($salary_type!='flexible'){echo '<i>(Labor)</i>';} ?></td>
 								<?php if($salary_type){ ?>
-								<td class="padright"><div align="right"><?php echo functions::formatMoney($pd['salary']);?></div></td>
-								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['regular_amount'],'4');?>"><?php echo functions::formatMoney($pd['regular_amount']);?></div></td>
+								<td class="padright"><div align="right"><?php echo ($salary_type=='flexible') ? functions::formatMoney($pd['salary']) : 'N/A';?></div></td>
+								<td class="padright"><div align="right" title="<?php echo ($salary_type=='flexible') ? functions::formatMoney($pd['regular_amount'],'~') : functions::formatMoney($pd['regular_amount']+$pd['absent_amount'],'~');?>"><?php echo ($salary_type=='flexible') ? functions::formatMoney($pd['regular_amount'],2) : functions::formatMoney($pd['regular_amount']+$pd['absent_amount'],2);?></div></td>
 								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['overtime_amount'],'4');?>"><?php echo functions::formatMoney($pd['overtime_amount']);?></div></td>
 								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['addons'],'4');?>"><a id="addons<?php echo $countEmp?>" class="thickbox" style="cursor: pointer;" title="Manage Add-ons" data-rel="tooltip" onclick="showThis(this.id,'payroll_addon_manage.php?eatid=<?php echo functions::encode($eatid);?>&eid=<?php echo functions::encode($pd['emp_id']);?>&pr=pr','Add-ons Detail',<?php echo $refresh ?>)"><?php echo functions::formatMoney($pd['addons']);?></a></div></td>
 								<td class="padright"><div align="right" title="<?php echo functions::formatMoney($pd['gross_pay'],'4');?>"><?php echo functions::formatMoney($pd['gross_pay']);?></div></td>

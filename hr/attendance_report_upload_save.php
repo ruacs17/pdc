@@ -597,7 +597,7 @@ if($uploaded_file){
 								//if yesterday is holiday, proceed to backwarding
 							}
 							else if( $db->getValue('emp_timein','count(*)',array('emp_id'=>$emp_id,'day_no'=>$dayNumber)) ){// if has a regular duty
-								//Check if there's a leave life yesterday
+								//Check if there's a leave with pay filed yesterday
 								if( isset($arrEmpLeaves[$fDate]) ){
 									$lf_id = $db->getValue('leave_file_detail','lf_id',array('lfd_id'=>$arrEmpLeaves[$fDate]));
 									$with_pay = $db->getValue('leave_config lc, leave_file lf','count(*)',array('lf_id'=>$lf_id,'with_pay'=>1),'AND lf.lc_id=lc.lc_id');
@@ -608,18 +608,8 @@ if($uploaded_file){
 								else{
 									$yesterdayAttQ = $db->select('emp_attendance_detail','*',array('emp_id'=>$emp_id,'eat_id'=>$eatid,'eat_date'=>$fDate));
 									$rya = $db->fetch_array($yesterdayAttQ);
-									$attCount=0;
-									if($rya['am_in'])
-										$attCount++;
-									if($rya['am_out'])
-										$attCount++;
-									if($rya['pm_in'])
-										$attCount++;
-									if($rya['pm_out'])
-										$attCount++;
-									if($attCount >=2 ){
+									if($rya['duty_min']>=60)
 										$holidayCreditAllowed=1;
-									}
 								}
 								$exit=1;
 							}
@@ -906,18 +896,8 @@ if($uploaded_file){
 								else{
 									$yesterdayAttQ = $db->select('emp_attendance_detail','*',array('emp_id'=>$emp_id,'eat_id'=>$eatid,'eat_date'=>$fDate));
 									$rya = $db->fetch_array($yesterdayAttQ);
-									$attCount=0;
-									if($rya['am_in'])
-										$attCount++;
-									if($rya['am_out'])
-										$attCount++;
-									if($rya['pm_in'])
-										$attCount++;
-									if($rya['pm_out'])
-										$attCount++;
-									if($attCount >=2 ){
+									if($rya['duty_min']>=60)
 										$holidayCreditAllowed=1;
-									}
 								}
 								$exit=1;
 							}

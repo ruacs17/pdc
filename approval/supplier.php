@@ -148,14 +148,14 @@ if(count($arrDisp))
 									echo ($eval) ? '<span class="'.$evalClass.'" title="Evaluation Status: '.htmlspecialchars($eval).'" data-rel="tooltip">'.$evalIcon.' '.htmlspecialchars($eval).'</span>' : '';
 								?>
 							</div>
-<?php if(!empty($itm['tin'])): ?>
-    <div style="margin-top: 6px; font-size: 12px; color: #555;">
-        <span style="background: #f8f9fa; border: 1px solid #e9ecef; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; color: #495057;">
-            <i class="halflings-icon tag" style="opacity: 0.6; font-size: 11px;"></i>
-            <strong>TIN:</strong> <span style="font-family: monospace; font-weight: bold;"><?php echo htmlspecialchars($itm['tin']); ?></span>
-        </span>
-    </div>
-<?php endif; ?>
+							<?php if(!empty($itm['tin'])): ?>
+								<div style="margin-top: 6px; font-size: 12px; color: #555;">
+									<span style="background: #f8f9fa; border: 1px solid #e9ecef; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; color: #495057;">
+										<i class="halflings-icon tag" style="opacity: 0.6; font-size: 11px;"></i>
+										<strong>TIN:</strong> <span style="font-family: monospace; font-weight: bold;"><?php echo htmlspecialchars($itm['tin']); ?></span>
+									</span>
+								</div>
+							<?php endif; ?>
 						</div>
 
 						<!-- Middle Section: Address & Contact Details -->

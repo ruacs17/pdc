@@ -47,7 +47,8 @@ if( !empty($eatid) && ($confirmed==0) ){
 	$totalAbsentAmount=0;$sal_type='';
 	$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','DISTINCT eas_id.emp_id',array('eat_id'=>$eatid),'AND eas_id.emp_id=emp.emp_id ORDER BY lname,fname');
 	#echo $db->last_query.'<br>';
-	#$eatid=152;$empid=217;
+	#$eatid=152;
+	#$empid=1213;
 	#$qEmps = $db->select('emp_attendance_personnel eas_id, employee emp','DISTINCT eas_id.emp_id',array('eat_id'=>$eatid,'emp.emp_id'=>$empid),'AND eas_id.emp_id=emp.emp_id ORDER BY lname,fname');
 	while( $rEmps = $db->fetch_array($qEmps)):
 		$totalAbsentAmount=0;$totalAbsent=0;$absent_amount=0;
@@ -127,20 +128,64 @@ if( !empty($eatid) && ($confirmed==0) ){
 					$semiMonthSal = ($txSalMonth) ? ($txSalMonth/2) : 0;
 				}
 				$qEmpAtt = $db->select('emp_attendance_detail','*',array('emp_id'=>$emp_id,'eat_id'=>$eatid),'AND eat_date BETWEEN "'.$db->clean($date_start).'" AND "'.$db->clean($date_end).'" ORDER BY eat_date');
+				#$qEmpAtt = $db->select('emp_attendance_detail','*',array('emp_id'=>1213,'eat_id'=>$eatid),'AND eat_date BETWEEN "2026-06-27" AND "2026-06-27" ORDER BY eat_date');
 				while($rA = $db->fetch_array($qEmpAtt)):
+					$duty_amount=$absent_amount=0;
+					$duty_min = $rA['duty_min'];
+					$tardy_min = ($rA['am_absent'] ||$rA['pm_absent']) ? ($rA['late_min'] + $rA['under_min']) - ($rA['am_absent_min'] + $rA['pm_absent_min']) : ($rA['late_min'] + $rA['under_min']);
+					$am_absent = $rA['am_absent'];
+					$pm_absent = $rA['pm_absent'];
+					$absence_min = $rA['late_min'] + $rA['under_min'];
+					$ot_min = $rA['ot_min'];
 					$empRegDutyMins = $rA['duty_min'];
 					$empRegOTMins = $rA['ot_min'];
 					$totalAbsent = $rA['late_min'] + $rA['under_min'];
 					$att_date = $rA['eat_date'];
 
 					$ot_amount = $empRegOTMins * $wage_minute;
+					#$duty_amount = $empRegDutyMins * $wage_minute;
 
-					$duty_amount = $empRegDutyMins * $wage_minute;
-					//if no duty minutes rendered, it means absent all day, then the absent amount should be equivalent to daily wage
-					if($rA['am_in_assign'] || $rA['am_out_assign'] || $rA['pm_in_assign'] || $rA['pm_out_assign']){
-						#$absent_amount = ($empRegDutyMins) ? $totalAbsent * $wage_minute : $wage_day;
-						$absent_amount = $totalAbsent * $wage_minute;
+					if($sal_type=='flexible'){//for office personnel
+						//if duty minutes is less than 1 hour, marked absent as daily rate not per hour/mins for office employee
+						if( ($duty_min>0) && ($duty_min<60) ){
+							$absent_amount=$wage_day;
+							$duty_amount=0;
+						}
+						else if( !empty($am_absent) && !empty($pm_absent) ){//absent whole day
+							$absent_amount=$wage_day;
+							$duty_amount=0;
+						}
+						else if($duty_min>=60){//duty beyond 1 hour
+							if($am_absent){//deduct the halfday rate
+								$absent_amount+=$wage_day*$am_absent;
+							}
+							if($pm_absent){
+								$absent_amount+=$wage_day*$pm_absent;
+							}
+							if($tardy_min)
+								$absent_amount+=$wage_minute*$tardy_min;
+							if( empty($am_absent) && empty($pm_absent) && empty($tardy_min)){//if no minutes absence, then daily wage
+								$duty_amount=$wage_day;
+							}
+							else{//if there's an absence,compute the per minute way of that day, because sometimes they have 8 or 9 hours.
+								$temp_wage_minutes = $wage_day / ($duty_min+$absence_min);
+								$duty_amount=$temp_wage_minutes * $duty_min;
+							}
+						}
+						else{//absent
+							if($am_absent){//deduct the halfday rate
+								$absent_amount+=$wage_day*$am_absent;
+							}
+							if($pm_absent){
+								$absent_amount+=$wage_day*$pm_absent;
+							}
+						}
 					}
+					else if($sal_type=='fixed'){//for labor group
+						$duty_amount=$duty_min * $wage_minute;
+						$absent_amount=$absence_min * $wage_minute;
+					}
+
 					//Has no schedule duty
 					$retain=1;
 					if( empty($rA['am_in_assign']) && empty($rA['am_out_assign']) && empty($rA['pm_in_assign']) && empty($rA['pm_out_assign']) ){
@@ -154,8 +199,6 @@ if( !empty($eatid) && ($confirmed==0) ){
 						$project_based = $db->getValue('emp_work_status','project_based',array('emp_id'=>$emp_id,'ews_stat'=>$work_status),'ORDER BY ews_date DESC LIMIT 1');
 					}
 
-					//***********LEAVE WITH PAY CHECKING****************
-					//***********LEAVE WITH PAY CHECKING END****************
 
 					//***********HOLIDAY CHECK****************
 					$addPercent=0;
@@ -187,18 +230,8 @@ if( !empty($eatid) && ($confirmed==0) ){
 								else{
 									$yesterdayAttQ = $db->select('emp_attendance_detail','*',array('emp_id'=>$emp_id,'eat_id'=>$eatid,'eat_date'=>$fDate));
 									$rya = $db->fetch_array($yesterdayAttQ);
-									$attCount=0;
-									if($rya['am_in'])
-										$attCount++;
-									if($rya['am_out'])
-										$attCount++;
-									if($rya['pm_in'])
-										$attCount++;
-									if($rya['pm_out'])
-										$attCount++;
-									if($attCount >=2 ){
+									if($rya['duty_min']>=60)
 										$holidayCreditAllowed=1;
-									}
 								}
 								$exit=1;
 							}

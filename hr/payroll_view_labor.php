@@ -356,7 +356,7 @@ if( isset($_REQUEST['c']) ){
 		.table-wrapper tr > :first-child {
 			min-width: 200px;
 			position: -webkit-sticky;
-			position: sticky; 
+			/*position: sticky; */
 			background: hsl(180, 50%, 70%);
 			left: 0; 
 			box-shadow: 0 1px 0 1px black;

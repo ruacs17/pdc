@@ -96,7 +96,8 @@ else{
 
 		$dutyDisplay = ($rA['duty_min']) ? functions::min_to_hour($rA['duty_min']) : '';
 		$otDisplay = ($rA['ot_min']) ? functions::min_to_hour($rA['ot_min']) : '';
-		
+		$duty_amount = $rA['duty_amount'];
+		$absent_amount = $rA['absent_amount'];
 		$absentDay=0;
 		if($rA['am_absent']){
 			$absentDay += $rA['am_absent'];
@@ -108,9 +109,10 @@ else{
 		}
 
 		$lateUnderMins = ( empty($rA['am_absent']) && empty($rA['pm_absent']) ) ? ($rA['late_min'] + $rA['under_min']) : ($rA['late_min'] + $rA['under_min']) - ($rA['am_absent_min']+$rA['pm_absent_min']);
-		$absentDayDisplay = ($absentDay) ? $absentDay.' (day)' : '';
+		$absentDayDisplay = ($absentDay) ? $absentDay : '';
 		$absentHrDisplay = ($absentMin) ? functions::min_to_hour($absentMin).' (hr)' : '';
-		$absentDisplay = ($absentDayDisplay || $absentHrDisplay) ? $absentDayDisplay.' = '.$absentHrDisplay : '';
+		#$absentDisplay = ($absentDayDisplay || $absentHrDisplay) ? $absentDayDisplay.' = '.$absentHrDisplay : '';
+		$absentDisplay = ($absentDayDisplay) ? $absentDayDisplay : '';
 
 		$empRegAmount += $rA['duty_amount'];
 		$empOTAmount += $rA['ot_amount'];
@@ -118,7 +120,7 @@ else{
 
 		$otin = ($rA['ot_in']) ? functions::MilToTwelve($rA['ot_in']) : functions::MilToTwelve($db->getValue('attendance_overtime_detail','actual_start_time',array('emp_id'=>$rA['emp_id'],'actual_start_date'=>$rA['eat_date'])));
 		$otout = ($rA['ot_out']) ? functions::MilToTwelve($rA['ot_out']) : functions::MilToTwelve($db->getValue('attendance_overtime_detail','actual_end_time',array('emp_id'=>$rA['emp_id'],'actual_start_date'=>$rA['eat_date'])));
-		$arrDailyAttendance[] = array('eatd_id'=>$rA['eatd_id'],'dailyName'=>$dailyName,'amin'=>$amin,'amout'=>$amout,'pmin'=>$pmin,'pmout'=>$pmout,'otin'=>$otin,'otout'=>$otout,'dutyHours'=>$rA['duty_min'],'otHours'=>$rA['ot_min'],'late'=>$rA['late_min'],'undertime'=>$rA['under_min'],'dutyDisplay'=>$dutyDisplay,'otDisplay'=>$otDisplay,'absentDisplay'=>$absentDisplay,'bgColor'=>$bgColor,'absentDay'=>$absentDay,'absentMinutes'=>$absentMin,'lateUnderMins'=>$lateUnderMins);
+		$arrDailyAttendance[] = array('eatd_id'=>$rA['eatd_id'],'dailyName'=>$dailyName,'amin'=>$amin,'amout'=>$amout,'pmin'=>$pmin,'pmout'=>$pmout,'otin'=>$otin,'otout'=>$otout,'dutyHours'=>$rA['duty_min'],'otHours'=>$rA['ot_min'],'late'=>$rA['late_min'],'undertime'=>$rA['under_min'],'dutyDisplay'=>$dutyDisplay,'otDisplay'=>$otDisplay,'absentDisplay'=>$absentDisplay,'bgColor'=>$bgColor,'absentDay'=>$absentDay,'absentMinutes'=>$absentMin,'lateUnderMins'=>$lateUnderMins,'duty_amount'=>$duty_amount,'absent_amount'=>$absent_amount);
 	endwhile;
 }
 
@@ -422,7 +424,7 @@ function position($emp_id){
 			color: var(--theme-brown-primary);
 			text-transform: uppercase;
 			letter-spacing: 0.5px;
-			font-size: 11px;
+			font-size: 13px;
 			padding: 8px 10px;
 			border-bottom: 1px solid var(--border-subtle);
 		}
@@ -434,7 +436,7 @@ function position($emp_id){
 		.attendance-table thead tr.head-sub td {
 			color: var(--text-muted);
 			font-weight: 700;
-			font-size: 11px;
+			font-size: 13px;
 			padding: 8px 10px;
 			border-bottom: 1px solid var(--border-subtle);
 		}
@@ -625,27 +627,31 @@ function position($emp_id){
 				</div>
 
 				<div class="table-wrapper">
-					<table class="attendance-table table-hover">
+					<table class="attendance-table table-hover" border="0">
 						<thead>
 							<tr class="head-group">
-								<td width="14%">DATE</td>
+								<td width="10%">DATE</td>
 								<td colspan="2" align="center">Morning</td>
 								<td colspan="2" align="center">Afternoon</td>
 								<td colspan="2" align="center">Overtime</td>
-								<td colspan="4" align="center">Total Summary</td>
+								<td colspan="<?php echo ($sal_type=='fixed') ? 6 : 5; ?>" align="center">Total Summary</td>
 							</tr>
 							<tr class="head-sub">
 								<td>&nbsp;</td>
-								<td width="9%" align="center">In <br><small>Actual (Assigned)</small></td>
-								<td width="9%" align="center">Out <br><small>Actual (Assigned)</small></td>
-								<td width="9%" align="center">In <br><small>Actual (Assigned)</small></td>
-								<td width="9%" align="center">Out <br><small>Actual (Assigned)</small></td>
+								<td width="8%" align="center">In <br><small>Actual (Assigned)</small></td>
+								<td width="8%" align="center">Out <br><small>Actual (Assigned)</small></td>
+								<td width="8%" align="center">In <br><small>Actual (Assigned)</small></td>
+								<td width="8%" align="center">Out <br><small>Actual (Assigned)</small></td>
 								<td width="7%" align="center">In</td>
 								<td width="7%" align="center">Out</td>
-								<td width="10%" align="center">Duty</td>
-								<td width="9%" align="center">Overtime</td>
-								<td width="10%" align="center">Absent</td>
-								<td width="10%" align="center">Tardy / Under</td>
+								<td width="7%" align="center">Duty</td>
+								<td width="7%" align="center">Overtime</td>
+								<td width="7%" align="center">Absent (day)</td>
+								<td width="7%" align="center">Tardy / Under</td>
+								<?php if($sal_type=='fixed'){ ?>
+								<td width="7%" align="center">Earning</td>
+								<?php } ?>
+								<td width="7%" align="center">Deduction</td>
 							</tr>
 						</thead>
 						<tbody>
@@ -654,7 +660,7 @@ function position($emp_id){
 								if($sal_type=='flexible')
 									$empAbsentAmount = ($es_salary / 2);
 							}
-							$totalLateUnderMins=$totalAbsent=0;$totalLate=0;$totalUnder=0;$countAtt=0;$totalAbsentDay=0;$totalAbsentMinutes=0;
+							$totalDutyAmount=$totalAbsentAmount=$totalLateUnderMins=$totalAbsent=0;$totalLate=0;$totalUnder=0;$countAtt=0;$totalAbsentDay=0;$totalAbsentMinutes=0;
 							foreach($arrDailyAttendance as $dly):
 								$countAtt++;
 								$totalAbsent += ($dly['late'] + $dly['undertime']);
@@ -664,6 +670,8 @@ function position($emp_id){
 								$totalAbsentDay+=$dly['absentDay'];
 								$totalAbsentMinutes+=$dly['absentMinutes'];
 								$totalLateUnderMins+=$dly['lateUnderMins'];
+								$totalDutyAmount+=$dutyAmount=$dly['duty_amount'];
+								$totalAbsentAmount+=$absentAmount=$dly['absent_amount'];
 							?>
 							<tr id="rw<?php echo $rID;?>" <?php echo $dly['bgColor']?>>
 								<td>
@@ -684,6 +692,10 @@ function position($emp_id){
 								<td align="center"><?php echo $dly['otDisplay'];?></td>
 								<td align="center"><?php echo $dly['absentDisplay'];?></td>
 								<td align="center"><?php echo ($dly['lateUnderMins']>0) ? functions::min_to_hour($dly['lateUnderMins']) : '';?></td>
+								<?php if($sal_type=='fixed'){ ?>
+								<td align="center"><div title="<?php echo ($dutyAmount) ? functions::formatMoney($dutyAmount,'~') : '';?>"><?php echo ($dutyAmount) ? functions::formatMoney($dutyAmount,2) : '';?></div></td>
+								<?php } ?>
+								<td align="center"><div title="<?php echo ($dutyAmount) ? functions::formatMoney($dutyAmount,'~') : '';?>"><?php echo ($absentAmount) ? functions::formatMoney($absentAmount,2) : '';?></div></td>
 							</tr>
 							<?php endforeach;?>
 						</tbody>
@@ -692,53 +704,13 @@ function position($emp_id){
 								<td colspan="7" align="right" style="font-weight:700;">Total Hours &nbsp;&nbsp;</td>
 								<td align="center"><strong><?php echo ($regularDutyHours) ? functions::min_to_hour($regularDutyHours) : '';?></strong></td>
 								<td align="center"><strong><?php echo ($otDutyHours) ? functions::min_to_hour($otDutyHours) : '';?></strong></td>
-								<td align="center"><strong><?php echo ($totalAbsentMinutes) ? functions::min_to_hour($totalAbsentMinutes) : '';?></strong></td>
+								<td align="center"><strong><?php echo ($totalAbsentMinutes) ? $totalAbsentDay : '';?></strong></td>
 								<td align="center"><strong><?php echo ($totalLateUnderMins) ? functions::min_to_hour($totalLateUnderMins) : ''; ?></strong></td>
+								<?php if($sal_type=='fixed'){ ?>
+								<td align="center"><div class="payout-pill" title="<?php echo functions::formatMoney($totalDutyAmount,'~'); ?>"><?php echo functions::formatMoney($totalDutyAmount,2); ?></div></td>
+								<?php } ?>
+								<td align="center"><div class="payout-pill deduction-pill" title="<?php echo functions::formatMoney($totalAbsentAmount,'~'); ?>"><?php echo functions::formatMoney($totalAbsentAmount,2); ?></div></td>
 							</tr>
-							<tr>
-								<td colspan="7" align="right" style="font-weight:700;">Amount &nbsp;&nbsp;</td>
-								<td align="center">
-									<?php if( $sal_type=='fixed' && $regularDutyHours ){ ?>
-										<div class="payout-pill" title="<?php echo functions::formatMoney($regularDutyHours*$es_minute,'~'); ?>">
-											<strong><?php echo functions::formatMoney($regularDutyHours*$es_minute,'3'); ?></strong>
-										</div>
-									<?php } ?>
-								</td>
-								<td align="center">
-									<?php if( $otDutyHours ){ ?>
-										<div class="payout-pill" title="<?php echo functions::formatMoney($otDutyHours*$es_minute,'~'); ?>">
-											<strong><?php echo functions::formatMoney($otDutyHours*$es_minute,'3'); ?></strong>
-										</div>
-									<?php } ?>
-								</td>
-								<td align="center" class="rwAbsent">
-									<?php if( $totalAbsentMinutes ){ ?>
-										<div class="payout-pill deduction-pill" title="<?php echo functions::formatMoney(($totalAbsentMinutes*$es_minute),'~'); ?>">
-											<strong><?php echo functions::formatMoney(($totalAbsentMinutes*$es_minute),'3'); ?></strong>
-										</div>
-									<?php } ?>
-								</td>
-								<td align="center" class="rwAbsent">
-									<?php if( $totalLateUnderMins ){ ?>
-										<div class="payout-pill deduction-pill" title="<?php echo functions::formatMoney($totalLateUnderMins*$es_minute,'~'); ?>">
-											<strong><?php echo functions::formatMoney($totalLateUnderMins*$es_minute,'3'); ?></strong>
-										</div>
-									<?php } ?>
-								</td>
-							</tr>
-							<!-- Optional Summary Row across Deduction Columns -->
-							<?php if ( $totalAbsentMinutes && $totalLateUnderMins ) { ?>
-							<tr>
-								<td colspan="9" align="right" style="font-weight: 700; color: var(--theme-red-deduction);">
-									Total Combined Deductions (Absent + Tardy): &nbsp;&nbsp;
-								</td>
-								<td colspan="2" align="center">
-									<div class="payout-pill deduction-pill" style="padding: 6px 16px; font-size: 13px;">
-										<strong><?php echo functions::formatMoney($grandTotalDeductionAmount, '3'); ?></strong>
-									</div>
-								</td>
-							</tr>
-							<?php } ?>
 						</tfoot>
 					</table>
 				</div>
