@@ -44,7 +44,7 @@ while($rDisp = $db->fetch_array($qDisp)):
 	$contact .= ($rDisp['contactPhoneNo2']) ? $rDisp['contactPhoneNo2'].'<br>' : '';
 	$contact .= ($rDisp['contactCellNo']) ? $rDisp['contactCellNo'].'<br>' : '';
 	$contact .= ($rDisp['contactCellNo2']) ? $rDisp['contactCellNo2'].'<br>' : '';
-	$arrDisp[] = array('supplierID'=>$rDisp['supplierID'],'name'=>$rDisp['name'],'address'=>$rDisp['address'],'contactPhoneNo'=>$contact,'business_type'=>$rDisp['business_type'],'accredited'=>$rDisp['accredited'],'evaluated'=>$rDisp['evaluated'],'vat'=>$rDisp['vat'],'tin'=>$rDisp['tin']);
+	$arrDisp[] = array('supplierID'=>$rDisp['supplierID'],'name'=>$rDisp['name'],'address'=>$rDisp['address'],'contactPhoneNo'=>$contact,'business_type'=>$rDisp['business_type'],'accredited'=>$rDisp['accredited'],'evaluated'=>$rDisp['evaluated'],'vat'=>$rDisp['vat'],'tin'=>$rDisp['tin'],'bank1'=>$rDisp['bank1'],'bank2'=>$rDisp['bank2'],'bank3'=>$rDisp['bank3']);
 endwhile;
 if(count($arrDisp))
 	functions::sortMultiArray($arrDisp,$orderBy,$sort_AscDesc);
@@ -162,9 +162,36 @@ if(count($arrDisp))
 						<div style="flex: 2; padding-right: 15px; font-size: 12px; color: #555; border-left: 1px solid #f0f0f0; border-right: 1px solid #f0f0f0; padding-left: 15px;">
 							<p style="margin: 0 0 4px 0;"><strong>Address:</strong> <?php echo htmlspecialchars($itm['address'] ? $itm['address'] : 'No address provided'); ?></p>
 							<?php if($itm['contactPhoneNo']): ?>
-								<p style="margin: 0;"><strong>Contact Numbers:</strong><br><?php echo $itm['contactPhoneNo']; ?></p>
+								<p style="margin: 0 0 8px 0;"><strong>Contact Numbers:</strong><br><?php echo $itm['contactPhoneNo']; ?></p>
+							<?php endif; ?>
+							
+							<!-- Enhanced Bank Accounts Section -->
+							<?php if($itm['bank1'] || $itm['bank2'] || $itm['bank3']): ?>
+								<div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e0e0e0;">
+									<div style="font-weight: bold; color: #444; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
+										<i class="halflings-icon credit-card" style="opacity: 0.6; font-size: 11px;"></i> Bank Accounts:
+									</div>
+									<div style="display: flex; flex-direction: column; gap: 3px;">
+										<?php if($itm['bank1']){ ?>
+											<div style="background: #fdfdfd; border: 1px solid #eaeaea; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 11px; color: #333;">
+												<?php echo htmlspecialchars($itm['bank1']); ?>
+											</div>
+										<?php } ?>
+										<?php if($itm['bank2']){ ?>
+											<div style="background: #fdfdfd; border: 1px solid #eaeaea; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 11px; color: #333;">
+												<?php echo htmlspecialchars($itm['bank2']); ?>
+											</div>
+										<?php } ?>
+										<?php if($itm['bank3']){ ?>
+											<div style="background: #fdfdfd; border: 1px solid #eaeaea; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 11px; color: #333;">
+												<?php echo htmlspecialchars($itm['bank3']); ?>
+											</div>
+										<?php } ?>
+									</div>
+								</div>
 							<?php endif; ?>
 						</div>
+
 						<?php if($allowSupplierManage){ ?>
 						<!-- Right Section: Actions with Spacing -->
 						<div style="flex: 0 0 90px; text-align: right; display: flex; gap: 8px; justify-content: flex-end; align-items: center;">

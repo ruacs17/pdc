@@ -729,7 +729,7 @@ endwhile;
 										<td><div align="center"><?php echo $pd['totalDayRequired'];?></div></td>
 										<td><div align="center"><?php echo $pd['totalDayPresent'];?></div></td>
 										<?php } ?>
-										<td><div align="center"><?php echo ($pd['totalDayAbsent'] > 1) ? $pd['totalDayAbsent'] : '';?></div></td>
+										<td><div align="center"><?php echo ($pd['totalDayAbsent'] > 0) ? $pd['totalDayAbsent'] : '';?></div></td>
 										<td><div align="center"><?php echo ($pd['overtime_hours']) ? functions::min_to_hour($pd['overtime_hours']) : '';?></div></td>
 										<?php if($worker_type=='labor'){ ?>
 										<td><div align="center"><?php echo ($totalDutyHours) ? functions::min_to_hour($totalDutyHours) : '';?></div></td>
