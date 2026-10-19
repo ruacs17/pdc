@@ -104,73 +104,101 @@ if(count($arrDisp))
 			</div>
 
 			<!-- Full-Width List Container -->
-			<div style="display: flex; flex-direction: column; gap: 10px; width: 100%; box-sizing: border-box;" id="tblist">
+			<div style="display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box;" id="tblist">
 			<?php if(count($arrDisp) > 0): ?>
 				<?php foreach($arrDisp as $itm):?>
-					<div id="rw<?php echo $itm['supplierID']?>" style="background: #fff; border: 1px solid #e0e0e0; border-radius: 6px; padding: 15px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: flex; justify-content: space-between; align-items: center; width: 100%; box-sizing: border-box;">
+					<div id="rw<?php echo $itm['supplierID']?>" style="background: #fff; border: 1px solid #e0e0e0; border-radius: 8px; padding: 18px 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.03); display: flex; flex-direction: column; gap: 12px; width: 100%; box-sizing: border-box;">
 						
-						<!-- Left Section: Name, Type & Badges -->
-						<div style="flex: 2; padding-right: 15px;">
-							<div style="font-size: 15px; font-weight: bold; color: #333; margin-bottom: 6px;">
-								<?php echo htmlspecialchars($itm['name']); ?>
-								<?php echo ($itm['vat']) ? '<small style="font-weight: normal; color: #777;">('.htmlspecialchars($itm['vat']).')</small>' : '';?>
-							</div>
-							<div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap; font-size: 12px;">
-								<span style="color: #666;"><strong>Business Type:</strong> <span style="background: #f1f1f1; padding: 2px 8px; border-radius: 4px; color: #333;"><?php echo htmlspecialchars($itm['business_type'] ? $itm['business_type'] : 'General'); ?></span></span>
-								<?php 
-									// Accreditation Badge Styling
-									$acc = $itm['accredited'];
-									$badgeClass = 'label';
-									if($acc == 'Accredited') $badgeClass .= ' label-success';
-									elseif($acc == 'Pre-Accredited') $badgeClass .= ' label-warning';
-									elseif($acc == 'Not Accredited') $badgeClass .= ' label-important';
-									
-									echo ($acc) ? '<span class="'.$badgeClass.'">'.htmlspecialchars($acc).'</span>' : '';
-
-									// Evaluation Badge Styling & Icons (Clean visual indicator without "Eval:" text)
-									$eval = $itm['evaluated'];
-									$evalClass = 'label';
-									$evalIcon = '';
-									if($eval == 'Pass' || $eval == 'Passed') {
-										$evalClass .= ' label-success';
-										$evalIcon = '<i class="halflings-icon white ok"></i>';
-									} elseif($eval == 'Evaluated') {
-										$evalClass .= ' label-info';
-										$evalIcon = '<i class="halflings-icon white eye-open"></i>';
-									} elseif($eval == 'Failed') {
-										$evalClass .= ' label-important';
-										$evalIcon = '<i class="halflings-icon white remove"></i>';
-									} else { // N/A or default
-										$evalClass .= ' label-default';
-										$evalIcon = '<i class="halflings-icon white minus"></i>';
-									}
-									
-									echo ($eval) ? '<span class="'.$evalClass.'" title="Evaluation Status: '.htmlspecialchars($eval).'" data-rel="tooltip">'.$evalIcon.' '.htmlspecialchars($eval).'</span>' : '';
-								?>
-							</div>
-							<?php if(!empty($itm['tin'])): ?>
-								<div style="margin-top: 6px; font-size: 12px; color: #555;">
-									<span style="background: #f8f9fa; border: 1px solid #e9ecef; padding: 2px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 4px; color: #495057;">
-										<i class="halflings-icon tag" style="opacity: 0.6; font-size: 11px;"></i>
-										<strong>TIN:</strong> <span style="font-family: monospace; font-weight: bold;"><?php echo htmlspecialchars($itm['tin']); ?></span>
+						<!-- Card Header: Name, Badges, and Actions -->
+						<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 15px;">
+							<div style="display: flex; flex-direction: column; gap: 6px; flex: 1;">
+								<div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+									<span style="font-size: 16px; font-weight: bold; color: #222;">
+										<?php echo htmlspecialchars($itm['name']); ?>
 									</span>
+									<?php echo ($itm['vat']) ? '<span style="background: #eef2f7; color: #334155; padding: 1px 6px; border-radius: 4px; font-size: 11px; font-weight: 600;">'.htmlspecialchars($itm['vat']).'</span>' : '';?>
+									
+									<!-- Accreditation & Evaluation Badges -->
+									<div style="display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+										<?php 
+											$acc = $itm['accredited'];
+											$badgeClass = 'label';
+											if($acc == 'Accredited') $badgeClass .= ' label-success';
+											elseif($acc == 'Pre-Accredited') $badgeClass .= ' label-warning';
+											elseif($acc == 'Not Accredited') $badgeClass .= ' label-important';
+											echo ($acc) ? '<span class="'.$badgeClass.'">'.htmlspecialchars($acc).'</span>' : '';
+
+											$eval = $itm['evaluated'];
+											$evalClass = 'label';
+											$evalIcon = '';
+											if($eval == 'Pass' || $eval == 'Passed') {
+												$evalClass .= ' label-success';
+												$evalIcon = '<i class="halflings-icon white ok"></i>';
+											} elseif($eval == 'Evaluated') {
+												$evalClass .= ' label-info';
+												$evalIcon = '<i class="halflings-icon white eye-open"></i>';
+											} elseif($eval == 'Failed') {
+												$evalClass .= ' label-important';
+												$evalIcon = '<i class="halflings-icon white remove"></i>';
+											} else {
+												$evalClass .= ' label-default';
+												$evalIcon = '<i class="halflings-icon white minus"></i>';
+											}
+											echo ($eval) ? '<span class="'.$evalClass.'" title="Evaluation Status: '.htmlspecialchars($eval).'" data-rel="tooltip">'.$evalIcon.' '.htmlspecialchars($eval).'</span>' : '';
+										?>
+									</div>
 								</div>
-							<?php endif; ?>
+								
+								<!-- Sub-header metadata (Business Type & TIN) -->
+								<div style="display: flex; gap: 15px; font-size: 12px; color: #666; align-items: center; flex-wrap: wrap;">
+									<span><strong>Business Type:</strong> <span style="background: #f1f1f1; padding: 2px 8px; border-radius: 4px; color: #333;"><?php echo htmlspecialchars($itm['business_type'] ? $itm['business_type'] : 'General'); ?></span></span>
+									<?php if(!empty($itm['tin'])): ?>
+										<span><strong>TIN:</strong> <span style="font-family: monospace; font-weight: bold; color: #444;"><?php echo htmlspecialchars($itm['tin']); ?></span></span>
+									<?php endif; ?>
+								</div>
+							</div>
+
+							<?php if($allowSupplierManage){ ?>
+							<!-- Action Buttons -->
+							<div style="display: flex; gap: 6px; align-items: center; flex-shrink: 0;">
+								<a id="vw<?php echo $itm['supplierID']?>" class="btn btn-mini btn-success thickbox" title="View Supplier Details" data-rel="tooltip" onclick="showThis(this.id,'supplier_view.php?sid=<?php echo functions::encode($itm['supplierID']);?>','Supplier Detail','1')"><i class="halflings-icon white zoom-in"></i></a>
+								<a id="edit<?php echo $itm['supplierID']?>" class="btn btn-mini btn-info thickbox" title="Modify Supplier" data-rel="tooltip" onclick="showThis(this.id,'supplier_edit.php?sid=<?php echo functions::encode($itm['supplierID']);?>','Supplier Detail')"><i class="halflings-icon white pencil"></i></a>
+							</div>
+							<?php } ?>
 						</div>
 
-						<!-- Middle Section: Address & Contact Details -->
-						<div style="flex: 2; padding-right: 15px; font-size: 12px; color: #555; border-left: 1px solid #f0f0f0; border-right: 1px solid #f0f0f0; padding-left: 15px;">
-							<p style="margin: 0 0 4px 0;"><strong>Address:</strong> <?php echo htmlspecialchars($itm['address'] ? $itm['address'] : 'No address provided'); ?></p>
-							<?php if($itm['contactPhoneNo']): ?>
-								<p style="margin: 0 0 8px 0;"><strong>Contact Numbers:</strong><br><?php echo $itm['contactPhoneNo']; ?></p>
-							<?php endif; ?>
+						<!-- Card Divider -->
+						<div style="border-top: 1px solid #eee; margin: 2px 0;"></div>
+
+						<!-- Card Body Details: 3-Column Structured Layout -->
+						<div style="display: flex; gap: 20px; font-size: 12px; color: #555; flex-wrap: wrap;">
 							
-							<!-- Enhanced Bank Accounts Section -->
-							<?php if($itm['bank1'] || $itm['bank2'] || $itm['bank3']): ?>
-								<div style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #e0e0e0;">
-									<div style="font-weight: bold; color: #444; margin-bottom: 4px; display: flex; align-items: center; gap: 4px;">
-										<i class="halflings-icon credit-card" style="opacity: 0.6; font-size: 11px;"></i> Bank Accounts:
-									</div>
+							<!-- Column 1: Address -->
+							<div style="flex: 1; min-width: 200px;">
+								<div style="font-weight: bold; color: #444; margin-bottom: 3px; display: flex; align-items: center; gap: 4px;">
+									<i class="halflings-icon map-marker" style="opacity: 0.6; font-size: 11px;"></i> Address:
+								</div>
+								<div style="color: #666; line-height: 1.4;">
+									<?php echo htmlspecialchars($itm['address'] ? $itm['address'] : 'No address provided'); ?>
+								</div>
+							</div>
+
+							<!-- Column 2: Contact Numbers -->
+							<div style="flex: 1; min-width: 180px;">
+								<div style="font-weight: bold; color: #444; margin-bottom: 3px; display: flex; align-items: center; gap: 4px;">
+									<i class="halflings-icon phone" style="opacity: 0.6; font-size: 11px;"></i> Contact Numbers:
+								</div>
+								<div style="color: #666; line-height: 1.4;">
+									<?php echo $itm['contactPhoneNo'] ? $itm['contactPhoneNo'] : '<span class="muted">None provided</span>'; ?>
+								</div>
+							</div>
+
+							<!-- Column 3: Bank Accounts -->
+							<div style="flex: 1; min-width: 200px;">
+								<div style="font-weight: bold; color: #444; margin-bottom: 3px; display: flex; align-items: center; gap: 4px;">
+									<i class="halflings-icon credit-card" style="opacity: 0.6; font-size: 11px;"></i> Bank Accounts:
+								</div>
+								<?php if($itm['bank1'] || $itm['bank2'] || $itm['bank3']): ?>
 									<div style="display: flex; flex-direction: column; gap: 3px;">
 										<?php if($itm['bank1']){ ?>
 											<div style="background: #fdfdfd; border: 1px solid #eaeaea; padding: 2px 6px; border-radius: 3px; font-family: monospace; font-size: 11px; color: #333;">
@@ -188,17 +216,12 @@ if(count($arrDisp))
 											</div>
 										<?php } ?>
 									</div>
-								</div>
-							<?php endif; ?>
-						</div>
+								<?php else: ?>
+									<div class="muted" style="color: #999;">No bank accounts listed</div>
+								<?php endif; ?>
+							</div>
 
-						<?php if($allowSupplierManage){ ?>
-						<!-- Right Section: Actions with Spacing -->
-						<div style="flex: 0 0 90px; text-align: right; display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
-							<a id="vw<?php echo $itm['supplierID']?>" class="btn btn-mini btn-success thickbox" title="View Supplier Details" data-rel="tooltip" onclick="showThis(this.id,'supplier_view.php?sid=<?php echo functions::encode($itm['supplierID']);?>','Supplier Detail','1')"><i class="halflings-icon white zoom-in"></i></a>
-							<a id="edit<?php echo $itm['supplierID']?>" class="btn btn-mini btn-info thickbox" title="Modify Supplier" data-rel="tooltip" onclick="showThis(this.id,'supplier_edit.php?sid=<?php echo functions::encode($itm['supplierID']);?>','Supplier Detail')"><i class="halflings-icon white pencil"></i></a>
 						</div>
-						<?php } ?>
 
 					</div>
 				<?php endforeach;?>
